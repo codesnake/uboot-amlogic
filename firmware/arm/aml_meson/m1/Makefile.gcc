@@ -1,0 +1,70 @@
+
+
+include $(TOPDIR)/config.mk
+ifdef SOC
+LDSCRIPT= $(TOPDIR)/firmware/$(ARCH)/$(CPU)/$(SOC)/u-boot.lds
+T=$(TOPDIR)/firmware/$(ARCH)/$(CPU)/$(SOC)/Makefile
+else
+LDSCRIPT= $(TOPDIR)/firmware/$(ARCH)/$(CPU)/u-boot.lds
+T=$(TOPDIR)/firmware/$(ARCH)/$(CPU)/Makefile
+endif
+LDFLAGS	= -Bstatic -T $(obj)firmware.lds  $(PLATFORM_LDFLAGS)
+BURNLDFLAGS	= -Bstatic -T $(obj)burner.lds  $(PLATFORM_LDFLAGS) 
+#AFLAGS	+= -DAML_DEBUG_ROM -DTEXT_BASE=$(TEXT_BASE)  -I$(OBJTREE)
+#CFLAGS	+= -DAML_DEBUG_ROM -DTEXT_BASE=$(TEXT_BASE)  -I$(OBJTREE)
+#CFLAGS :=  -g --cpu cortex-a9  -Ospace  --c99 -W  --thumb \
+#				 $(filter -D%,$(CFLAGS)) $(filter -I%,$(CFLAGS))
+#-Ospace 
+#LDFLAGS = --cpu cortex-a9 --info totals --info unused --info inputs --scatter firmware.scat --entry _start --keep=rom_spl_arm.o\(.magic\)
+#AFLAGS = -g --cpu cortex-a9  $(filter -I%,$(CFLAGS))
+ 
+CFLAGS	:=$(CFLAGS:-marm=-mthumb)
+CFLAGS	:=$(CFLAGS:-mthumb-interwork=)
+CFLAGS	:=$(CFLAGS:-O=)
+CFLAGS	+=  -DCONFIG_AMLROM_SPL -DTEXT_BASE=$(TEXT_BASE) -MD
+AFLAGS	+= -DCONFIG_AMLROM_SPL -DTEXT_BASE=$(TEXT_BASE) -MD 
+
+#CC=armcc --translate_gcc --gnu --c99 
+
+
+SOBJS	= rom_spl.o magic.o
+COBJS	= spl.o   
+				
+OBJS	:= $(addprefix $(obj),$(SOBJS)  )
+__OBJS	:= $(SOBJS) $(COBJS)
+BURNOBJS:= $(addprefix $(obj),$(SOBJS) $(COBJS) burn.o )
+VPATH_LIST=	$(TOPDIR)/board/$(BOARDDIR) \
+						$(SRCTREE)/$(CPUDIR)/$(SOC) \
+						$(SRCTREE)/$(CPUDIR)/common	\
+						$(SRCTREE)/$(CPUDIR)  			\
+						$(SRCTREE)/common
+VPATH_LIST:=$(VPATH_LIST:%=%/firmware)											
+CFLAGS+=$(VPATH_LIST:%=-I%)					
+vpath %.c $(VPATH_LIST)
+vpath %.S $(VPATH_LIST)
+vpath %.s $(VPATH_LIST)
+
+ALL	= $(FIRMWARE) $(dir $(FIRMWARE))aml-debug-rom.bin \
+			$(basename $(FIRMWARE)).out $(dir $(FIRMWARE))aml-debug-rom.out
+ELFFILES=$(basename $(FIRMWARE)).out $(dir $(FIRMWARE))aml-debug-rom.out
+
+all:	 $(ALL) $(ELFFILES)
+
+
+	
+%.bin:	%.out
+	$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+$(basename $(FIRMWARE)).out:$(OBJS) $(obj)spl.o $(obj)firmware.lds
+$(dir $(FIRMWARE))aml-debug-rom.out:$(OBJS) $(obj)debugrom.o $(obj)firmware.lds
+%.out:
+	$(LD) $(LDFLAGS) $(filter %.o,$^) $(EXTERN_LIB)\
+		-Map $(@:%=%.map) --cref \
+		-o $@
+$(obj)firmware.lds:firmware.lds
+	$(CPP) $(CPPFLAGS) -DEND_ADDR=0x49001800  $(LDPPFLAGS) -std=c99 -D__ASSEMBLY__ -P - <$^ >$@
+
+sinclude $(wildcard $(obj)*.d)
+
+
+
+#########################################################################

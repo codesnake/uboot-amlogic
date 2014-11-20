@@ -1,0 +1,120 @@
+# ------------------------------------------------------------
+# Makefile for ROM BOOT CODE
+# ------------------------------------------------------------
+include $(TOPDIR)/config.mk
+
+ARCCC = arc-elf32-em4-gcc
+ARCASM = arc-elf32-em4-as
+ARCLD = arc-elf32-em4-ld
+ifeq ($(OS),Windows_NT)
+MKDIR=if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+else
+MKDIR=mkdir -p $(1)
+endif
+
+ARCOBJCOPY = arc-elf32-em4-objcopy
+ARCDUMPELF = arc-elf32-em4-elfdump
+ARCDUMP_FLAGS = -z
+ARCCPP=arc-elf32-em4-cpp
+
+#ARCCC_FLAGS = -mA7 -mno-volatile-cache -O2 -D__ARC__ -DCONFIG_ARC -I. -Iinclude -Wall
+
+#BASEFLAGS = -arcv2em -core1 -Xcd -Xbs -DAML_ARCEM4
+BASEFLAGS = -mARCv2EM  
+#CC_FLAGS = $(BASEFLAGS) -O -HL -Hnocrt -Hnolib  -I$(ucode) -c $(CC_FLAGS_ADD) -DARC6 -DAO_ARC
+CC_FLAGS = $(BASEFLAGS) -O  -c $(CC_FLAGS_ADD) 
+#ASM_FLAGS = $(BASEFLAGS) -HL -Hnocrt -Hnolib $(ASM_FLAGS_ADD) -I$(ucode) -c  $(ASM_FLAGS_ADD)
+#LD_FLAGS =  -Bbase=0x00000000 -L${METAWARE_ROOT}/arc/lib/av2em/le -l ct -l mw 
+#DUMP_FLAGS = -z 
+
+
+ARCCC_FLAGS = $(CC_FLAGS) -Iinclude -Wall
+ARCCC_FLAGS += -g -MD -mno-sdata -fno-builtin -ffreestanding -nostdinc -isystem -pipe -fomit-frame-pointer
+AARCC_FLAGS += -Wstrict-prototypes -fno-stack-protector -D__KERNEL__ -mno-cond-exec
+ARCCC_FLAGS += -I./include/ -I$(TOPDIR)/arch/arm/include/asm/arch-m8/ -I$(TOPDIR)/arch/arm/include/ -I$(TOPDIR)/arch/arm/include/asm/ -I$(TOPDIR)/build/include
+ARCCC_FLAGS += -include $(TOPDIR)/build/include/config.h -I $(TOPDIR)/include/ -I $(TOPDIR)/arch/arm/include/
+
+ifdef CONFIG_SUPPORT_CUSOTMER_BOARD
+VPATH_LIST = $(TOPDIR)/customer/board/$(BOARD) \
+		$(SRCTREE)/$(CPUDIR)/$(SOC)  \
+		$(SRCTREE)/$(CPUDIR)
+else
+VPATH_LIST=	$(TOPDIR)/board/$(BOARDDIR) \
+		$(SRCTREE)/$(CPUDIR)/$(SOC) \
+		$(SRCTREE)/$(CPUDIR)
+endif
+
+VPATH_LIST:=$(VPATH_LIST:%=%/firmware/arc_power/)
+ARCCC_FLAGS += $(VPATH_LIST:%=-I%)
+vpath %.c $(VPATH_LIST)
+
+ARCCC_FLAGS += -I.
+
+ARCASM_FLAGS = -D__ASSEMBLY__ $(CC_FLAGS)
+
+ARCGCCLIBPATH=$(dir $(shell $(ARCCC) -print-libgcc-file-name))
+
+ARCCOPY_FLAGS= -I elf32-little -O binary
+
+obj =$(SRCTREE)/build/arc_power/
+
+ARCLD_FLAGS   =  -Bstatic -T $(obj)romboot.lds -L$(ARCGCCLIBPATH) -lgcc 
+ARCLD_FLAGS += -marcelf 
+define MAP_OUT_OPTION
+	  -Map $(obj)code_elf.map
+endef
+
+
+#CSRCS = $(wildcard *.c lib/*.c)
+CSRCS = i2c.c arc_pwr.c mmc.c lib/*.c
+OBJS = $(CSRCS:%.c=$(obj)%.o)
+
+#all : clean $(obj)code_elf.out 
+all : clean $(obj)code_elf.out $(obj)arc_pwr.bin
+
+$(obj)arc_pwr.bin: $(obj)code_elf.out
+	$(ARCOBJCOPY) -I elf32-little --gap-fill=0xff -O binary $< $@
+
+$(obj)code_elf.out: $(obj)romboot.lds Makefile  $(obj)start_arc.o $(OBJS)
+	$(ARCLD) $(ARCLD_FLAGS) $(filter %.o,$^)  $(MAP_OUT_OPTION) --cref -o $@
+ifneq ($(OS),Windows_NT)	
+	$(ARCOBJCOPY) -I elf32-little --gap-fill=0xff -O binary $@ $(@:%.out=%.bin)
+endif	
+	./bin2code arc_code $(obj)code_elf.bin $(SRCTREE)/build/include2/arc_code.dat
+
+down: $(obj)code_elf.out	
+	mdb -jtag -OKN $<
+	
+$(obj)%.o:	%.s
+	@$(call MKDIR, $(@D))
+	$(ARCCC)  $(ARCASM_FLAGS)  \
+		-o $@ $< -c
+		
+$(obj)%.o:	%.S
+	@$(call MKDIR, $(@D))
+	$(ARCCC)   $(ASM_FLAGS)  \
+		-o $@ $< -c		
+		
+$(obj)%.S:	%.s
+	@$(call MKDIR, $(@D))
+	$(ARCCPP) -I. -ansi -D__ASSEMBLY__ -MD -MT $@ -E $< -o $@	
+	
+$(obj)%.o:	%.c
+	@$(call MKDIR, $(@D))
+	$(ARCCC)  $(ARCCC_FLAGS) -o $@ $< -c
+	
+clean:
+	rm -r -f $(obj)
+	rm -f $(SRCTREE)/build/include2/arc_code.dat
+	
+help:
+	@echo "test arc_power"
+	@echo "VPATH_LIST="$(VPATH_LIST)
+	@echo "SRCTREE="$(SRCTREE)
+	@echo "CPUDIR="$(CPUDIR)
+	@echo "SOC="$(SOC)
+
+$(obj)romboot.lds: romboot.lds
+	@$(call MKDIR, $(@D))	
+	$(ARCCPP) $(ARCCPPFLAGS) $(ARCLDPPFLAGS) -std=c99 -D__ASSEMBLY__ -P - <$^ >$@
+-include $(wildcard $(OBJS:%.o=%.d))

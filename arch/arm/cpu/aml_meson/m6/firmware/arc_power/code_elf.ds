@@ -1,0 +1,2201 @@
+MetaWare ELF Dumper 3.2.25 (C) Copyright 2000-2008, ARC International.
+Dump of "code_elf.out":
+Content of section .start (#1) size=0x20 start=0x54
+_start:
+   0: 20200f80 00000008        j	boot_start		; boot_start
+boot_start:
+   8: 240a3f80 00040000        mov	%sp,0x4_0000		; 0x4_0000 = ddr_settings+0x3dcf4
+  10: 0d160080                 bl	main
+  14: 264a7000                 nop
+  18: 00010000                 b	0x18 = boot_start+16
+  1c: 264a7000                 nop
+Content of section .text (#2) size=0x1c82 start=0x74
+clk_util_clk_msr:
+  20: 1cfcb6c8                 push	%fp
+  24: 230a3700                 mov	%fp,%sp
+  28: 70b8                     mov_s	%r5,%r0
+  2a: d800                     mov_s	%r0,0
+  2c: 240a0f80 c1108780        mov	%r4,0xc110_8780		; 0xc110_8780 = .regmask_lo+0x2908a741
+  34: 1cdc8020                 st.di	%r0,[%r4,-36]
+  38: 14dc8803                 ld.di	%r3,[%r4,-36]
+  3c: 23040f83 ffff0000        and	%r3,%r3,0xffff_0000		; 0xffff_0000 = .regmask_lo+0x67f71fc1
+  44: 6909                     sub_s	%r0,%r1,1
+  46: 7865                     or_s	%r0,%r0,%r3
+  48: 1cdc8020                 st.di	%r0,[%r4,-36]
+  4c: 14dc8800                 ld.di	%r0,[%r4,-36]
+  50: 20040f80 fff9ffff        and	%r0,%r0,0xfff9_ffff		; 0xfff9_ffff = .regmask_lo+0x67f21fc0
+  58: 1cdc8020                 st.di	%r0,[%r4,-36]
+  5c: 14dc8803                 ld.di	%r3,[%r4,-36]
+  60: 23040f83 ff06ffff        and	%r3,%r3,0xff06_ffff		; 0xff06_ffff = .regmask_lo+0x66ff1fc0
+  68: 2d400500                 asl	%r0,%r5,20
+  6c: 20050f80 00090000        or	%r0,%r0,0x9_0000		; 0x9_0000 = ddr_settings+0x8dcf4
+  74: 7865                     or_s	%r0,%r0,%r3
+  76: 1cdc8020                 st.di	%r0,[%r4,-36]
+  7a: 14dc8800                 ld.di	%r0,[%r4,-36]
+  7e: 240a0f80 c1108780        mov	%r4,0xc110_8780		; 0xc110_8780 = .regmask_lo+0x2908a741
+  86: 14dc8800                 ld.di	%r0,[%r4,-36]
+  8a: 20040f80 80000000        and	%r0,%r0,0x8000_0000		; 0x8000_0000 = .regmask_lo+0x70000000
+  92: e8f7                     brnz_s	%r0,0,0x7e = clk_util_clk_msr+0x5e
+  94: 14dc8800                 ld.di	%r0,[%r4,-36]
+  98: b8b0                     bclr_s	%r0,%r0,16
+  9a: 1cdc8020                 st.di	%r0,[%r4,-36]
+  9e: 14e48802                 ld.di	%r2,[%r4,-28]
+  a2: bad3                     bmsk_s	%r2,%r2,19
+  a4: 2a410180                 lsr	%r0,%r2,6
+  a8: 240a36c0                 mov	%sp,%fp
+  ac: 1404341b                 pop	%fp
+  b0: 7ee0                     j_s	[%blink]
+  b2: 78e0                     nop_s
+ts_delay:
+  b4: c5e1                     push_s	%r13
+  b6: c6e1                     push_s	%r14
+  b8: c7e1                     push_s	%r15
+  ba: 1cfcb6c8                 push	%fp
+  be: 230a3700                 mov	%fp,%sp
+  c2: 77eb                     mov_s	%r15,%blink
+  c4: 7608                     mov_s	%r14,%r0
+  c6: dd00                     mov_s	%r13,0
+  c8: 0d111383                 brge	%r13,%r14,0xd8 = ts_delay+0x24
+  cc: d87d                     mov_s	%r0,125
+  ce: b808                     asl_s	%r0,%r0,8
+  d0: 08c20080                 bl	delay_tick
+  d4: e501                     add_s	%r13,%r13,1
+  d6: f1fa                     b_s	0xc8 = ts_delay+0x14
+  d8: 77fb                     mov_s	%blink,%r15
+  da: 240a36c0                 mov	%sp,%fp
+  de: 1404341b                 pop	%fp
+  e2: c7c1                     pop_s	%r15
+  e4: c6c1                     pop_s	%r14
+  e6: c5c1                     pop_s	%r13
+  e8: 7ee0                     j_s	[%blink]
+  ea: 78e0                     nop_s
+disable_mmc_req:
+  ec: c0f1                     push_s	%blink
+  ee: 70cf 00001ca4            mov_s	%r0,0x1ca4		; 0x1ca4 = get_uart_ctrl+16
+  f4: 0a7a00c0                 bl	serial_puts
+  f8: d900                     mov_s	%r1,0
+  fa: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 100: 18810078                 st.di	%r1,[%r0,0x204]
+ 104: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 10a: 10c90e00                 ld.di	%r0,[%r0,0x324]
+ 10e: e885                     brnz_s	%r0,0,0x116 = disable_mmc_req+0x2a
+ 110: d802                     mov_s	%r0,2
+ 112: ffe9                     bl_s	ts_delay
+ 114: f1f8                     b_s	0x104 = disable_mmc_req+0x18
+ 116: d802                     mov_s	%r0,2
+ 118: ffe7                     bl_s	ts_delay
+ 11a: c0d1                     pop_s	%blink
+ 11c: 7ee0                     j_s	[%blink]
+ 11e: 78e0                     nop_s
+dt_delay:
+ 120: 1cfcb6c8                 push	%fp
+ 124: 230a3700                 mov	%fp,%sp
+ 128: d900                     mov_s	%r1,0
+ 12a: d900                     mov_s	%r1,0
+ 12c: 090d0f83 00002710        brge	%r1,0x2710,0x138 = dt_delay+0x18		; 0x2710 = ddr_settings+0x404
+ 134: e101                     add_s	%r1,%r1,1
+ 136: f1fc                     b_s	0x12c = dt_delay+12
+ 138: b861                     sub_s	%r0,%r0,1
+ 13a: 08f38053                 brge	%r0,1,0x12a = dt_delay+10
+ 13e: 240a36c0                 mov	%sp,%fp
+ 142: 1404341b                 pop	%fp
+ 146: 7ee0                     j_s	[%blink]
+reset_mmc:
+ 148: c5e1                     push_s	%r13
+ 14a: c6e1                     push_s	%r14
+ 14c: 1cfcb6c8                 push	%fp
+ 150: 230a3700                 mov	%fp,%sp
+ 154: c1a1                     sub_s	%sp,%sp,4
+ 156: 76eb                     mov_s	%r14,%blink
+ 158: 70cf 00001cbc            mov_s	%r0,0x1cbc		; 0x1cbc = get_uart_ctrl+0x28
+ 15e: 0a1200c0                 bl	serial_puts
+ 162: 75cf c8000e00            mov_s	%r13,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 168: 15c81e00                 ld.di	%r0,[%r13,0x320]
+ 16c: 1bfcb000                 st	%r0,[%fp,-4]
+ 170: 13fcb000                 ld	%r0,[%fp,-4]
+ 174: d920                     mov_s	%r1,32
+ 176: 0a6200c0                 bl	serial_put_hex
+ 17a: 1dc81fb8 000017ff        st.di	0x17ff,[%r13,0x320]		; 0x17ff = switch_clk81+0x6b
+ 182: d804                     mov_s	%r0,4
+ 184: ffe7                     bl_s	dt_delay
+ 186: 75cf c8000e00            mov_s	%r13,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 18c: 15c81e00                 ld.di	%r0,[%r13,0x320]
+ 190: 1bfcb000                 st	%r0,[%fp,-4]
+ 194: e810                     brz_s	%r0,0,0x1b4 = reset_mmc+0x6c
+ 196: 13fcb000                 ld	%r0,[%fp,-4]
+ 19a: d920                     mov_s	%r1,32
+ 19c: 0a3a00c0                 bl	serial_put_hex
+ 1a0: 13fcb000                 ld	%r0,[%fp,-4]
+ 1a4: 75cf c8000e00            mov_s	%r13,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 1aa: 1dc81038                 st.di	%r0,[%r13,0x320]
+ 1ae: d804                     mov_s	%r0,4
+ 1b0: ffdc                     bl_s	dt_delay
+ 1b2: f1eb                     b_s	0x186 = reset_mmc+0x3e
+ 1b4: 76fb                     mov_s	%blink,%r14
+ 1b6: 240a36c0                 mov	%sp,%fp
+ 1ba: 1404341b                 pop	%fp
+ 1be: c6c1                     pop_s	%r14
+ 1c0: c5c1                     pop_s	%r13
+ 1c2: 7ee0                     j_s	[%blink]
+enable_mmc_req:
+ 1c4: c5e1                     push_s	%r13
+ 1c6: 75eb                     mov_s	%r13,%blink
+ 1c8: 70cf 00001ccc            mov_s	%r0,0x1ccc		; 0x1ccc = get_uart_ctrl+0x38
+ 1ce: 09a200c0                 bl	serial_puts
+ 1d2: d9ff                     mov_s	%r1,255
+ 1d4: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 1da: 18810078                 st.di	%r1,[%r0,0x204]
+ 1de: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 1e4: 10c90e00                 ld.di	%r0,[%r0,0x324]
+ 1e8: e884                     brnz_s	%r0,0,0x1f0 = enable_mmc_req+0x2c
+ 1ea: d802                     mov_s	%r0,2
+ 1ec: ffb2                     bl_s	ts_delay
+ 1ee: f1f9                     b_s	0x1de = enable_mmc_req+0x1a
+ 1f0: 75fb                     mov_s	%blink,%r13
+ 1f2: c5c1                     pop_s	%r13
+ 1f4: 7ee0                     j_s	[%blink]
+ 1f6: 78e0                     nop_s
+mmc_sleep:
+ 1f8: c5e1                     push_s	%r13
+ 1fa: c6e1                     push_s	%r14
+ 1fc: c7e1                     push_s	%r15
+ 1fe: 1cfcb6c8                 push	%fp
+ 202: 230a3700                 mov	%fp,%sp
+ 206: c1a1                     sub_s	%sp,%sp,4
+ 208: 77eb                     mov_s	%r15,%blink
+ 20a: 70cf 00001ce8            mov_s	%r0,0x1ce8		; 0x1ce8 = get_uart_ctrl+0x54
+ 210: 095e00c0                 bl	serial_puts
+ 214: de02                     mov_s	%r14,2
+ 216: 70c9                     mov_s	%r0,%r14
+ 218: ffa7                     bl_s	ts_delay
+ 21a: 75cf c7fffe08            mov_s	%r13,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 220: 15801e00                 ld.di	%r0,[%r13,0x200]
+ 224: 1bfcb000                 st	%r0,[%fp,-4]
+ 228: 13fcb000                 ld	%r0,[%fp,-4]
+ 22c: d920                     mov_s	%r1,32
+ 22e: 09aa00c0                 bl	serial_put_hex
+ 232: 13fcb000                 ld	%r0,[%fp,-4]
+ 236: e888                     brnz_s	%r0,0,0x244 = mmc_sleep+0x4c
+ 238: d801                     mov_s	%r0,1
+ 23a: 1d7f1038                 st.di	%r0,[%r13,0x1fc]
+ 23e: d804                     mov_s	%r0,4
+ 240: ff9d                     bl_s	ts_delay
+ 242: f014                     b_s	0x268 = mmc_sleep+0x70
+ 244: 13fcb000                 ld	%r0,[%fp,-4]
+ 248: 080f0051                 brne	%r0,1,0x256 = mmc_sleep+0x5e
+ 24c: 1d7f13b8                 st.di	%r14,[%r13,0x1fc]
+ 250: d804                     mov_s	%r0,4
+ 252: ff99                     bl_s	ts_delay
+ 254: f00a                     b_s	0x268 = mmc_sleep+0x70
+ 256: 13fcb000                 ld	%r0,[%fp,-4]
+ 25a: 081100d1                 brne	%r0,3,0x268 = mmc_sleep+0x70
+ 25e: d803                     mov_s	%r0,3
+ 260: 1d7f1038                 st.di	%r0,[%r13,0x1fc]
+ 264: d804                     mov_s	%r0,4
+ 266: ff94                     bl_s	ts_delay
+ 268: 13fcb000                 ld	%r0,[%fp,-4]
+ 26c: 08a98151                 brne	%r0,5,0x214 = mmc_sleep+0x1c
+ 270: 77fb                     mov_s	%blink,%r15
+ 272: 240a36c0                 mov	%sp,%fp
+ 276: 1404341b                 pop	%fp
+ 27a: c7c1                     pop_s	%r15
+ 27c: c6c1                     pop_s	%r14
+ 27e: c5c1                     pop_s	%r13
+ 280: 7ee0                     j_s	[%blink]
+ 282: 78e0                     nop_s
+mmc_wakeup:
+ 284: 1cfcb6c8                 push	%fp
+ 288: 230a3700                 mov	%fp,%sp
+ 28c: c1a1                     sub_s	%sp,%sp,4
+ 28e: 71cf c7fffe08            mov_s	%r1,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 294: 11800e00                 ld.di	%r0,[%r1,0x200]
+ 298: 1bfcb000                 st	%r0,[%fp,-4]
+ 29c: 13fcb000                 ld	%r0,[%fp,-4]
+ 2a0: 08130151                 brne	%r0,5,0x2b2 = mmc_wakeup+0x2e
+ 2a4: d804                     mov_s	%r0,4
+ 2a6: 197f0038                 st.di	%r0,[%r1,0x1fc]
+ 2aa: 13fcb000                 ld	%r0,[%fp,-4]
+ 2ae: 08ff8151                 brne	%r0,5,0x2aa = mmc_wakeup+0x26
+ 2b2: 13fcb000                 ld	%r0,[%fp,-4]
+ 2b6: e88c                     brnz_s	%r0,0,0x2cc = mmc_wakeup+0x48
+ 2b8: d801                     mov_s	%r0,1
+ 2ba: 71cf c7fffe08            mov_s	%r1,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 2c0: 197f0038                 st.di	%r0,[%r1,0x1fc]
+ 2c4: 13fcb000                 ld	%r0,[%fp,-4]
+ 2c8: 08fd8051                 brne	%r0,1,0x2c4 = mmc_wakeup+0x40
+ 2cc: 13fcb000                 ld	%r0,[%fp,-4]
+ 2d0: 08190051                 brne	%r0,1,0x2e8 = mmc_wakeup+0x64
+ 2d4: d802                     mov_s	%r0,2
+ 2d6: 71cf c7fffe08            mov_s	%r1,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 2dc: 197f0038                 st.di	%r0,[%r1,0x1fc]
+ 2e0: 13fcb000                 ld	%r0,[%fp,-4]
+ 2e4: 08fd80d1                 brne	%r0,3,0x2e0 = mmc_wakeup+0x5c
+ 2e8: 13fcb000                 ld	%r0,[%fp,-4]
+ 2ec: 08a38151                 brne	%r0,5,0x28e = mmc_wakeup+10
+ 2f0: 240a36c0                 mov	%sp,%fp
+ 2f4: 1404341b                 pop	%fp
+ 2f8: 7ee0                     j_s	[%blink]
+ 2fa: 78e0                     nop_s
+load_nop:
+ 2fc: 70cf c7fffe08            mov_s	%r0,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 302: 188e0fb8 80100000        st.di	0x8010_0000,[%r0,0x238]		; 0x8010_0000 = .regmask_lo+0x70100000
+ 30a: 70cf c7fffe08            mov_s	%r0,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 310: 108e0e00                 ld.di	%r0,[%r0,0x238]
+ 314: 20040f80 80000000        and	%r0,%r0,0x8000_0000		; 0x8000_0000 = .regmask_lo+0x70000000
+ 31c: e8f7                     brnz_s	%r0,0,0x30a = load_nop+14
+ 31e: 7ee0                     j_s	[%blink]
+load_prea:
+ 320: 70cf c7fffe08            mov_s	%r0,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 326: 188e0fb8 80100001        st.di	0x8010_0001,[%r0,0x238]		; 0x8010_0001 = .regmask_lo+0x70100001
+ 32e: 70cf c7fffe08            mov_s	%r0,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 334: 108e0e00                 ld.di	%r0,[%r0,0x238]
+ 338: 20040f80 80000000        and	%r0,%r0,0x8000_0000		; 0x8000_0000 = .regmask_lo+0x70000000
+ 340: e8f7                     brnz_s	%r0,0,0x32e = load_prea+14
+ 342: 7ee0                     j_s	[%blink]
+load_mrs:
+ 344: 1cfcb6c8                 push	%fp
+ 348: 230a3700                 mov	%fp,%sp
+ 34c: 28400443                 asl	%r3,%r0,17
+ 350: 23050f83 80100000        or	%r3,%r3,0x8010_0000		; 0x8010_0000 = .regmask_lo+0x70100000
+ 358: 6954                     asl_s	%r2,%r1,4
+ 35a: 7a65                     or_s	%r2,%r2,%r3
+ 35c: 224500c3                 or	%r3,%r2,3
+ 360: 72cf c7fffe08            mov_s	%r2,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 366: 1a8e00f8                 st.di	%r3,[%r2,0x238]
+ 36a: 72cf c7fffe08            mov_s	%r2,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 370: 128e0e02                 ld.di	%r2,[%r2,0x238]
+ 374: 22040f82 80000000        and	%r2,%r2,0x8000_0000		; 0x8000_0000 = .regmask_lo+0x70000000
+ 37c: eaf7                     brnz_s	%r2,0,0x36a = load_mrs+0x26
+ 37e: 240a36c0                 mov	%sp,%fp
+ 382: 1404341b                 pop	%fp
+ 386: 7ee0                     j_s	[%blink]
+load_ref:
+ 388: 70cf c7fffe08            mov_s	%r0,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 38e: 188e0fb8 80100002        st.di	0x8010_0002,[%r0,0x238]		; 0x8010_0002 = .regmask_lo+0x70100002
+ 396: 70cf c7fffe08            mov_s	%r0,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 39c: 108e0e00                 ld.di	%r0,[%r0,0x238]
+ 3a0: 20040f80 80000000        and	%r0,%r0,0x8000_0000		; 0x8000_0000 = .regmask_lo+0x70000000
+ 3a8: e8f7                     brnz_s	%r0,0,0x396 = load_ref+14
+ 3aa: 7ee0                     j_s	[%blink]
+load_zqcl:
+ 3ac: 1cfcb6c8                 push	%fp
+ 3b0: 230a3700                 mov	%fp,%sp
+ 3b4: 6834                     asl_s	%r1,%r0,4
+ 3b6: 21050f81 80100000        or	%r1,%r1,0x8010_0000		; 0x8010_0000 = .regmask_lo+0x70100000
+ 3be: 21450142                 or	%r2,%r1,5
+ 3c2: 71cf c7fffe08            mov_s	%r1,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 3c8: 198e00b8                 st.di	%r2,[%r1,0x238]
+ 3cc: 71cf c7fffe08            mov_s	%r1,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 3d2: 118e0e01                 ld.di	%r1,[%r1,0x238]
+ 3d6: 21040f81 80000000        and	%r1,%r1,0x8000_0000		; 0x8000_0000 = .regmask_lo+0x70000000
+ 3de: e9f8                     brnz_s	%r1,0,0x3cc = load_zqcl+0x20
+ 3e0: 240a36c0                 mov	%sp,%fp
+ 3e4: 1404341b                 pop	%fp
+ 3e8: 7ee0                     j_s	[%blink]
+ 3ea: 78e0                     nop_s
+get_mrs0:
+ 3ec: 72cf 0000230c            mov_s	%r2,0x230c		; ddr_settings
+ 3f2: 8261                     ld_s	%r3,[%r2,4]
+ 3f4: d900                     mov_s	%r1,0
+ 3f6: b98c                     bset_s	%r1,%r1,12
+ 3f8: 23040f80 00000400        and	%r0,%r3,0x400		; 0x400 = get_mrs0+0x14
+ 400: e803                     brz_s	%r0,0,0x406 = get_mrs0+0x1a
+ 402: d802                     mov_s	%r0,2
+ 404: f002                     b_s	0x408 = get_mrs0+0x1c
+ 406: d800                     mov_s	%r0,0
+ 408: 7905                     or_s	%r1,%r1,%r0
+ 40a: 72cf 0000230c            mov_s	%r2,0x230c		; ddr_settings
+ 410: 8212                     ld_s	%r0,[%r2,72]
+ 412: b864                     sub_s	%r0,%r0,4
+ 414: b8c2                     bmsk_s	%r0,%r0,2
+ 416: b804                     asl_s	%r0,%r0,4
+ 418: 7905                     or_s	%r1,%r1,%r0
+ 41a: 8218                     ld_s	%r0,[%r2,96]
+ 41c: b864                     sub_s	%r0,%r0,4
+ 41e: b8c2                     bmsk_s	%r0,%r0,2
+ 420: b809                     asl_s	%r0,%r0,9
+ 422: 7905                     or_s	%r1,%r1,%r0
+ 424: 21530300                 bmsk	%r0,%r1,12
+ 428: 7ee0                     j_s	[%blink]
+ 42a: 78e0                     nop_s
+get_mrs1:
+ 42c: da44                     mov_s	%r2,68
+ 42e: 73cf 0000230c            mov_s	%r3,0x230c		; ddr_settings
+ 434: 8330                     ld_s	%r1,[%r3,64]
+ 436: e908                     brz_s	%r1,0,0x444 = get_mrs1+0x18
+ 438: 8312                     ld_s	%r0,[%r3,72]
+ 43a: 8330                     ld_s	%r1,[%r3,64]
+ 43c: 7822                     sub_s	%r0,%r0,%r1
+ 43e: b8c1                     bmsk_s	%r0,%r0,1
+ 440: b803                     asl_s	%r0,%r0,3
+ 442: 7a05                     or_s	%r2,%r2,%r0
+ 444: 22530300                 bmsk	%r0,%r2,12
+ 448: 7ee0                     j_s	[%blink]
+ 44a: 78e0                     nop_s
+get_mrs2:
+ 44c: 70cf 0000230c            mov_s	%r0,0x230c		; ddr_settings
+ 452: 8011                     ld_s	%r0,[%r0,68]
+ 454: b865                     sub_s	%r0,%r0,5
+ 456: b8c2                     bmsk_s	%r0,%r0,2
+ 458: 6833                     asl_s	%r1,%r0,3
+ 45a: 21530300                 bmsk	%r0,%r1,12
+ 45e: 7ee0                     j_s	[%blink]
+init_dmc:
+ 460: c0f1                     push_s	%blink
+ 462: 70cf 0000230c            mov_s	%r0,0x230c		; ddr_settings
+ 468: 8001                     ld_s	%r0,[%r0,4]
+ 46a: 71cf c8000e00            mov_s	%r1,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ 470: 19800038                 st.di	%r0,[%r1,0x200]
+ 474: d8ff                     mov_s	%r0,255
+ 476: 19810038                 st.di	%r0,[%r1,0x204]
+ 47a: d808                     mov_s	%r0,8
+ 47c: ff0e                     bl_s	ts_delay
+ 47e: c0d1                     pop_s	%blink
+ 480: 7ee0                     j_s	[%blink]
+ 482: 78e0                     nop_s
+disp_pctl:
+ 484: c5e1                     push_s	%r13
+ 486: c6e1                     push_s	%r14
+ 488: c7e1                     push_s	%r15
+ 48a: 1cfcb408                 push	%r16
+ 48e: c0f1                     push_s	%blink
+ 490: 70cf 00001cf4            mov_s	%r0,0x1cf4		; 0x1cf4 = get_uart_ctrl+0x60
+ 496: 0eda0080                 bl	serial_puts
+ 49a: 77cf c1103fa4            mov_s	%r15,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+ 4a0: 177f1e00                 ld.di	%r0,[%r15,0x1fc]
+ 4a4: d920                     mov_s	%r1,32
+ 4a6: 0f320080                 bl	serial_put_hex
+ 4aa: d80a                     mov_s	%r0,10
+ 4ac: 0e2a0080                 bl	serial_putc
+ 4b0: 70cf 00001d08            mov_s	%r0,0x1d08		; 0x1d08 = get_uart_ctrl+0x74
+ 4b6: 0eba0080                 bl	serial_puts
+ 4ba: 75cf c7fffe08            mov_s	%r13,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 4c0: 15ae1e00                 ld.di	%r0,[%r13,0x2b8]
+ 4c4: d920                     mov_s	%r1,32
+ 4c6: 0f120080                 bl	serial_put_hex
+ 4ca: d80a                     mov_s	%r0,10
+ 4cc: 0e0a0080                 bl	serial_putc
+ 4d0: 70cf 00001d1c            mov_s	%r0,0x1d1c		; 0x1d1c = get_uart_ctrl+0x88
+ 4d6: 0e9a0080                 bl	serial_puts
+ 4da: 15b11e00                 ld.di	%r0,[%r13,0x2c4]
+ 4de: d920                     mov_s	%r1,32
+ 4e0: 0ef60080                 bl	serial_put_hex
+ 4e4: d80a                     mov_s	%r0,10
+ 4e6: 0df20080                 bl	serial_putc
+ 4ea: 70cf 00001d34            mov_s	%r0,0x1d34		; 0x1d34 = get_uart_ctrl+0xa0
+ 4f0: 0e7e0080                 bl	serial_puts
+ 4f4: 15af1e00                 ld.di	%r0,[%r13,0x2bc]
+ 4f8: d920                     mov_s	%r1,32
+ 4fa: 0ede0080                 bl	serial_put_hex
+ 4fe: d80a                     mov_s	%r0,10
+ 500: 0dd60080                 bl	serial_putc
+ 504: 70cf 00001d48            mov_s	%r0,0x1d48		; 0x1d48 = get_uart_ctrl+0xb4
+ 50a: 0e660080                 bl	serial_puts
+ 50e: 70cf c80015fc            mov_s	%r0,0xc800_15fc		; 0xc800_15fc = .regmask_lo+0x2ff835bd
+ 514: 10618e00                 ld.di	%r0,[%r0,0xffff_fd84]
+ 518: d920                     mov_s	%r1,32
+ 51a: 0ebe0080                 bl	serial_put_hex
+ 51e: d80a                     mov_s	%r0,10
+ 520: 0db60080                 bl	serial_putc
+ 524: 200a2f80 00001d58        mov	%r16,0x1d58		; 0x1d58 = get_uart_ctrl+0xc4
+ 52c: 700a                     mov_s	%r0,%r16
+ 52e: 0e420080                 bl	serial_puts
+ 532: 70cf 00001d60            mov_s	%r0,0x1d60		; 0x1d60 = get_uart_ctrl+0xcc
+ 538: 0e360080                 bl	serial_puts
+ 53c: 76cf c8000604            mov_s	%r14,0xc800_0604		; 0xc800_0604 = .regmask_lo+0x2ff825c5
+ 542: 16119e00                 ld.di	%r0,[%r14,0xffff_fc44]
+ 546: d920                     mov_s	%r1,32
+ 548: 0e8e0080                 bl	serial_put_hex
+ 54c: d80a                     mov_s	%r0,10
+ 54e: 0d8a0080                 bl	serial_putc
+ 552: 70cf 00001d70            mov_s	%r0,0x1d70		; 0x1d70 = get_uart_ctrl+0xdc
+ 558: 0e160080                 bl	serial_puts
+ 55c: 15b01e00                 ld.di	%r0,[%r13,0x2c0]
+ 560: d920                     mov_s	%r1,32
+ 562: 0e760080                 bl	serial_put_hex
+ 566: d80a                     mov_s	%r0,10
+ 568: 0d6e0080                 bl	serial_putc
+ 56c: 70cf 00001d84            mov_s	%r0,0x1d84		; 0x1d84 = get_uart_ctrl+0xf0
+ 572: 0dfe0080                 bl	serial_puts
+ 576: 15cb1e00                 ld.di	%r0,[%r13,0x32c]
+ 57a: d920                     mov_s	%r1,32
+ 57c: 0e5a0080                 bl	serial_put_hex
+ 580: d80a                     mov_s	%r0,10
+ 582: 0d560080                 bl	serial_putc
+ 586: 700a                     mov_s	%r0,%r16
+ 588: 0de60080                 bl	serial_puts
+ 58c: 70cf 00001d98            mov_s	%r0,0x1d98		; 0x1d98 = get_uart_ctrl+0x104
+ 592: 0dde0080                 bl	serial_puts
+ 596: 15901e00                 ld.di	%r0,[%r13,0x240]
+ 59a: d920                     mov_s	%r1,32
+ 59c: 0e3a0080                 bl	serial_put_hex
+ 5a0: d80a                     mov_s	%r0,10
+ 5a2: 0d360080                 bl	serial_putc
+ 5a6: 70cf 00001dac            mov_s	%r0,0x1dac		; 0x1dac = get_uart_ctrl+0x118
+ 5ac: 0dc20080                 bl	serial_puts
+ 5b0: 158f1e00                 ld.di	%r0,[%r13,0x23c]
+ 5b4: d920                     mov_s	%r1,32
+ 5b6: 0e220080                 bl	serial_put_hex
+ 5ba: d80a                     mov_s	%r0,10
+ 5bc: 0d1a0080                 bl	serial_putc
+ 5c0: 70cf 00001dc0            mov_s	%r0,0x1dc0		; 0x1dc0 = get_uart_ctrl+0x12c
+ 5c6: 0daa0080                 bl	serial_puts
+ 5ca: 15a11e00                 ld.di	%r0,[%r13,0x284]
+ 5ce: d920                     mov_s	%r1,32
+ 5d0: 0e060080                 bl	serial_put_hex
+ 5d4: d80a                     mov_s	%r0,10
+ 5d6: 0d020080                 bl	serial_putc
+ 5da: 70cf 00001dd4            mov_s	%r0,0x1dd4		; 0x1dd4 = get_uart_ctrl+0x140
+ 5e0: 0d8e0080                 bl	serial_puts
+ 5e4: 161a9e00                 ld.di	%r0,[%r14,0xffff_fc68]
+ 5e8: d920                     mov_s	%r1,32
+ 5ea: 0dee0080                 bl	serial_put_hex
+ 5ee: d80a                     mov_s	%r0,10
+ 5f0: 0ce60080                 bl	serial_putc
+ 5f4: 700a                     mov_s	%r0,%r16
+ 5f6: 0d7a0080                 bl	serial_puts
+ 5fa: 70cf 00001de4            mov_s	%r0,0x1de4		; 0x1de4 = get_uart_ctrl+0x150
+ 600: 0d6e0080                 bl	serial_puts
+ 604: 15b21e00                 ld.di	%r0,[%r13,0x2c8]
+ 608: d920                     mov_s	%r1,32
+ 60a: 0dce0080                 bl	serial_put_hex
+ 60e: d80a                     mov_s	%r0,10
+ 610: 0cc60080                 bl	serial_putc
+ 614: 70cf 00001df8            mov_s	%r0,0x1df8		; 0x1df8 = get_uart_ctrl+0x164
+ 61a: 0d560080                 bl	serial_puts
+ 61e: 15b31e00                 ld.di	%r0,[%r13,0x2cc]
+ 622: d920                     mov_s	%r1,32
+ 624: 0db20080                 bl	serial_put_hex
+ 628: d80a                     mov_s	%r0,10
+ 62a: 0cae0080                 bl	serial_putc
+ 62e: 70cf 00001e08            mov_s	%r0,0x1e08		; 0x1e08 = get_uart_ctrl+0x174
+ 634: 0d3a0080                 bl	serial_puts
+ 638: 15b41e00                 ld.di	%r0,[%r13,0x2d0]
+ 63c: d920                     mov_s	%r1,32
+ 63e: 0d9a0080                 bl	serial_put_hex
+ 642: d80a                     mov_s	%r0,10
+ 644: 0c920080                 bl	serial_putc
+ 648: 70cf 00001e18            mov_s	%r0,0x1e18		; 0x1e18 = get_uart_ctrl+0x184
+ 64e: 0d220080                 bl	serial_puts
+ 652: 15b51e00                 ld.di	%r0,[%r13,0x2d4]
+ 656: d920                     mov_s	%r1,32
+ 658: 0d7e0080                 bl	serial_put_hex
+ 65c: d80a                     mov_s	%r0,10
+ 65e: 0c7a0080                 bl	serial_putc
+ 662: 70cf 00001e28            mov_s	%r0,0x1e28		; 0x1e28 = get_uart_ctrl+0x194
+ 668: 0d060080                 bl	serial_puts
+ 66c: 15b71e00                 ld.di	%r0,[%r13,0x2dc]
+ 670: d920                     mov_s	%r1,32
+ 672: 0d660080                 bl	serial_put_hex
+ 676: d80a                     mov_s	%r0,10
+ 678: 0c5e0080                 bl	serial_putc
+ 67c: 70cf 00001e38            mov_s	%r0,0x1e38		; 0x1e38 = get_uart_ctrl+0x1a4
+ 682: 0cee0080                 bl	serial_puts
+ 686: 15b91e00                 ld.di	%r0,[%r13,0x2e4]
+ 68a: d920                     mov_s	%r1,32
+ 68c: 0d4a0080                 bl	serial_put_hex
+ 690: d80a                     mov_s	%r0,10
+ 692: 0c460080                 bl	serial_putc
+ 696: 70cf 00001e48            mov_s	%r0,0x1e48		; 0x1e48 = get_uart_ctrl+0x1b4
+ 69c: 0cd20080                 bl	serial_puts
+ 6a0: 15b81e00                 ld.di	%r0,[%r13,0x2e0]
+ 6a4: d920                     mov_s	%r1,32
+ 6a6: 0d320080                 bl	serial_put_hex
+ 6aa: d80a                     mov_s	%r0,10
+ 6ac: 0c2a0080                 bl	serial_putc
+ 6b0: 70cf 00001e58            mov_s	%r0,0x1e58		; 0x1e58 = get_uart_ctrl+0x1c4
+ 6b6: 0cba0080                 bl	serial_puts
+ 6ba: 15ba1e00                 ld.di	%r0,[%r13,0x2e8]
+ 6be: d920                     mov_s	%r1,32
+ 6c0: 0d160080                 bl	serial_put_hex
+ 6c4: d80a                     mov_s	%r0,10
+ 6c6: 0c120080                 bl	serial_putc
+ 6ca: 70cf 00001e68            mov_s	%r0,0x1e68		; 0x1e68 = get_uart_ctrl+0x1d4
+ 6d0: 0c9e0080                 bl	serial_puts
+ 6d4: 15bb1e00                 ld.di	%r0,[%r13,0x2ec]
+ 6d8: d920                     mov_s	%r1,32
+ 6da: 0cfe0080                 bl	serial_put_hex
+ 6de: d80a                     mov_s	%r0,10
+ 6e0: 0bf60080                 bl	serial_putc
+ 6e4: 70cf 00001e78            mov_s	%r0,0x1e78		; 0x1e78 = get_uart_ctrl+0x1e4
+ 6ea: 0c860080                 bl	serial_puts
+ 6ee: 15bc1e00                 ld.di	%r0,[%r13,0x2f0]
+ 6f2: d920                     mov_s	%r1,32
+ 6f4: 0ce20080                 bl	serial_put_hex
+ 6f8: d80a                     mov_s	%r0,10
+ 6fa: 0bde0080                 bl	serial_putc
+ 6fe: 70cf 00001e88            mov_s	%r0,0x1e88		; 0x1e88 = get_uart_ctrl+0x1f4
+ 704: 0c6a0080                 bl	serial_puts
+ 708: 15bd1e00                 ld.di	%r0,[%r13,0x2f4]
+ 70c: d920                     mov_s	%r1,32
+ 70e: 0cca0080                 bl	serial_put_hex
+ 712: d80a                     mov_s	%r0,10
+ 714: 0bc20080                 bl	serial_putc
+ 718: 70cf 00001e98            mov_s	%r0,0x1e98		; 0x1e98 = get_uart_ctrl+0x204
+ 71e: 0c520080                 bl	serial_puts
+ 722: 15be1e00                 ld.di	%r0,[%r13,0x2f8]
+ 726: d920                     mov_s	%r1,32
+ 728: 0cae0080                 bl	serial_put_hex
+ 72c: d80a                     mov_s	%r0,10
+ 72e: 0baa0080                 bl	serial_putc
+ 732: 70cf 00001ea8            mov_s	%r0,0x1ea8		; 0x1ea8 = get_uart_ctrl+0x214
+ 738: 0c360080                 bl	serial_puts
+ 73c: 15bf1e00                 ld.di	%r0,[%r13,0x2fc]
+ 740: d920                     mov_s	%r1,32
+ 742: 0c960080                 bl	serial_put_hex
+ 746: d80a                     mov_s	%r0,10
+ 748: 0b8e0080                 bl	serial_putc
+ 74c: 70cf 00001eb8            mov_s	%r0,0x1eb8		; 0x1eb8 = get_uart_ctrl+0x224
+ 752: 0c1e0080                 bl	serial_puts
+ 756: 15c01e00                 ld.di	%r0,[%r13,0x300]
+ 75a: d920                     mov_s	%r1,32
+ 75c: 0c7a0080                 bl	serial_put_hex
+ 760: d80a                     mov_s	%r0,10
+ 762: 0b760080                 bl	serial_putc
+ 766: 70cf 00001ec8            mov_s	%r0,0x1ec8		; 0x1ec8 = get_uart_ctrl+0x234
+ 76c: 0c020080                 bl	serial_puts
+ 770: 15c11e00                 ld.di	%r0,[%r13,0x304]
+ 774: d920                     mov_s	%r1,32
+ 776: 0c620080                 bl	serial_put_hex
+ 77a: d80a                     mov_s	%r0,10
+ 77c: 0b5a0080                 bl	serial_putc
+ 780: 70cf 00001edc            mov_s	%r0,0x1edc		; 0x1edc = get_uart_ctrl+0x248
+ 786: 0bea0080                 bl	serial_puts
+ 78a: 15c21e00                 ld.di	%r0,[%r13,0x308]
+ 78e: d920                     mov_s	%r1,32
+ 790: 0c460080                 bl	serial_put_hex
+ 794: d80a                     mov_s	%r0,10
+ 796: 0b420080                 bl	serial_putc
+ 79a: 70cf 00001eec            mov_s	%r0,0x1eec		; 0x1eec = get_uart_ctrl+0x258
+ 7a0: 0bce0080                 bl	serial_puts
+ 7a4: 15c61e00                 ld.di	%r0,[%r13,0x318]
+ 7a8: d920                     mov_s	%r1,32
+ 7aa: 0c2e0080                 bl	serial_put_hex
+ 7ae: d80a                     mov_s	%r0,10
+ 7b0: 0b260080                 bl	serial_putc
+ 7b4: 70cf 00001efc            mov_s	%r0,0x1efc		; 0x1efc = get_uart_ctrl+0x268
+ 7ba: 0bb60080                 bl	serial_puts
+ 7be: 15ca1e00                 ld.di	%r0,[%r13,0x328]
+ 7c2: d920                     mov_s	%r1,32
+ 7c4: 0c120080                 bl	serial_put_hex
+ 7c8: d80a                     mov_s	%r0,10
+ 7ca: 0b0e0080                 bl	serial_putc
+ 7ce: 70cf 00001f0c            mov_s	%r0,0x1f0c		; 0x1f0c = get_uart_ctrl+0x278
+ 7d4: 0b9a0080                 bl	serial_puts
+ 7d8: 15cc1e00                 ld.di	%r0,[%r13,0x330]
+ 7dc: d920                     mov_s	%r1,32
+ 7de: 0bfa0080                 bl	serial_put_hex
+ 7e2: d80a                     mov_s	%r0,10
+ 7e4: 0af20080                 bl	serial_putc
+ 7e8: 70cf 00001f20            mov_s	%r0,0x1f20		; 0x1f20 = get_uart_ctrl+0x28c
+ 7ee: 0b820080                 bl	serial_puts
+ 7f2: 15c51e00                 ld.di	%r0,[%r13,0x314]
+ 7f6: d920                     mov_s	%r1,32
+ 7f8: 0bde0080                 bl	serial_put_hex
+ 7fc: d80a                     mov_s	%r0,10
+ 7fe: 0ada0080                 bl	serial_putc
+ 802: 70cf 00001f34            mov_s	%r0,0x1f34		; 0x1f34 = get_uart_ctrl+0x2a0
+ 808: 0b660080                 bl	serial_puts
+ 80c: 15c81e00                 ld.di	%r0,[%r13,0x320]
+ 810: d920                     mov_s	%r1,32
+ 812: 0bc60080                 bl	serial_put_hex
+ 816: d80a                     mov_s	%r0,10
+ 818: 0abe0080                 bl	serial_putc
+ 81c: 70cf 00001f48            mov_s	%r0,0x1f48		; 0x1f48 = get_uart_ctrl+0x2b4
+ 822: 0b4e0080                 bl	serial_puts
+ 826: 15c71e00                 ld.di	%r0,[%r13,0x31c]
+ 82a: d920                     mov_s	%r1,32
+ 82c: 0baa0080                 bl	serial_put_hex
+ 830: d80a                     mov_s	%r0,10
+ 832: 0aa60080                 bl	serial_putc
+ 836: 70cf 00001f5c            mov_s	%r0,0x1f5c		; 0x1f5c = get_uart_ctrl+0x2c8
+ 83c: 0b320080                 bl	serial_puts
+ 840: 15c91e00                 ld.di	%r0,[%r13,0x324]
+ 844: d920                     mov_s	%r1,32
+ 846: 0b920080                 bl	serial_put_hex
+ 84a: d80a                     mov_s	%r0,10
+ 84c: 0a8a0080                 bl	serial_putc
+ 850: 700a                     mov_s	%r0,%r16
+ 852: 0b1e0080                 bl	serial_puts
+ 856: 70cf 00001f6c            mov_s	%r0,0x1f6c		; 0x1f6c = get_uart_ctrl+0x2d8
+ 85c: 0b120080                 bl	serial_puts
+ 860: 159e1e00                 ld.di	%r0,[%r13,0x278]
+ 864: d920                     mov_s	%r1,32
+ 866: 0b720080                 bl	serial_put_hex
+ 86a: d80a                     mov_s	%r0,10
+ 86c: 0a6a0080                 bl	serial_putc
+ 870: 70cf 00001f7c            mov_s	%r0,0x1f7c		; 0x1f7c = get_uart_ctrl+0x2e8
+ 876: 0afa0080                 bl	serial_puts
+ 87a: 160f9e00                 ld.di	%r0,[%r14,0xffff_fc3c]
+ 87e: d920                     mov_s	%r1,32
+ 880: 0b560080                 bl	serial_put_hex
+ 884: d80a                     mov_s	%r0,10
+ 886: 0a520080                 bl	serial_putc
+ 88a: 70cf 00001f90            mov_s	%r0,0x1f90		; 0x1f90 = get_uart_ctrl+0x2fc
+ 890: 0ade0080                 bl	serial_puts
+ 894: 16169e00                 ld.di	%r0,[%r14,0xffff_fc58]
+ 898: d920                     mov_s	%r1,32
+ 89a: 0b3e0080                 bl	serial_put_hex
+ 89e: d80a                     mov_s	%r0,10
+ 8a0: 0a360080                 bl	serial_putc
+ 8a4: 70cf 00001f98            mov_s	%r0,0x1f98		; 0x1f98 = get_uart_ctrl+0x304
+ 8aa: 0ac60080                 bl	serial_puts
+ 8ae: 16129e00                 ld.di	%r0,[%r14,0xffff_fc48]
+ 8b2: d920                     mov_s	%r1,32
+ 8b4: 0b220080                 bl	serial_put_hex
+ 8b8: d80a                     mov_s	%r0,10
+ 8ba: 0a1e0080                 bl	serial_putc
+ 8be: 70cf 00001fa0            mov_s	%r0,0x1fa0		; 0x1fa0 = get_uart_ctrl+0x30c
+ 8c4: 0aaa0080                 bl	serial_puts
+ 8c8: 17711e00                 ld.di	%r0,[%r15,0x1c4]
+ 8cc: d920                     mov_s	%r1,32
+ 8ce: 0b0a0080                 bl	serial_put_hex
+ 8d2: d80a                     mov_s	%r0,10
+ 8d4: 0a020080                 bl	serial_putc
+ 8d8: 70cf 00001fb0            mov_s	%r0,0x1fb0		; 0x1fb0 = get_uart_ctrl+0x31c
+ 8de: 0a920080                 bl	serial_puts
+ 8e2: 17871e00                 ld.di	%r0,[%r15,0x21c]
+ 8e6: d920                     mov_s	%r1,32
+ 8e8: 0aee0080                 bl	serial_put_hex
+ 8ec: d80a                     mov_s	%r0,10
+ 8ee: 09ea0080                 bl	serial_putc
+ 8f2: 70cf 00001fc0            mov_s	%r0,0x1fc0		; 0x1fc0 = get_uart_ctrl+0x32c
+ 8f8: 0a760080                 bl	serial_puts
+ 8fc: 177e1e00                 ld.di	%r0,[%r15,0x1f8]
+ 900: d920                     mov_s	%r1,32
+ 902: 0ad60080                 bl	serial_put_hex
+ 906: d80a                     mov_s	%r0,10
+ 908: 09ce0080                 bl	serial_putc
+ 90c: 70cf 00001fd4            mov_s	%r0,0x1fd4		; 0x1fd4 = get_uart_ctrl+0x340
+ 912: 0a5e0080                 bl	serial_puts
+ 916: 17741e00                 ld.di	%r0,[%r15,0x1d0]
+ 91a: d920                     mov_s	%r1,32
+ 91c: 0aba0080                 bl	serial_put_hex
+ 920: d80a                     mov_s	%r0,10
+ 922: 09b60080                 bl	serial_putc
+ 926: c0d1                     pop_s	%blink
+ 928: 14043410                 pop	%r16
+ 92c: c7c1                     pop_s	%r15
+ 92e: c6c1                     pop_s	%r14
+ 930: c5c1                     pop_s	%r13
+ 932: 7ee0                     j_s	[%blink]
+save_ddr_settings:
+ 934: 70cf c1103fa4            mov_s	%r0,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+ 93a: 107f0e00                 ld.di	%r0,[%r0,0x1fc]
+ 93e: 71cf 0000230c            mov_s	%r1,0x230c		; ddr_settings
+ 944: a100                     st_s	%r0,[%r1]
+ 946: 70cf c80015fc            mov_s	%r0,0xc800_15fc		; 0xc800_15fc = .regmask_lo+0x2ff835bd
+ 94c: 10618e00                 ld.di	%r0,[%r0,0xffff_fd84]
+ 950: a101                     st_s	%r0,[%r1,4]
+ 952: 72cf c7fffe08            mov_s	%r2,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ 958: 12ae0e00                 ld.di	%r0,[%r2,0x2b8]
+ 95c: a102                     st_s	%r0,[%r1,8]
+ 95e: 12b10e00                 ld.di	%r0,[%r2,0x2c4]
+ 962: a103                     st_s	%r0,[%r1,12]
+ 964: 12af0e00                 ld.di	%r0,[%r2,0x2bc]
+ 968: a104                     st_s	%r0,[%r1,16]
+ 96a: 73cf c8000604            mov_s	%r3,0xc800_0604		; 0xc800_0604 = .regmask_lo+0x2ff825c5
+ 970: 13118e00                 ld.di	%r0,[%r3,0xffff_fc44]
+ 974: a105                     st_s	%r0,[%r1,20]
+ 976: 12b00e00                 ld.di	%r0,[%r2,0x2c0]
+ 97a: a106                     st_s	%r0,[%r1,24]
+ 97c: 12cb0e00                 ld.di	%r0,[%r2,0x32c]
+ 980: a107                     st_s	%r0,[%r1,28]
+ 982: 12900e00                 ld.di	%r0,[%r2,0x240]
+ 986: a108                     st_s	%r0,[%r1,32]
+ 988: 128f0e00                 ld.di	%r0,[%r2,0x23c]
+ 98c: a109                     st_s	%r0,[%r1,36]
+ 98e: 12a10e00                 ld.di	%r0,[%r2,0x284]
+ 992: a10a                     st_s	%r0,[%r1,40]
+ 994: 131a8e00                 ld.di	%r0,[%r3,0xffff_fc68]
+ 998: a10b                     st_s	%r0,[%r1,44]
+ 99a: 12b20e00                 ld.di	%r0,[%r2,0x2c8]
+ 99e: a10c                     st_s	%r0,[%r1,48]
+ 9a0: 12b30e00                 ld.di	%r0,[%r2,0x2cc]
+ 9a4: a10d                     st_s	%r0,[%r1,52]
+ 9a6: 12b40e00                 ld.di	%r0,[%r2,0x2d0]
+ 9aa: a10e                     st_s	%r0,[%r1,56]
+ 9ac: 12b50e00                 ld.di	%r0,[%r2,0x2d4]
+ 9b0: a10f                     st_s	%r0,[%r1,60]
+ 9b2: 12b70e00                 ld.di	%r0,[%r2,0x2dc]
+ 9b6: a110                     st_s	%r0,[%r1,64]
+ 9b8: 12b90e00                 ld.di	%r0,[%r2,0x2e4]
+ 9bc: a111                     st_s	%r0,[%r1,68]
+ 9be: 12b80e00                 ld.di	%r0,[%r2,0x2e0]
+ 9c2: a112                     st_s	%r0,[%r1,72]
+ 9c4: 12ba0e00                 ld.di	%r0,[%r2,0x2e8]
+ 9c8: a113                     st_s	%r0,[%r1,76]
+ 9ca: 12bb0e00                 ld.di	%r0,[%r2,0x2ec]
+ 9ce: a114                     st_s	%r0,[%r1,80]
+ 9d0: 12bc0e00                 ld.di	%r0,[%r2,0x2f0]
+ 9d4: a115                     st_s	%r0,[%r1,84]
+ 9d6: 12bd0e00                 ld.di	%r0,[%r2,0x2f4]
+ 9da: a116                     st_s	%r0,[%r1,88]
+ 9dc: 12be0e00                 ld.di	%r0,[%r2,0x2f8]
+ 9e0: a117                     st_s	%r0,[%r1,92]
+ 9e2: 12bf0e00                 ld.di	%r0,[%r2,0x2fc]
+ 9e6: a118                     st_s	%r0,[%r1,96]
+ 9e8: 12c00e00                 ld.di	%r0,[%r2,0x300]
+ 9ec: a119                     st_s	%r0,[%r1,100]
+ 9ee: 12c10e00                 ld.di	%r0,[%r2,0x304]
+ 9f2: a11a                     st_s	%r0,[%r1,104]
+ 9f4: 12c20e00                 ld.di	%r0,[%r2,0x308]
+ 9f8: a11b                     st_s	%r0,[%r1,108]
+ 9fa: 12c60e00                 ld.di	%r0,[%r2,0x318]
+ 9fe: a11c                     st_s	%r0,[%r1,112]
+ a00: 12ca0e00                 ld.di	%r0,[%r2,0x328]
+ a04: a11d                     st_s	%r0,[%r1,116]
+ a06: 12cc0e00                 ld.di	%r0,[%r2,0x330]
+ a0a: a11e                     st_s	%r0,[%r1,120]
+ a0c: 12c50e00                 ld.di	%r0,[%r2,0x314]
+ a10: 19980000                 st	%r0,[%r1,152]
+ a14: 12c80e00                 ld.di	%r0,[%r2,0x320]
+ a18: a11f                     st_s	%r0,[%r1,124]
+ a1a: 12c70e00                 ld.di	%r0,[%r2,0x31c]
+ a1e: 19800000                 st	%r0,[%r1,128]
+ a22: 12c90e00                 ld.di	%r0,[%r2,0x324]
+ a26: 19840000                 st	%r0,[%r1,132]
+ a2a: 129e0e00                 ld.di	%r0,[%r2,0x278]
+ a2e: 19880000                 st	%r0,[%r1,136]
+ a32: 130f8e00                 ld.di	%r0,[%r3,0xffff_fc3c]
+ a36: 198c0000                 st	%r0,[%r1,140]
+ a3a: 13168e00                 ld.di	%r0,[%r3,0xffff_fc58]
+ a3e: 19900000                 st	%r0,[%r1,144]
+ a42: 13128e00                 ld.di	%r0,[%r3,0xffff_fc48]
+ a46: 19940000                 st	%r0,[%r1,148]
+ a4a: 7ee0                     j_s	[%blink]
+init_pctl:
+ a4c: c5e1                     push_s	%r13
+ a4e: c6e1                     push_s	%r14
+ a50: c7e1                     push_s	%r15
+ a52: 1cfcb408                 push	%r16
+ a56: 1cfcb448                 push	%r17
+ a5a: 1cfcb488                 push	%r18
+ a5e: c0f1                     push_s	%blink
+ a60: de00                     mov_s	%r14,0
+ a62: 70cf 00001fe4            mov_s	%r0,0x1fe4		; 0x1fe4 = get_uart_ctrl+0x350
+ a68: 09060080                 bl	serial_puts
+ a6c: 71cf 0000230c            mov_s	%r1,0x230c		; ddr_settings
+ a72: 8100                     ld_s	%r0,[%r1]
+ a74: b88f                     bset_s	%r0,%r0,15
+ a76: 72cf c1103fa4            mov_s	%r2,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+ a7c: 1a7f0038                 st.di	%r0,[%r2,0x1fc]
+ a80: 1a800fb8 065e31ff        st.di	0x65e_31ff,[%r2,0x200]		; 0x65e_31ff = ddr_settings+0x65e0ef3
+ a88: 1a810fb8 1649a941        st.di	0x1649_a941,[%r2,0x204]		; 0x1649_a941 = .regmask_lo+0x649a941
+ a90: 8100                     ld_s	%r0,[%r1]
+ a92: b8af                     bclr_s	%r0,%r0,15
+ a94: 1a7f0038                 st.di	%r0,[%r2,0x1fc]
+ a98: d908                     mov_s	%r1,8
+ a9a: 70cf c11047a0            mov_s	%r0,0xc110_47a0		; 0xc110_47a0 = .regmask_lo+0x29086761
+ aa0: 181a8078                 st.di	%r1,[%r0,0xffff_fc68]
+ aa4: d814                     mov_s	%r0,20
+ aa6: fd9f                     bl_s	dt_delay
+ aa8: df00                     mov_s	%r15,0
+ aaa: 278c9a0f                 cmp	%r15,0x3e8
+ aae: f64d                     bge_s	0xac6 = init_pctl+0x7a
+ ab0: 71cf 0000230c            mov_s	%r1,0x230c		; ddr_settings
+ ab6: 8121                     ld_s	%r1,[%r1,4]
+ ab8: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ abe: 18800078                 st.di	%r1,[%r0,0x200]
+ ac2: e701                     add_s	%r15,%r15,1
+ ac4: f1f3                     b_s	0xaaa = init_pctl+0x5e
+ ac6: 70cf 00001ff4            mov_s	%r0,0x1ff4		; 0x1ff4 = get_uart_ctrl+0x360
+ acc: 08a20080                 bl	serial_puts
+ ad0: 70cf c8000048            mov_s	%r0,0xc800_0048		; 0xc800_0048 = .regmask_lo+0x2ff82009
+ ad6: d920                     mov_s	%r1,32
+ ad8: 08fe0080                 bl	serial_put_hex
+ adc: 220a2f80 c7fffe08        mov	%r18,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ ae4: 12902e00                 ld.di	%r0,[%r18,0x240]
+ ae8: d920                     mov_s	%r1,32
+ aea: 08ee0080                 bl	serial_put_hex
+ aee: 71cf 0000230c            mov_s	%r1,0x230c		; ddr_settings
+ af4: 8102                     ld_s	%r0,[%r1,8]
+ af6: 1aae2038                 st.di	%r0,[%r18,0x2b8]
+ afa: 8103                     ld_s	%r0,[%r1,12]
+ afc: 1ab12038                 st.di	%r0,[%r18,0x2c4]
+ b00: 8104                     ld_s	%r0,[%r1,16]
+ b02: 1aaf2038                 st.di	%r0,[%r18,0x2bc]
+ b06: 8106                     ld_s	%r0,[%r1,24]
+ b08: 1ab02038                 st.di	%r0,[%r18,0x2c0]
+ b0c: 8107                     ld_s	%r0,[%r1,28]
+ b0e: 1acb2038                 st.di	%r0,[%r18,0x32c]
+ b12: da01                     mov_s	%r2,1
+ b14: 70cf c80015fc            mov_s	%r0,0xc800_15fc		; 0xc800_15fc = .regmask_lo+0x2ff835bd
+ b1a: 186180b8                 st.di	%r2,[%r0,0xffff_fd84]
+ b1e: 8105                     ld_s	%r0,[%r1,20]
+ b20: 72cf c8000604            mov_s	%r2,0xc800_0604		; 0xc800_0604 = .regmask_lo+0x2ff825c5
+ b26: 1a118038                 st.di	%r0,[%r2,0xffff_fc44]
+ b2a: 118c0000                 ld	%r0,[%r1,140]
+ b2e: 1a0f8038                 st.di	%r0,[%r2,0xffff_fc3c]
+ b32: 220a2f80 c7fffe08        mov	%r18,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ b3a: 12902e00                 ld.di	%r0,[%r18,0x240]
+ b3e: 20860f7f                 bic	%r0,%r0,-3
+ b42: e879                     brz_s	%r0,0,0xb32 = init_pctl+0xe6
+ b44: da01                     mov_s	%r2,1
+ b46: 1a8f20b8                 st.di	%r2,[%r18,0x23c]
+ b4a: 244a0000                 mov	%r4,0
+ b4e: 220a2f80 c7fffe08        mov	%r18,0xc7ff_fe08		; 0xc7ff_fe08 = .regmask_lo+0x2ff81dc9
+ b56: 12902e00                 ld.di	%r0,[%r18,0x240]
+ b5a: b8c0                     bmsk_s	%r0,%r0,0
+ b5c: e877                     brz_s	%r0,0,0xb4a = init_pctl+0xfe
+ b5e: 71cf 0000230c            mov_s	%r1,0x230c		; ddr_settings
+ b64: 11880000                 ld	%r0,[%r1,136]
+ b68: 1a9e2038                 st.di	%r0,[%r18,0x278]
+ b6c: 810c                     ld_s	%r0,[%r1,48]
+ b6e: 1ab22038                 st.di	%r0,[%r18,0x2c8]
+ b72: 810d                     ld_s	%r0,[%r1,52]
+ b74: 1ab32038                 st.di	%r0,[%r18,0x2cc]
+ b78: 810e                     ld_s	%r0,[%r1,56]
+ b7a: 1ab42038                 st.di	%r0,[%r18,0x2d0]
+ b7e: 810f                     ld_s	%r0,[%r1,60]
+ b80: 1ab52038                 st.di	%r0,[%r18,0x2d4]
+ b84: 8110                     ld_s	%r0,[%r1,64]
+ b86: 1ab72038                 st.di	%r0,[%r18,0x2dc]
+ b8a: 8111                     ld_s	%r0,[%r1,68]
+ b8c: 1ab92038                 st.di	%r0,[%r18,0x2e4]
+ b90: 8112                     ld_s	%r0,[%r1,72]
+ b92: 1ab82038                 st.di	%r0,[%r18,0x2e0]
+ b96: 8113                     ld_s	%r0,[%r1,76]
+ b98: 1aba2038                 st.di	%r0,[%r18,0x2e8]
+ b9c: 8114                     ld_s	%r0,[%r1,80]
+ b9e: 1abb2038                 st.di	%r0,[%r18,0x2ec]
+ ba2: 8115                     ld_s	%r0,[%r1,84]
+ ba4: 1abc2038                 st.di	%r0,[%r18,0x2f0]
+ ba8: 8116                     ld_s	%r0,[%r1,88]
+ baa: 1abd2038                 st.di	%r0,[%r18,0x2f4]
+ bae: 8117                     ld_s	%r0,[%r1,92]
+ bb0: 1abe2038                 st.di	%r0,[%r18,0x2f8]
+ bb4: 8118                     ld_s	%r0,[%r1,96]
+ bb6: 1abf2038                 st.di	%r0,[%r18,0x2fc]
+ bba: 8119                     ld_s	%r0,[%r1,100]
+ bbc: 1ac02038                 st.di	%r0,[%r18,0x300]
+ bc0: 811a                     ld_s	%r0,[%r1,104]
+ bc2: 1ac12038                 st.di	%r0,[%r18,0x304]
+ bc6: 811b                     ld_s	%r0,[%r1,108]
+ bc8: 1ac22038                 st.di	%r0,[%r18,0x308]
+ bcc: 811c                     ld_s	%r0,[%r1,112]
+ bce: 1ac62038                 st.di	%r0,[%r18,0x318]
+ bd2: 811d                     ld_s	%r0,[%r1,116]
+ bd4: 1aca2038                 st.di	%r0,[%r18,0x328]
+ bd8: 811e                     ld_s	%r0,[%r1,120]
+ bda: 1acc2038                 st.di	%r0,[%r18,0x330]
+ bde: 11980000                 ld	%r0,[%r1,152]
+ be2: 1ac52038                 st.di	%r0,[%r18,0x314]
+ be6: 811f                     ld_s	%r0,[%r1,124]
+ be8: 1ac82038                 st.di	%r0,[%r18,0x320]
+ bec: 11800000                 ld	%r0,[%r1,128]
+ bf0: 1ac72038                 st.di	%r0,[%r18,0x31c]
+ bf4: 11840000                 ld	%r0,[%r1,132]
+ bf8: 1ac92038                 st.di	%r0,[%r18,0x324]
+ bfc: 810a                     ld_s	%r0,[%r1,40]
+ bfe: 1aa12038                 st.di	%r0,[%r18,0x284]
+ c02: 810b                     ld_s	%r0,[%r1,44]
+ c04: 72cf c8000604            mov_s	%r2,0xc800_0604		; 0xc800_0604 = .regmask_lo+0x2ff825c5
+ c0a: 1a1a8038                 st.di	%r0,[%r2,0xffff_fc68]
+ c0e: fdbc                     bl_s	load_nop
+ c10: fe0f                     bl_s	get_mrs2
+ c12: 7108                     mov_s	%r1,%r0
+ c14: d802                     mov_s	%r0,2
+ c16: fdcc                     bl_s	load_mrs
+ c18: d803                     mov_s	%r0,3
+ c1a: 71c9                     mov_s	%r1,%r14
+ c1c: fdca                     bl_s	load_mrs
+ c1e: fe04                     bl_s	get_mrs1
+ c20: 20500010                 bclr	%r16,%r0,0
+ c24: d801                     mov_s	%r0,1
+ c26: 710a                     mov_s	%r1,%r16
+ c28: fdc7                     bl_s	load_mrs
+ c2a: fdf1                     bl_s	get_mrs0
+ c2c: 204f020d                 bset	%r13,%r0,8
+ c30: 7088                     mov_s	%r0,%r4
+ c32: 71a9                     mov_s	%r1,%r13
+ c34: fdc4                     bl_s	load_mrs
+ c36: 7088                     mov_s	%r0,%r4
+ c38: fddd                     bl_s	load_zqcl
+ c3a: 70cf 00002004            mov_s	%r0,0x2004		; 0x2004 = get_uart_ctrl+0x370
+ c40: 0f2e0040                 bl	serial_puts
+ c44: c0d1                     pop_s	%blink
+ c46: 14043412                 pop	%r18
+ c4a: 14043411                 pop	%r17
+ c4e: 14043410                 pop	%r16
+ c52: c7c1                     pop_s	%r15
+ c54: c6c1                     pop_s	%r14
+ c56: c5c1                     pop_s	%r13
+ c58: 7ee0                     j_s	[%blink]
+ c5a: 78e0                     nop_s
+enable_retention:
+ c5c: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ c62: 11840600                 ld	%r0,[%r1,0x210]
+ c66: b8b4                     bclr_s	%r0,%r0,20
+ c68: 19840018                 st	%r0,[%r1,0x210]
+ c6c: 7ee0                     j_s	[%blink]
+ c6e: 78e0                     nop_s
+disable_retention:
+ c70: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ c76: 11840600                 ld	%r0,[%r1,0x210]
+ c7a: b894                     bset_s	%r0,%r0,20
+ c7c: 19840018                 st	%r0,[%r1,0x210]
+ c80: 7ee0                     j_s	[%blink]
+ c82: 78e0                     nop_s
+dirty_delay:
+ c84: c5e1                     push_s	%r13
+ c86: c6e1                     push_s	%r14
+ c88: c7e1                     push_s	%r15
+ c8a: 1cfcb6c8                 push	%fp
+ c8e: 230a3700                 mov	%fp,%sp
+ c92: 77eb                     mov_s	%r15,%blink
+ c94: 7508                     mov_s	%r13,%r0
+ c96: 0d131052                 brlt	%r13,1,0xca6 = dirty_delay+0x22
+ c9a: d87d                     mov_s	%r0,125
+ c9c: b808                     asl_s	%r0,%r0,8
+ c9e: 0cf60000                 bl	delay_tick
+ ca2: bd61                     sub_s	%r13,%r13,1
+ ca4: f1f9                     b_s	0xc96 = dirty_delay+0x12
+ ca6: 77fb                     mov_s	%blink,%r15
+ ca8: 240a36c0                 mov	%sp,%fp
+ cac: 1404341b                 pop	%fp
+ cb0: c7c1                     pop_s	%r15
+ cb2: c6c1                     pop_s	%r14
+ cb4: c5c1                     pop_s	%r13
+ cb6: 7ee0                     j_s	[%blink]
+tt_delay:
+ cb8: 1cfcb6c8                 push	%fp
+ cbc: 230a3700                 mov	%fp,%sp
+ cc0: d900                     mov_s	%r1,0
+ cc2: d900                     mov_s	%r1,0
+ cc4: 090d0f83 00002710        brge	%r1,0x2710,0xcd0 = tt_delay+0x18		; 0x2710 = ddr_settings+0x404
+ ccc: e101                     add_s	%r1,%r1,1
+ cce: f1fc                     b_s	0xcc4 = tt_delay+12
+ cd0: b861                     sub_s	%r0,%r0,1
+ cd2: 08f38053                 brge	%r0,1,0xcc2 = tt_delay+10
+ cd6: 240a36c0                 mov	%sp,%fp
+ cda: 1404341b                 pop	%fp
+ cde: 7ee0                     j_s	[%blink]
+enable_iso_ao:
+ ce0: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ ce6: 11830600                 ld	%r0,[%r1,0x20c]
+ cea: 204603c0                 bic	%r0,%r0,15
+ cee: 19830018                 st	%r0,[%r1,0x20c]
+ cf2: 7ee0                     j_s	[%blink]
+enable_iso_ee:
+ cf4: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ cfa: 11830600                 ld	%r0,[%r1,0x20c]
+ cfe: b8a4                     bclr_s	%r0,%r0,4
+ d00: 19830018                 st	%r0,[%r1,0x20c]
+ d04: 7ee0                     j_s	[%blink]
+ d06: 78e0                     nop_s
+disable_iso_ao:
+ d08: c0f1                     push_s	%blink
+ d0a: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ d10: 11830600                 ld	%r0,[%r1,0x20c]
+ d14: 20450340                 or	%r0,%r0,13
+ d18: 19830018                 st	%r0,[%r1,0x20c]
+ d1c: 19a20f98 0000ffff        st	0xffff,[%r1,0x288]		; 0xffff = ddr_settings+0xdcf3
+ d24: 11830600                 ld	%r0,[%r1,0x20c]
+ d28: b885                     bset_s	%r0,%r0,5
+ d2a: 19830018                 st	%r0,[%r1,0x20c]
+ d2e: 11830600                 ld	%r0,[%r1,0x20c]
+ d32: b889                     bset_s	%r0,%r0,9
+ d34: 19830018                 st	%r0,[%r1,0x20c]
+ d38: 11830600                 ld	%r0,[%r1,0x20c]
+ d3c: b8a9                     bclr_s	%r0,%r0,9
+ d3e: 19830018                 st	%r0,[%r1,0x20c]
+ d42: 11830600                 ld	%r0,[%r1,0x20c]
+ d46: b889                     bset_s	%r0,%r0,9
+ d48: 19830018                 st	%r0,[%r1,0x20c]
+ d4c: d87d                     mov_s	%r0,125
+ d4e: b808                     asl_s	%r0,%r0,8
+ d50: 0c420000                 bl	delay_tick
+ d54: d87d                     mov_s	%r0,125
+ d56: b808                     asl_s	%r0,%r0,8
+ d58: 0c3a0000                 bl	delay_tick
+ d5c: c0d1                     pop_s	%blink
+ d5e: 7ee0                     j_s	[%blink]
+disable_iso_ee:
+ d60: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ d66: 11830600                 ld	%r0,[%r1,0x20c]
+ d6a: b884                     bset_s	%r0,%r0,4
+ d6c: 19830018                 st	%r0,[%r1,0x20c]
+ d70: 7ee0                     j_s	[%blink]
+ d72: 78e0                     nop_s
+cpu_on:
+ d74: c0f1                     push_s	%blink
+ d76: da02                     mov_s	%r2,2
+ d78: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ d7e: 198600b8                 st.di	%r2,[%r1,0x218]
+ d82: 70cf c1109778            mov_s	%r0,0xc110_9778		; 0xc110_9778 = .regmask_lo+0x2908b739
+ d88: 186500b8                 st.di	%r2,[%r0,0x194]
+ d8c: 11830e00                 ld.di	%r0,[%r1,0x20c]
+ d90: b884                     bset_s	%r0,%r0,4
+ d92: 19830038                 st.di	%r0,[%r1,0x20c]
+ d96: d90f                     mov_s	%r1,15
+ d98: 70cf c11047a0            mov_s	%r0,0xc110_47a0		; 0xc110_47a0 = .regmask_lo+0x29086761
+ d9e: 181d8078                 st.di	%r1,[%r0,0xffff_fc74]
+ da2: 71cf c1103fa4            mov_s	%r1,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+ da8: 117e0e00                 ld.di	%r0,[%r1,0x1f8]
+ dac: b8b3                     bclr_s	%r0,%r0,19
+ dae: 197e0038                 st.di	%r0,[%r1,0x1f8]
+ db2: d87d                     mov_s	%r0,125
+ db4: b808                     asl_s	%r0,%r0,8
+ db6: 0bde0000                 bl	delay_tick
+ dba: d87d                     mov_s	%r0,125
+ dbc: b808                     asl_s	%r0,%r0,8
+ dbe: 0bd60000                 bl	delay_tick
+ dc2: d87d                     mov_s	%r0,125
+ dc4: b808                     asl_s	%r0,%r0,8
+ dc6: 0bce0000                 bl	delay_tick
+ dca: c0d1                     pop_s	%blink
+ dcc: 7ee0                     j_s	[%blink]
+ dce: 78e0                     nop_s
+cpu_off:
+ dd0: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ dd6: 11830e00                 ld.di	%r0,[%r1,0x20c]
+ dda: b8a4                     bclr_s	%r0,%r0,4
+ ddc: 19830038                 st.di	%r0,[%r1,0x20c]
+ de0: 7ee0                     j_s	[%blink]
+ de2: 78e0                     nop_s
+ee_on:
+ de4: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ dea: 11830600                 ld	%r0,[%r1,0x20c]
+ dee: b889                     bset_s	%r0,%r0,9
+ df0: 19830018                 st	%r0,[%r1,0x20c]
+ df4: 7ee0                     j_s	[%blink]
+ df6: 78e0                     nop_s
+ee_off:
+ df8: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ dfe: 11830600                 ld	%r0,[%r1,0x20c]
+ e02: b8a9                     bclr_s	%r0,%r0,9
+ e04: 19830018                 st	%r0,[%r1,0x20c]
+ e08: 7ee0                     j_s	[%blink]
+ e0a: 78e0                     nop_s
+power_down:
+ e0c: c5e1                     push_s	%r13
+ e0e: c6e1                     push_s	%r14
+ e10: c7e1                     push_s	%r15
+ e12: 77eb                     mov_s	%r15,%blink
+ e14: de00                     mov_s	%r14,0
+ e16: 75cf c80ffe04            mov_s	%r13,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ e1c: 1d7f1f98 01230123        st	0x123_0123,[%r13,0x1fc]		; 0x123_0123 = ddr_settings+0x122de17
+ e24: 70cf 00002014            mov_s	%r0,0x2014		; 0x2014 = get_uart_ctrl+0x380
+ e2a: 0d460040                 bl	serial_puts
+ e2e: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ e34: 188103b8                 st.di	%r14,[%r0,0x204]
+ e38: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ e3e: 10c90e00                 ld.di	%r0,[%r0,0x324]
+ e42: e887                     brnz_s	%r0,0,0xe4e = power_down+0x42
+ e44: d87d                     mov_s	%r0,125
+ e46: b808                     asl_s	%r0,%r0,8
+ e48: 0b4a0000                 bl	delay_tick
+ e4c: f1f6                     b_s	0xe38 = power_down+0x2c
+ e4e: d87d                     mov_s	%r0,125
+ e50: b808                     asl_s	%r0,%r0,8
+ e52: 0b420000                 bl	delay_tick
+ e56: 70cf 0000202c            mov_s	%r0,0x202c		; 0x202c = get_uart_ctrl+0x398
+ e5c: 0d120040                 bl	serial_puts
+ e60: 0b9aff8f                 bl	mmc_sleep
+ e64: d87d                     mov_s	%r0,125
+ e66: b808                     asl_s	%r0,%r0,8
+ e68: 0b2a0000                 bl	delay_tick
+ e6c: 70cf 00002044            mov_s	%r0,0x2044		; 0x2044 = get_uart_ctrl+0x3b0
+ e72: 0cfe0040                 bl	serial_puts
+ e76: 75cf c80ffe04            mov_s	%r13,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ e7c: 15841600                 ld	%r0,[%r13,0x210]
+ e80: b8b4                     bclr_s	%r0,%r0,20
+ e82: 1d841018                 st	%r0,[%r13,0x210]
+ e86: d87d                     mov_s	%r0,125
+ e88: b808                     asl_s	%r0,%r0,8
+ e8a: 0b0a0000                 bl	delay_tick
+ e8e: 70cf 00002058            mov_s	%r0,0x2058		; 0x2058 = get_uart_ctrl+0x3c4
+ e94: 0cda0040                 bl	serial_puts
+ e98: 1d7f1f98 01230123        st	0x123_0123,[%r13,0x1fc]		; 0x123_0123 = ddr_settings+0x122de17
+ ea0: 15831600                 ld	%r0,[%r13,0x20c]
+ ea4: b8a4                     bclr_s	%r0,%r0,4
+ ea6: 1d831018                 st	%r0,[%r13,0x20c]
+ eaa: 70cf 00002078            mov_s	%r0,0x2078		; 0x2078 = get_uart_ctrl+0x3e4
+ eb0: 0cbe0040                 bl	serial_puts
+ eb4: 15831e00                 ld.di	%r0,[%r13,0x20c]
+ eb8: b8a0                     bclr_s	%r0,%r0,0
+ eba: 1d831038                 st.di	%r0,[%r13,0x20c]
+ ebe: 15831600                 ld	%r0,[%r13,0x20c]
+ ec2: 204603c0                 bic	%r0,%r0,15
+ ec6: 1d831018                 st	%r0,[%r13,0x20c]
+ eca: 70cf 0000208c            mov_s	%r0,0x208c		; 0x208c = get_uart_ctrl+0x3f8
+ ed0: 0c9e0040                 bl	serial_puts
+ ed4: 15831600                 ld	%r0,[%r13,0x20c]
+ ed8: b8a9                     bclr_s	%r0,%r0,9
+ eda: 1d831018                 st	%r0,[%r13,0x20c]
+ ede: 77fb                     mov_s	%blink,%r15
+ ee0: c7c1                     pop_s	%r15
+ ee2: c6c1                     pop_s	%r14
+ ee4: c5c1                     pop_s	%r13
+ ee6: 7ee0                     j_s	[%blink]
+power_up:
+ ee8: c5e1                     push_s	%r13
+ eea: c6e1                     push_s	%r14
+ eec: c7e1                     push_s	%r15
+ eee: 1cfcb408                 push	%r16
+ ef2: 1cfcb448                 push	%r17
+ ef6: c0f1                     push_s	%blink
+ ef8: 70cf 00002098            mov_s	%r0,0x2098		; 0x2098 = get_uart_ctrl+0x404
+ efe: 0c720040                 bl	serial_puts
+ f02: 76cf c80ffe04            mov_s	%r14,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ f08: 16831600                 ld	%r0,[%r14,0x20c]
+ f0c: b8a9                     bclr_s	%r0,%r0,9
+ f0e: 1e831018                 st	%r0,[%r14,0x20c]
+ f12: 16831600                 ld	%r0,[%r14,0x20c]
+ f16: 20450340                 or	%r0,%r0,13
+ f1a: 1e831018                 st	%r0,[%r14,0x20c]
+ f1e: 1ea21f98 0000ffff        st	0xffff,[%r14,0x288]		; 0xffff = ddr_settings+0xdcf3
+ f26: 16831600                 ld	%r0,[%r14,0x20c]
+ f2a: b885                     bset_s	%r0,%r0,5
+ f2c: 1e831018                 st	%r0,[%r14,0x20c]
+ f30: 16831600                 ld	%r0,[%r14,0x20c]
+ f34: b889                     bset_s	%r0,%r0,9
+ f36: 1e831018                 st	%r0,[%r14,0x20c]
+ f3a: 16831600                 ld	%r0,[%r14,0x20c]
+ f3e: b8a9                     bclr_s	%r0,%r0,9
+ f40: 1e831018                 st	%r0,[%r14,0x20c]
+ f44: 16831600                 ld	%r0,[%r14,0x20c]
+ f48: b889                     bset_s	%r0,%r0,9
+ f4a: 1e831018                 st	%r0,[%r14,0x20c]
+ f4e: d87d                     mov_s	%r0,125
+ f50: b808                     asl_s	%r0,%r0,8
+ f52: 0a420000                 bl	delay_tick
+ f56: d87d                     mov_s	%r0,125
+ f58: b808                     asl_s	%r0,%r0,8
+ f5a: 0a3a0000                 bl	delay_tick
+ f5e: 70cf 000020a0            mov_s	%r0,0x20a0		; 0x20a0 = get_uart_ctrl+0x40c
+ f64: 0c0a0040                 bl	serial_puts
+ f68: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ f6e: 18c80fb8 000017ff        st.di	0x17ff,[%r0,0x320]		; 0x17ff = switch_clk81+0x6b
+ f76: d87d                     mov_s	%r0,125
+ f78: b808                     asl_s	%r0,%r0,8
+ f7a: 0a1a0000                 bl	delay_tick
+ f7e: 204a2000                 mov	%r16,0
+ f82: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ f88: 10c80e00                 ld.di	%r0,[%r0,0x320]
+ f8c: e811                     brz_s	%r0,0,0xfae = power_up+0xc6
+ f8e: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+ f94: 10c80e0f                 ld.di	%r15,[%r0,0x320]
+ f98: 18c803f8                 st.di	%r15,[%r0,0x320]
+ f9c: 70e9                     mov_s	%r0,%r15
+ f9e: d920                     mov_s	%r1,32
+ fa0: 0c360040                 bl	serial_put_hex
+ fa4: d87d                     mov_s	%r0,125
+ fa6: b808                     asl_s	%r0,%r0,8
+ fa8: 09ea0000                 bl	delay_tick
+ fac: f1e9                     b_s	0xf7e = power_up+0x96
+ fae: d87d                     mov_s	%r0,125
+ fb0: b808                     asl_s	%r0,%r0,8
+ fb2: 09e20000                 bl	delay_tick
+ fb6: 76cf c80ffe04            mov_s	%r14,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+ fbc: 16831600                 ld	%r0,[%r14,0x20c]
+ fc0: b885                     bset_s	%r0,%r0,5
+ fc2: 1e831018                 st	%r0,[%r14,0x20c]
+ fc6: 16831600                 ld	%r0,[%r14,0x20c]
+ fca: b883                     bset_s	%r0,%r0,3
+ fcc: 1e831018                 st	%r0,[%r14,0x20c]
+ fd0: 16831600                 ld	%r0,[%r14,0x20c]
+ fd4: b882                     bset_s	%r0,%r0,2
+ fd6: 1e831018                 st	%r0,[%r14,0x20c]
+ fda: 16831600                 ld	%r0,[%r14,0x20c]
+ fde: b881                     bset_s	%r0,%r0,1
+ fe0: 1e831018                 st	%r0,[%r14,0x20c]
+ fe4: 16831600                 ld	%r0,[%r14,0x20c]
+ fe8: b880                     bset_s	%r0,%r0,0
+ fea: 1e831018                 st	%r0,[%r14,0x20c]
+ fee: 700a                     mov_s	%r0,%r16
+ ff0: 0fa60000                 bl	switch_clk81
+ ff4: 70cf 000020b0            mov_s	%r0,0x20b0		; 0x20b0 = get_uart_ctrl+0x41c
+ ffa: 0b760040                 bl	serial_puts
+ ffe: d902                     mov_s	%r1,2
+1000: 1e861058                 st	%r1,[%r14,0x218]
+1004: 70cf c1109778            mov_s	%r0,0xc110_9778		; 0xc110_9778 = .regmask_lo+0x2908b739
+100a: 18650078                 st.di	%r1,[%r0,0x194]
+100e: d87d                     mov_s	%r0,125
+1010: b808                     asl_s	%r0,%r0,8
+1012: 09820000                 bl	delay_tick
+1016: d87d                     mov_s	%r0,125
+1018: b808                     asl_s	%r0,%r0,8
+101a: 097a0000                 bl	delay_tick
+101e: 16831600                 ld	%r0,[%r14,0x20c]
+1022: b884                     bset_s	%r0,%r0,4
+1024: 1e831018                 st	%r0,[%r14,0x20c]
+1028: d87d                     mov_s	%r0,125
+102a: b808                     asl_s	%r0,%r0,8
+102c: 09660000                 bl	delay_tick
+1030: d87d                     mov_s	%r0,125
+1032: b808                     asl_s	%r0,%r0,8
+1034: 095e0000                 bl	delay_tick
+1038: d90f                     mov_s	%r1,15
+103a: 70cf c11047a0            mov_s	%r0,0xc110_47a0		; 0xc110_47a0 = .regmask_lo+0x29086761
+1040: 181d8078                 st.di	%r1,[%r0,0xffff_fc74]
+1044: 750a                     mov_s	%r13,%r16
+1046: 0d2b1293                 brge	%r13,10,0x106e = power_up+0x186
+104a: d87d                     mov_s	%r0,125
+104c: b808                     asl_s	%r0,%r0,8
+104e: 09460000                 bl	delay_tick
+1052: d87d                     mov_s	%r0,125
+1054: b808                     asl_s	%r0,%r0,8
+1056: 093e0000                 bl	delay_tick
+105a: d87d                     mov_s	%r0,125
+105c: b808                     asl_s	%r0,%r0,8
+105e: 09360000                 bl	delay_tick
+1062: d87d                     mov_s	%r0,125
+1064: b808                     asl_s	%r0,%r0,8
+1066: 092e0000                 bl	delay_tick
+106a: e501                     add_s	%r13,%r13,1
+106c: f1ed                     b_s	0x1046 = power_up+0x15e
+106e: 70cf 000020bc            mov_s	%r0,0x20bc		; 0x20bc = get_uart_ctrl+0x428
+1074: 0afa0040                 bl	serial_puts
+1078: 09d6ffcf                 bl	init_pctl
+107c: d87d                     mov_s	%r0,125
+107e: b808                     asl_s	%r0,%r0,8
+1080: 09120000                 bl	delay_tick
+1084: 70cf 000020c8            mov_s	%r0,0x20c8		; 0x20c8 = get_uart_ctrl+0x434
+108a: 0ae60040                 bl	serial_puts
+108e: 76cf c8000604            mov_s	%r14,0xc800_0604		; 0xc800_0604 = .regmask_lo+0x2ff825c5
+1094: 16169e00                 ld.di	%r0,[%r14,0xffff_fc58]
+1098: d920                     mov_s	%r1,32
+109a: 0b3e0040                 bl	serial_put_hex
+109e: d80a                     mov_s	%r0,10
+10a0: 0a360040                 bl	serial_putc
+10a4: 70cf 000020d0            mov_s	%r0,0x20d0		; 0x20d0 = get_uart_ctrl+0x43c
+10aa: 0ac60040                 bl	serial_puts
+10ae: 16129e00                 ld.di	%r0,[%r14,0xffff_fc48]
+10b2: d920                     mov_s	%r1,32
+10b4: 0b220040                 bl	serial_put_hex
+10b8: d80a                     mov_s	%r0,10
+10ba: 0a1e0040                 bl	serial_putc
+10be: d87d                     mov_s	%r0,125
+10c0: b808                     asl_s	%r0,%r0,8
+10c2: 08d20000                 bl	delay_tick
+10c6: d855                     mov_s	%r0,85
+10c8: 1e169038                 st.di	%r0,[%r14,0xffff_fc58]
+10cc: 208a0249                 mov	%r0,0x249
+10d0: 1e129038                 st.di	%r0,[%r14,0xffff_fc48]
+10d4: 70cf 000020d8            mov_s	%r0,0x20d8		; 0x20d8 = get_uart_ctrl+0x444
+10da: 0a960040                 bl	serial_puts
+10de: 0b86ff8f                 bl	init_dmc
+10e2: 70cf 000020e4            mov_s	%r0,0x20e4		; 0x20e4 = get_uart_ctrl+0x450
+10e8: 0a860040                 bl	serial_puts
+10ec: 090eff8f                 bl	mmc_sleep
+10f0: d87d                     mov_s	%r0,125
+10f2: b808                     asl_s	%r0,%r0,8
+10f4: 089e0000                 bl	delay_tick
+10f8: 70cf 000020f0            mov_s	%r0,0x20f0		; 0x20f0 = get_uart_ctrl+0x45c
+10fe: 0a720040                 bl	serial_puts
+1102: 76cf c80ffe04            mov_s	%r14,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1108: 16841600                 ld	%r0,[%r14,0x210]
+110c: b894                     bset_s	%r0,%r0,20
+110e: 1e841018                 st	%r0,[%r14,0x210]
+1112: 70cf 00002104            mov_s	%r0,0x2104		; 0x2104 = get_uart_ctrl+0x470
+1118: 0a560040                 bl	serial_puts
+111c: 096aff8f                 bl	mmc_wakeup
+1120: 70cf 00002114            mov_s	%r0,0x2114		; 0x2114 = get_uart_ctrl+0x480
+1126: 0a4a0040                 bl	serial_puts
+112a: d9ff                     mov_s	%r1,255
+112c: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+1132: 18810078                 st.di	%r1,[%r0,0x204]
+1136: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+113c: 10c90e00                 ld.di	%r0,[%r0,0x324]
+1140: e87b                     brz_s	%r0,0,0x1136 = power_up+0x24e
+1142: d87d                     mov_s	%r0,125
+1144: b808                     asl_s	%r0,%r0,8
+1146: 084e0000                 bl	delay_tick
+114a: c0d1                     pop_s	%blink
+114c: 14043411                 pop	%r17
+1150: 14043410                 pop	%r16
+1154: c7c1                     pop_s	%r15
+1156: c6c1                     pop_s	%r14
+1158: c5c1                     pop_s	%r13
+115a: 7ee0                     j_s	[%blink]
+timer_init:
+115c: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1162: 11920e00                 ld.di	%r0,[%r1,0x248]
+1166: 204507c0                 or	%r0,%r0,31
+116a: 19920038                 st.di	%r0,[%r1,0x248]
+116e: 7ee0                     j_s	[%blink]
+get_tick:
+1170: 1cfcb6c8                 push	%fp
+1174: 230a3700                 mov	%fp,%sp
+1178: 7108                     mov_s	%r1,%r0
+117a: 70cf c80ffe04            mov_s	%r0,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1180: 10940e00                 ld.di	%r0,[%r0,0x250]
+1184: 7822                     sub_s	%r0,%r0,%r1
+1186: 240a36c0                 mov	%sp,%fp
+118a: 1404341b                 pop	%fp
+118e: 7ee0                     j_s	[%blink]
+delay_tick:
+1190: 1cfcb6c8                 push	%fp
+1194: 230a3700                 mov	%fp,%sp
+1198: 240a07c0                 mov	%r4,%blink
+119c: 7308                     mov_s	%r3,%r0
+119e: d800                     mov_s	%r0,0
+11a0: fff4                     bl_s	get_tick
+11a2: 7208                     mov_s	%r2,%r0
+11a4: 70cf c80ffe04            mov_s	%r0,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+11aa: 10830e00                 ld.di	%r0,[%r0,0x20c]
+11ae: 20860ffb                 bic	%r0,%r0,0xffff_feff
+11b2: e807                     brz_s	%r0,0,0x11be = delay_tick+0x2e
+11b4: 7048                     mov_s	%r0,%r2
+11b6: ffef                     bl_s	get_tick
+11b8: 08fd80c4                 brlo	%r0,%r3,0x11b4 = delay_tick+0x24
+11bc: f008                     b_s	0x11cc = delay_tick+0x3c
+11be: 7048                     mov_s	%r0,%r2
+11c0: ffec                     bl_s	get_tick
+11c2: 6b32                     asl_s	%r1,%r3,2
+11c4: 7935                     add2_s	%r1,%r1,%r1
+11c6: 7935                     add2_s	%r1,%r1,%r1
+11c8: 08f78044                 brlo	%r0,%r1,0x11be = delay_tick+0x2e
+11cc: d800                     mov_s	%r0,0
+11ce: 270a3100                 mov	%blink,%r4
+11d2: 240a36c0                 mov	%sp,%fp
+11d6: 1404341b                 pop	%fp
+11da: 7ee0                     j_s	[%blink]
+mem_test:
+11dc: c5e1                     push_s	%r13
+11de: c6e1                     push_s	%r14
+11e0: c0f1                     push_s	%blink
+11e2: 266f1043                 ror	%r14,1
+11e6: 70cf 00002130            mov_s	%r0,0x2130		; 0x2130 = get_uart_ctrl+0x49c
+11ec: 09820040                 bl	serial_puts
+11f0: dd00                     mov_s	%r13,0
+11f2: 0d151293                 brge	%r13,10,0x1204 = mem_test+0x28
+11f6: 1e001f80 a5a5a5a5        st	0xa5a5_a5a5,[%r14]		; 0xa5a5_a5a5 = .regmask_lo+0xd9dc566
+11fe: e604                     add_s	%r14,%r14,4
+1200: e501                     add_s	%r13,%r13,1
+1202: f1f9                     b_s	0x11f2 = mem_test+0x16
+1204: 266f1043                 ror	%r14,1
+1208: dd00                     mov_s	%r13,0
+120a: 0d231293                 brge	%r13,10,0x122a = mem_test+0x4e
+120e: 8600                     ld_s	%r0,[%r14]
+1210: 08150f80 a5a5a5a5        breq	%r0,0xa5a5_a5a5,0x1224 = mem_test+0x48		; 0xa5a5_a5a5 = .regmask_lo+0xd9dc566
+1218: 70cf 00002140            mov_s	%r0,0x2140		; 0x2140 = get_uart_ctrl+0x4ac
+121e: 09520040                 bl	serial_puts
+1222: f005                     b_s	0x122a = mem_test+0x4e
+1224: e604                     add_s	%r14,%r14,4
+1226: e501                     add_s	%r13,%r13,1
+1228: f1f1                     b_s	0x120a = mem_test+0x2e
+122a: 70cf 0000214c            mov_s	%r0,0x214c		; 0x214c = get_uart_ctrl+0x4b8
+1230: 093e0040                 bl	serial_puts
+1234: c0d1                     pop_s	%blink
+1236: c6c1                     pop_s	%r14
+1238: c5c1                     pop_s	%r13
+123a: 7ee0                     j_s	[%blink]
+copy_reboot_code:
+123c: c5e1                     push_s	%r13
+123e: c6e1                     push_s	%r14
+1240: 76eb                     mov_s	%r14,%blink
+1242: 70cf 00002158            mov_s	%r0,0x2158		; 0x2158 = get_uart_ctrl+0x4c4
+1248: 09260040                 bl	serial_puts
+124c: dd00                     mov_s	%r13,0
+124e: 258c9006                 cmp	%r13,0x180
+1252: f64f                     bge_s	0x126e = copy_reboot_code+0x32
+1254: 72cf 000022d0            mov_s	%r2,0x22d0		; UART_CONFIG_24M
+125a: 8203                     ld_s	%r0,[%r2,12]
+125c: 6d32                     asl_s	%r1,%r13,2
+125e: 20708043                 ld.aw.di	%r3,[%r0,%r1]
+1262: 8202                     ld_s	%r0,[%r2,8]
+1264: 6038                     add_s	%r0,%r0,%r1
+1266: 180000e0                 st.di	%r3,[%r0]
+126a: e501                     add_s	%r13,%r13,1
+126c: f1f1                     b_s	0x124e = copy_reboot_code+0x12
+126e: 76fb                     mov_s	%blink,%r14
+1270: c6c1                     pop_s	%r14
+1272: c5c1                     pop_s	%r13
+1274: 7ee0                     j_s	[%blink]
+1276: 78e0                     nop_s
+reboot_arm:
+1278: c5e1                     push_s	%r13
+127a: c6e1                     push_s	%r14
+127c: 76eb                     mov_s	%r14,%blink
+127e: 70cf 00002170            mov_s	%r0,0x2170		; 0x2170 = get_uart_ctrl+0x4dc
+1284: 08ea0040                 bl	serial_puts
+1288: da00                     mov_s	%r2,0
+128a: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1290: 19810fb8 1234abcd        st.di	0x1234_abcd,[%r1,0x204]		; 0x1234_abcd = .regmask_lo+0x234abcd
+1298: db02                     mov_s	%r3,2
+129a: 198600f8                 st.di	%r3,[%r1,0x218]
+129e: 70cf c1109778            mov_s	%r0,0xc110_9778		; 0xc110_9778 = .regmask_lo+0x2908b739
+12a4: 186500f8                 st.di	%r3,[%r0,0x194]
+12a8: 70cf c1103fa4            mov_s	%r0,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+12ae: 18680fb8 7fffffff        st.di	0x7fff_ffff,[%r0,0x1a0]		; 0x7fff_ffff = .regmask_lo+0x6fffffff
+12b6: 11830e00                 ld.di	%r0,[%r1,0x20c]
+12ba: b884                     bset_s	%r0,%r0,4
+12bc: 19830038                 st.di	%r0,[%r1,0x20c]
+12c0: 7548                     mov_s	%r13,%r2
+12c2: 0d111293                 brge	%r13,10,0x12d0 = reboot_arm+0x58
+12c6: d87d                     mov_s	%r0,125
+12c8: b808                     asl_s	%r0,%r0,8
+12ca: ffb2                     bl_s	delay_tick
+12cc: e501                     add_s	%r13,%r13,1
+12ce: f1fb                     b_s	0x12c2 = reboot_arm+0x4a
+12d0: d90f                     mov_s	%r1,15
+12d2: da00                     mov_s	%r2,0
+12d4: 70cf c11047a0            mov_s	%r0,0xc110_47a0		; 0xc110_47a0 = .regmask_lo+0x29086761
+12da: 181d8078                 st.di	%r1,[%r0,0xffff_fc74]
+12de: 7548                     mov_s	%r13,%r2
+12e0: e5e4                     cmp_s	%r13,100
+12e2: f647                     bge_s	0x12ee = reboot_arm+0x76
+12e4: d87d                     mov_s	%r0,125
+12e6: b808                     asl_s	%r0,%r0,8
+12e8: ffaa                     bl_s	delay_tick
+12ea: e501                     add_s	%r13,%r13,1
+12ec: f1fa                     b_s	0x12e0 = reboot_arm+0x68
+12ee: 76fb                     mov_s	%blink,%r14
+12f0: c6c1                     pop_s	%r14
+12f2: c5c1                     pop_s	%r13
+12f4: 7ee0                     j_s	[%blink]
+12f6: 78e0                     nop_s
+test_pd:
+12f8: c5e1                     push_s	%r13
+12fa: c6e1                     push_s	%r14
+12fc: c7e1                     push_s	%r15
+12fe: 1cfcb408                 push	%r16
+1302: c0f1                     push_s	%blink
+1304: 70cf 00002180            mov_s	%r0,0x2180		; 0x2180 = get_uart_ctrl+0x4ec
+130a: 08660040                 bl	serial_puts
+130e: 0de2ff4f                 bl	disable_mmc_req
+1312: 0eeaff4f                 bl	mmc_sleep
+1316: 094affcf                 bl	enable_retention
+131a: dd00                     mov_s	%r13,0
+131c: 71cf c1103fa4            mov_s	%r1,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+1322: 117e0600                 ld	%r0,[%r1,0x1f8]
+1326: b893                     bset_s	%r0,%r0,19
+1328: 197e0018                 st	%r0,[%r1,0x1f8]
+132c: 77cf c80ffe04            mov_s	%r15,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1332: 17831600                 ld	%r0,[%r15,0x20c]
+1336: b8a4                     bclr_s	%r0,%r0,4
+1338: 1f831018                 st	%r0,[%r15,0x20c]
+133c: 11710600                 ld	%r0,[%r1,0x1c4]
+1340: b88f                     bset_s	%r0,%r0,15
+1342: 19710018                 st	%r0,[%r1,0x1c4]
+1346: d801                     mov_s	%r0,1
+1348: 0c4e0000                 bl	switch_clk81
+134c: 178f1600                 ld	%r0,[%r15,0x23c]
+1350: b8ac                     bclr_s	%r0,%r0,12
+1352: 1f8f1018                 st	%r0,[%r15,0x23c]
+1356: 17831600                 ld	%r0,[%r15,0x20c]
+135a: b8a0                     bclr_s	%r0,%r0,0
+135c: 1f831018                 st	%r0,[%r15,0x20c]
+1360: 17831600                 ld	%r0,[%r15,0x20c]
+1364: 204603c0                 bic	%r0,%r0,15
+1368: 1f831018                 st	%r0,[%r15,0x20c]
+136c: 17831600                 ld	%r0,[%r15,0x20c]
+1370: b8a9                     bclr_s	%r0,%r0,9
+1372: 1f831018                 st	%r0,[%r15,0x20c]
+1376: 70cf 0000219c            mov_s	%r0,0x219c		; 0x219c = get_uart_ctrl+0x508
+137c: 0ff20000                 bl	serial_puts
+1380: 76a9                     mov_s	%r14,%r13
+1382: 0e191093                 brge	%r14,2,0x1398 = test_pd+0xa0
+1386: 70cf 000021b4            mov_s	%r0,0x21b4		; 0x21b4 = get_uart_ctrl+0x520
+138c: 0fe20000                 bl	serial_puts
+1390: d801                     mov_s	%r0,1
+1392: fe4a                     bl_s	tt_delay
+1394: e601                     add_s	%r14,%r14,1
+1396: f1f7                     b_s	0x1382 = test_pd+0x8a
+1398: 70cf 000021b8            mov_s	%r0,0x21b8		; 0x21b8 = get_uart_ctrl+0x524
+139e: 0fd20000                 bl	serial_puts
+13a2: dd00                     mov_s	%r13,0
+13a4: 77cf c80ffe04            mov_s	%r15,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+13aa: 17831600                 ld	%r0,[%r15,0x20c]
+13ae: b8a9                     bclr_s	%r0,%r0,9
+13b0: 1f831018                 st	%r0,[%r15,0x20c]
+13b4: 17831600                 ld	%r0,[%r15,0x20c]
+13b8: 20450340                 or	%r0,%r0,13
+13bc: 1f831018                 st	%r0,[%r15,0x20c]
+13c0: 1fa21f98 0000ffff        st	0xffff,[%r15,0x288]		; 0xffff = ddr_settings+0xdcf3
+13c8: 17831600                 ld	%r0,[%r15,0x20c]
+13cc: b885                     bset_s	%r0,%r0,5
+13ce: 1f831018                 st	%r0,[%r15,0x20c]
+13d2: 17831600                 ld	%r0,[%r15,0x20c]
+13d6: b889                     bset_s	%r0,%r0,9
+13d8: 1f831018                 st	%r0,[%r15,0x20c]
+13dc: 17831600                 ld	%r0,[%r15,0x20c]
+13e0: b8a9                     bclr_s	%r0,%r0,9
+13e2: 1f831018                 st	%r0,[%r15,0x20c]
+13e6: 17831600                 ld	%r0,[%r15,0x20c]
+13ea: b889                     bset_s	%r0,%r0,9
+13ec: 1f831018                 st	%r0,[%r15,0x20c]
+13f0: d87d                     mov_s	%r0,125
+13f2: b808                     asl_s	%r0,%r0,8
+13f4: ff67                     bl_s	delay_tick
+13f6: d87d                     mov_s	%r0,125
+13f8: b808                     asl_s	%r0,%r0,8
+13fa: ff66                     bl_s	delay_tick
+13fc: 70cf 000021d0            mov_s	%r0,0x21d0		; 0x21d0 = get_uart_ctrl+0x53c
+1402: 0f6e0000                 bl	serial_puts
+1406: 178f1600                 ld	%r0,[%r15,0x23c]
+140a: b88c                     bset_s	%r0,%r0,12
+140c: 1f8f1018                 st	%r0,[%r15,0x23c]
+1410: 70cf 000021e4            mov_s	%r0,0x21e4		; 0x21e4 = get_uart_ctrl+0x550
+1416: 0f5a0000                 bl	serial_puts
+141a: 17831600                 ld	%r0,[%r15,0x20c]
+141e: b885                     bset_s	%r0,%r0,5
+1420: 1f831018                 st	%r0,[%r15,0x20c]
+1424: 17831600                 ld	%r0,[%r15,0x20c]
+1428: b883                     bset_s	%r0,%r0,3
+142a: 1f831018                 st	%r0,[%r15,0x20c]
+142e: 17831600                 ld	%r0,[%r15,0x20c]
+1432: b882                     bset_s	%r0,%r0,2
+1434: 1f831018                 st	%r0,[%r15,0x20c]
+1438: 17831600                 ld	%r0,[%r15,0x20c]
+143c: b881                     bset_s	%r0,%r0,1
+143e: 1f831018                 st	%r0,[%r15,0x20c]
+1442: 17831600                 ld	%r0,[%r15,0x20c]
+1446: b880                     bset_s	%r0,%r0,0
+1448: 1f831018                 st	%r0,[%r15,0x20c]
+144c: d87d                     mov_s	%r0,125
+144e: b808                     asl_s	%r0,%r0,8
+1450: ff50                     bl_s	delay_tick
+1452: 71cf c1103fa4            mov_s	%r1,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+1458: 117e0600                 ld	%r0,[%r1,0x1f8]
+145c: b8b3                     bclr_s	%r0,%r0,19
+145e: 197e0018                 st	%r0,[%r1,0x1f8]
+1462: 70a9                     mov_s	%r0,%r13
+1464: 0b320000                 bl	switch_clk81
+1468: 0ce2ff4f                 bl	reset_mmc
+146c: 204a2080                 mov	%r16,2
+1470: 700a                     mov_s	%r0,%r16
+1472: fe12                     bl_s	tt_delay
+1474: 0ddaff8f                 bl	init_pctl
+1478: 77cf 0000230c            mov_s	%r15,0x230c		; ddr_settings
+147e: 17901000                 ld	%r0,[%r15,144]
+1482: d920                     mov_s	%r1,32
+1484: 0f520000                 bl	serial_put_hex
+1488: 17941000                 ld	%r0,[%r15,148]
+148c: d920                     mov_s	%r1,32
+148e: 0f4a0000                 bl	serial_put_hex
+1492: 17901000                 ld	%r0,[%r15,144]
+1496: 71cf c8000604            mov_s	%r1,0xc800_0604		; 0xc800_0604 = .regmask_lo+0x2ff825c5
+149c: 19168038                 st.di	%r0,[%r1,0xffff_fc58]
+14a0: 17941000                 ld	%r0,[%r15,148]
+14a4: 19128038                 st.di	%r0,[%r1,0xffff_fc48]
+14a8: 0d52ff4f                 bl	mmc_sleep
+14ac: 0fc6ff8f                 bl	disable_retention
+14b0: 0dd6ff4f                 bl	mmc_wakeup
+14b4: 0d12ff4f                 bl	enable_mmc_req
+14b8: 700a                     mov_s	%r0,%r16
+14ba: fe00                     bl_s	tt_delay
+14bc: 0fcaff4f                 bl	disp_pctl
+14c0: ff47                     bl_s	mem_test
+14c2: 0c8e0000                 bl	disp_arm_code
+14c6: 76a9                     mov_s	%r14,%r13
+14c8: 0e0d1513                 brge	%r14,20,0x14d4 = test_pd+0x1dc
+14cc: d802                     mov_s	%r0,2
+14ce: fdfb                     bl_s	tt_delay
+14d0: e601                     add_s	%r14,%r14,1
+14d2: f1fc                     b_s	0x14c8 = test_pd+0x1d0
+14d4: 70cf 000021f4            mov_s	%r0,0x21f4		; 0x21f4 = get_uart_ctrl+0x560
+14da: 0e960000                 bl	serial_puts
+14de: 204a2080                 mov	%r16,2
+14e2: 77cf c80ffe04            mov_s	%r15,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+14e8: 1f861438                 st.di	%r16,[%r15,0x218]
+14ec: 70cf c1109778            mov_s	%r0,0xc110_9778		; 0xc110_9778 = .regmask_lo+0x2908b739
+14f2: 18650438                 st.di	%r16,[%r0,0x194]
+14f6: 71cf c1103fa4            mov_s	%r1,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+14fc: 19680fb8 7fffffff        st.di	0x7fff_ffff,[%r1,0x1a0]		; 0x7fff_ffff = .regmask_lo+0x6fffffff
+1504: 17831600                 ld	%r0,[%r15,0x20c]
+1508: b884                     bset_s	%r0,%r0,4
+150a: 1f831018                 st	%r0,[%r15,0x20c]
+150e: 700a                     mov_s	%r0,%r16
+1510: fdea                     bl_s	tt_delay
+1512: 0c3e0000                 bl	disp_arm_code
+1516: c0d1                     pop_s	%blink
+1518: 14043410                 pop	%r16
+151c: c7c1                     pop_s	%r15
+151e: c6c1                     pop_s	%r14
+1520: c5c1                     pop_s	%r13
+1522: 7ee0                     j_s	[%blink]
+main:
+1524: 214a2000                 mov	%r17,0
+1528: ff0d                     bl_s	timer_init
+152a: 70cf 00002204            mov_s	%r0,0x2204		; 0x2204 = get_uart_ctrl+0x570
+1530: 0e3e0000                 bl	serial_puts
+1534: 204a2000                 mov	%r16,0
+1538: 77cf c80ffe04            mov_s	%r15,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+153e: 177f1e0d                 ld.di	%r13,[%r15,0x1fc]
+1542: ed86                     brnz_s	%r13,0,0x154c = main+0x28
+1544: d87d                     mov_s	%r0,125
+1546: b808                     asl_s	%r0,%r0,8
+1548: ff12                     bl_s	delay_tick
+154a: f1f6                     b_s	0x1534 = main+16
+154c: 7eaf                     extb_s	%r14,%r13
+154e: e6f4                     cmp_s	%r14,116
+1550: f406                     bnz_s	0x155c = main+0x38
+1552: ff3b                     bl_s	copy_reboot_code
+1554: ff69                     bl_s	test_pd
+1556: 1f7f1438                 st.di	%r16,[%r15,0x1fc]
+155a: f01e                     b_s	0x1594 = main+0x70
+155c: e6f1                     cmp_s	%r14,113
+155e: f40f                     bnz_s	0x157a = main+0x56
+1560: 70cf 00002228            mov_s	%r0,0x2228		; 0x2228 = get_uart_ctrl+0x594
+1566: 0e0a0000                 bl	serial_puts
+156a: 204a2000                 mov	%r16,0
+156e: 77cf c80ffe04            mov_s	%r15,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1574: 1f7f1438                 st.di	%r16,[%r15,0x1fc]
+1578: f00e                     b_s	0x1594 = main+0x70
+157a: 70cf 00002240            mov_s	%r0,0x2240		; 0x2240 = get_uart_ctrl+0x5ac
+1580: 0dee0000                 bl	serial_puts
+1584: 204a2000                 mov	%r16,0
+1588: 77cf c80ffe04            mov_s	%r15,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+158e: 1f7f1438                 st.di	%r16,[%r15,0x1fc]
+1592: f1d2                     b_s	0x1534 = main+16
+1594: 70cf 0000225c            mov_s	%r0,0x225c		; 0x225c = get_uart_ctrl+0x5c8
+159a: 0dd60000                 bl	serial_puts
+159e: 216f003f                 sleep
+15a2: 07ffffcf                 b	0x159e = main+0x7a
+15a6: 78e0                     nop_s
+store_restore_plls:
+15a8: c5e1                     push_s	%r13
+15aa: c6e1                     push_s	%r14
+15ac: c7e1                     push_s	%r15
+15ae: 1cfcb408                 push	%r16
+15b2: 1cfcb448                 push	%r17
+15b6: 1cfcb488                 push	%r18
+15ba: 1cfcb6c8                 push	%fp
+15be: 230a3700                 mov	%fp,%sp
+15c2: 220a27c0                 mov	%r18,%blink
+15c6: 7508                     mov_s	%r13,%r0
+15c8: 0db51010                 breq	%r13,0,0x167c = store_restore_plls+0xd4
+15cc: 76cf c1103fa4            mov_s	%r14,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+15d2: 16711e00                 ld.di	%r0,[%r14,0x1c4]
+15d6: 210a2f80 000022fc        mov	%r17,0x22fc		; settings
+15de: 19002000                 st	%r0,[%r17]
+15e2: 16871e00                 ld.di	%r0,[%r14,0x21c]
+15e6: 19042000                 st	%r0,[%r17,4]
+15ea: 167e1e00                 ld.di	%r0,[%r14,0x1f8]
+15ee: 19082000                 st	%r0,[%r17,8]
+15f2: 16741e00                 ld.di	%r0,[%r14,0x1d0]
+15f6: 190c2000                 st	%r0,[%r17,12]
+15fa: 0b3eff8f                 bl	save_ddr_settings
+15fe: 77cf 00002270            mov_s	%r15,0x2270		; 0x2270 = get_uart_ctrl+0x5dc
+1604: 70e9                     mov_s	%r0,%r15
+1606: 0d6a0000                 bl	serial_puts
+160a: 76cf 00002274            mov_s	%r14,0x2274		; 0x2274 = get_uart_ctrl+0x5e0
+1610: 70c9                     mov_s	%r0,%r14
+1612: 0d5e0000                 bl	serial_puts
+1616: 11002000                 ld	%r0,[%r17]
+161a: d920                     mov_s	%r1,32
+161c: 0dba0000                 bl	serial_put_hex
+1620: d80a                     mov_s	%r0,10
+1622: 0cb60000                 bl	serial_putc
+1626: 70e9                     mov_s	%r0,%r15
+1628: 0d460000                 bl	serial_puts
+162c: 70c9                     mov_s	%r0,%r14
+162e: 0d420000                 bl	serial_puts
+1632: 11042000                 ld	%r0,[%r17,4]
+1636: d920                     mov_s	%r1,32
+1638: 0d9e0000                 bl	serial_put_hex
+163c: d80a                     mov_s	%r0,10
+163e: 0c9a0000                 bl	serial_putc
+1642: 70e9                     mov_s	%r0,%r15
+1644: 0d2a0000                 bl	serial_puts
+1648: 70c9                     mov_s	%r0,%r14
+164a: 0d260000                 bl	serial_puts
+164e: 11082000                 ld	%r0,[%r17,8]
+1652: d920                     mov_s	%r1,32
+1654: 0d820000                 bl	serial_put_hex
+1658: d80a                     mov_s	%r0,10
+165a: 0c7e0000                 bl	serial_putc
+165e: 70e9                     mov_s	%r0,%r15
+1660: 0d0e0000                 bl	serial_puts
+1664: 70c9                     mov_s	%r0,%r14
+1666: 0d0a0000                 bl	serial_puts
+166a: 110c2000                 ld	%r0,[%r17,12]
+166e: d920                     mov_s	%r1,32
+1670: 0d660000                 bl	serial_put_hex
+1674: d80a                     mov_s	%r0,10
+1676: 0c620000                 bl	serial_putc
+167a: f07d                     b_s	0x1772 = store_restore_plls+0x1ca
+167c: df00                     mov_s	%r15,0
+167e: 76cf c1103fa4            mov_s	%r14,0xc110_3fa4		; 0xc110_3fa4 = .regmask_lo+0x29085f65
+1684: 16711e01                 ld.di	%r1,[%r14,0x1c4]
+1688: 210a2f80 000022fc        mov	%r17,0x22fc		; settings
+1690: 11002000                 ld	%r0,[%r17]
+1694: 08df0040                 breq	%r0,%r1,0x1772 = store_restore_plls+0x1ca
+1698: 11002000                 ld	%r0,[%r17]
+169c: b88f                     bset_s	%r0,%r0,15
+169e: 1e711038                 st.di	%r0,[%r14,0x1c4]
+16a2: 1e641fb8 065e31ff        st.di	0x65e_31ff,[%r14,0x190]		; 0x65e_31ff = ddr_settings+0x65e0ef3
+16aa: 1e6d1fb8 1649a941        st.di	0x1649_a941,[%r14,0x1b4]		; 0x1649_a941 = .regmask_lo+0x649a941
+16b2: 11002000                 ld	%r0,[%r17]
+16b6: b8af                     bclr_s	%r0,%r0,15
+16b8: 1e711038                 st.di	%r0,[%r14,0x1c4]
+16bc: 11042000                 ld	%r0,[%r17,4]
+16c0: b88f                     bset_s	%r0,%r0,15
+16c2: 1e871038                 st.di	%r0,[%r14,0x21c]
+16c6: 1e881fb8 065e31ff        st.di	0x65e_31ff,[%r14,0x220]		; 0x65e_31ff = ddr_settings+0x65e0ef3
+16ce: 1e891fb8 1649a941        st.di	0x1649_a941,[%r14,0x224]		; 0x1649_a941 = .regmask_lo+0x649a941
+16d6: 11042000                 ld	%r0,[%r17,4]
+16da: b8af                     bclr_s	%r0,%r0,15
+16dc: 1e871038                 st.di	%r0,[%r14,0x21c]
+16e0: d87d                     mov_s	%r0,125
+16e2: b808                     asl_s	%r0,%r0,8
+16e4: 0aaeffcf                 bl	delay_tick
+16e8: d802                     mov_s	%r0,2
+16ea: d940                     mov_s	%r1,64
+16ec: 0936ff4f                 bl	clk_util_clk_msr
+16f0: d804                     mov_s	%r0,4
+16f2: d940                     mov_s	%r1,64
+16f4: 092eff4f                 bl	clk_util_clk_msr
+16f8: 11082000                 ld	%r0,[%r17,8]
+16fc: 1e7e1038                 st.di	%r0,[%r14,0x1f8]
+1700: 110c2000                 ld	%r0,[%r17,12]
+1704: 1e741038                 st.di	%r0,[%r14,0x1d0]
+1708: d87d                     mov_s	%r0,125
+170a: b808                     asl_s	%r0,%r0,8
+170c: 0a86ffcf                 bl	delay_tick
+1710: d807                     mov_s	%r0,7
+1712: d940                     mov_s	%r1,64
+1714: 090eff4f                 bl	clk_util_clk_msr
+1718: 71cf 0000230c            mov_s	%r1,0x230c		; ddr_settings
+171e: 8100                     ld_s	%r0,[%r1]
+1720: b88f                     bset_s	%r0,%r0,15
+1722: 1e7f1038                 st.di	%r0,[%r14,0x1fc]
+1726: 1e801fb8 065e31ff        st.di	0x65e_31ff,[%r14,0x200]		; 0x65e_31ff = ddr_settings+0x65e0ef3
+172e: 1e811fb8 1649a941        st.di	0x1649_a941,[%r14,0x204]		; 0x1649_a941 = .regmask_lo+0x649a941
+1736: 8100                     ld_s	%r0,[%r1]
+1738: b8af                     bclr_s	%r0,%r0,15
+173a: 1e7f1038                 st.di	%r0,[%r14,0x1fc]
+173e: d908                     mov_s	%r1,8
+1740: 70cf c11047a0            mov_s	%r0,0xc110_47a0		; 0xc110_47a0 = .regmask_lo+0x29086761
+1746: 181a8078                 st.di	%r1,[%r0,0xffff_fc68]
+174a: d87d                     mov_s	%r0,125
+174c: b808                     asl_s	%r0,%r0,8
+174e: 0a46ffcf                 bl	delay_tick
+1752: 771a                     mov_s	%r16,%r15
+1754: 208caa0f                 cmp	%r16,0x3e8
+1758: f64d                     bge_s	0x1772 = store_restore_plls+0x1ca
+175a: 71cf 0000230c            mov_s	%r1,0x230c		; ddr_settings
+1760: 8121                     ld_s	%r1,[%r1,4]
+1762: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+1768: 18800078                 st.di	%r1,[%r0,0x200]
+176c: 20402050                 add	%r16,%r16,1
+1770: f1f2                     b_s	0x1754 = store_restore_plls+0x1ac
+1772: 270a3480                 mov	%blink,%r18
+1776: 240a36c0                 mov	%sp,%fp
+177a: 1404341b                 pop	%fp
+177e: 14043412                 pop	%r18
+1782: 14043411                 pop	%r17
+1786: 14043410                 pop	%r16
+178a: c7c1                     pop_s	%r15
+178c: c6c1                     pop_s	%r14
+178e: c5c1                     pop_s	%r13
+1790: 7ee0                     j_s	[%blink]
+1792: 78e0                     nop_s
+switch_clk81:
+1794: c5e1                     push_s	%r13
+1796: c6e1                     push_s	%r14
+1798: c7e1                     push_s	%r15
+179a: 1cfcb408                 push	%r16
+179e: 1cfcb448                 push	%r17
+17a2: c0f1                     push_s	%blink
+17a4: 1cfcb6c8                 push	%fp
+17a8: 230a3700                 mov	%fp,%sp
+17ac: 7708                     mov_s	%r15,%r0
+17ae: 0f8d1010                 breq	%r15,0,0x1838 = switch_clk81+0xa4
+17b2: 0ce60000                 bl	get_uart_ctrl
+17b6: 75cf 000022d0            mov_s	%r13,0x22d0		; UART_CONFIG_24M
+17bc: a504                     st_s	%r0,[%r13,16]
+17be: 70cf 00002274            mov_s	%r0,0x2274		; 0x2274 = get_uart_ctrl+0x5e0
+17c4: 0baa0000                 bl	serial_puts
+17c8: 8504                     ld_s	%r0,[%r13,16]
+17ca: d920                     mov_s	%r1,32
+17cc: 0c0a0000                 bl	serial_put_hex
+17d0: d80a                     mov_s	%r0,10
+17d2: 0b060000                 bl	serial_putc
+17d6: d801                     mov_s	%r0,1
+17d8: ff74                     bl_s	store_restore_plls
+17da: 200a2f80 00002278        mov	%r16,0x2278		; 0x2278 = get_uart_ctrl+0x5e4
+17e2: 700a                     mov_s	%r0,%r16
+17e4: 0b8a0000                 bl	serial_puts
+17e8: d87d                     mov_s	%r0,125
+17ea: b808                     asl_s	%r0,%r0,8
+17ec: 09a6ffcf                 bl	delay_tick
+17f0: 700a                     mov_s	%r0,%r16
+17f2: 0b7e0000                 bl	serial_puts
+17f6: d87d                     mov_s	%r0,125
+17f8: b808                     asl_s	%r0,%r0,8
+17fa: 099affcf                 bl	delay_tick
+17fe: d87d                     mov_s	%r0,125
+1800: b808                     asl_s	%r0,%r0,8
+1802: 0992ffcf                 bl	delay_tick
+1806: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+180c: 11830e00                 ld.di	%r0,[%r1,0x20c]
+1810: b888                     bset_s	%r0,%r0,8
+1812: 19830038                 st.di	%r0,[%r1,0x20c]
+1816: 8501                     ld_s	%r0,[%r13,4]
+1818: d901                     mov_s	%r1,1
+181a: 0a120000                 bl	serial_init
+181e: d87d                     mov_s	%r0,125
+1820: b808                     asl_s	%r0,%r0,8
+1822: 0972ffcf                 bl	delay_tick
+1826: d87d                     mov_s	%r0,125
+1828: b808                     asl_s	%r0,%r0,8
+182a: 096affcf                 bl	delay_tick
+182e: d87d                     mov_s	%r0,125
+1830: b808                     asl_s	%r0,%r0,8
+1832: 0962ffcf                 bl	delay_tick
+1836: f046                     b_s	0x18c0 = switch_clk81+0x12c
+1838: 70cf 00002280            mov_s	%r0,0x2280		; 0x2280 = get_uart_ctrl+0x5ec
+183e: 0b320000                 bl	serial_puts
+1842: 70cf 00002274            mov_s	%r0,0x2274		; 0x2274 = get_uart_ctrl+0x5e0
+1848: 0b260000                 bl	serial_puts
+184c: 75cf 000022d0            mov_s	%r13,0x22d0		; UART_CONFIG_24M
+1852: 8504                     ld_s	%r0,[%r13,16]
+1854: d920                     mov_s	%r1,32
+1856: 0b820000                 bl	serial_put_hex
+185a: d80a                     mov_s	%r0,10
+185c: 0a7a0000                 bl	serial_putc
+1860: d87d                     mov_s	%r0,125
+1862: b808                     asl_s	%r0,%r0,8
+1864: 092effcf                 bl	delay_tick
+1868: 254a0000                 mov	%r5,0
+186c: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1872: 11830e00                 ld.di	%r0,[%r1,0x20c]
+1876: b8a8                     bclr_s	%r0,%r0,8
+1878: 19830038                 st.di	%r0,[%r1,0x20c]
+187c: d87d                     mov_s	%r0,125
+187e: b808                     asl_s	%r0,%r0,8
+1880: 0912ffcf                 bl	delay_tick
+1884: 70a8                     mov_s	%r0,%r5
+1886: ff49                     bl_s	store_restore_plls
+1888: d87d                     mov_s	%r0,125
+188a: b808                     asl_s	%r0,%r0,8
+188c: 0906ffcf                 bl	delay_tick
+1890: d87d                     mov_s	%r0,125
+1892: b808                     asl_s	%r0,%r0,8
+1894: 08feffcf                 bl	delay_tick
+1898: 8504                     ld_s	%r0,[%r13,16]
+189a: d901                     mov_s	%r1,1
+189c: 098e0000                 bl	serial_init
+18a0: d87d                     mov_s	%r0,125
+18a2: b808                     asl_s	%r0,%r0,8
+18a4: 08eeffcf                 bl	delay_tick
+18a8: d87d                     mov_s	%r0,125
+18aa: b808                     asl_s	%r0,%r0,8
+18ac: 08e6ffcf                 bl	delay_tick
+18b0: d87d                     mov_s	%r0,125
+18b2: b808                     asl_s	%r0,%r0,8
+18b4: 08deffcf                 bl	delay_tick
+18b8: d87d                     mov_s	%r0,125
+18ba: b808                     asl_s	%r0,%r0,8
+18bc: 08d6ffcf                 bl	delay_tick
+18c0: 70cf 00002288            mov_s	%r0,0x2288		; 0x2288 = get_uart_ctrl+0x5f4
+18c6: 0aaa0000                 bl	serial_puts
+18ca: 0a560000                 bl	serial_tstc
+18ce: e87f                     brz_s	%r0,0,0x18ca = switch_clk81+0x136
+18d0: 0a5e0000                 bl	serial_getc
+18d4: 7e0f                     extb_s	%r14,%r0
+18d6: 70cf 00002274            mov_s	%r0,0x2274		; 0x2274 = get_uart_ctrl+0x5e0
+18dc: 0a920000                 bl	serial_puts
+18e0: 70c9                     mov_s	%r0,%r14
+18e2: d920                     mov_s	%r1,32
+18e4: 0af20000                 bl	serial_put_hex
+18e8: d80a                     mov_s	%r0,10
+18ea: 09ee0000                 bl	serial_putc
+18ee: e6c5                     cmp_s	%r14,69
+18f0: f5e8                     bnz_s	0x18c0 = switch_clk81+0x12c
+18f2: 70cf 0000229c            mov_s	%r0,0x229c		; 0x229c = get_uart_ctrl+0x608
+18f8: 0a760000                 bl	serial_puts
+18fc: 240a36c0                 mov	%sp,%fp
+1900: 1404341b                 pop	%fp
+1904: c0d1                     pop_s	%blink
+1906: 14043411                 pop	%r17
+190a: 14043410                 pop	%r16
+190e: c7c1                     pop_s	%r15
+1910: c6c1                     pop_s	%r14
+1912: c5c1                     pop_s	%r13
+1914: 7ee0                     j_s	[%blink]
+1916: 78e0                     nop_s
+pre_switch_to_clk81:
+1918: c0f1                     push_s	%blink
+191a: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+1920: 18c80fb8 000017ff        st.di	0x17ff,[%r0,0x320]		; 0x17ff = switch_clk81+0x6b
+1928: 70cf c8000e00            mov_s	%r0,0xc800_0e00		; 0xc800_0e00 = .regmask_lo+0x2ff82dc1
+192e: 10c80e00                 ld.di	%r0,[%r0,0x320]
+1932: e807                     brz_s	%r0,0,0x193e = pre_switch_to_clk81+0x26
+1934: d87d                     mov_s	%r0,125
+1936: b808                     asl_s	%r0,%r0,8
+1938: 085affcf                 bl	delay_tick
+193c: f1f6                     b_s	0x1928 = pre_switch_to_clk81+16
+193e: d87d                     mov_s	%r0,125
+1940: b808                     asl_s	%r0,%r0,8
+1942: 0852ffcf                 bl	delay_tick
+1946: c0d1                     pop_s	%blink
+1948: 7ee0                     j_s	[%blink]
+194a: 78e0                     nop_s
+disp_arm_code:
+194c: c5e1                     push_s	%r13
+194e: c6e1                     push_s	%r14
+1950: c7e1                     push_s	%r15
+1952: 77eb                     mov_s	%r15,%blink
+1954: 76cf 8f800000            mov_s	%r14,0x8f80_0000		; 0x8f80_0000 = .regmask_lo+0x7f800000
+195a: dd01                     mov_s	%r13,1
+195c: 0d3312d3                 brge	%r13,11,0x198e = disp_arm_code+0x42
+1960: 16041400                 ld.ab	%r0,[%r14,4]
+1964: d920                     mov_s	%r1,32
+1966: 0a720000                 bl	serial_put_hex
+196a: 70cf 000022a4            mov_s	%r0,0x22a4		; 0x22a4 = get_uart_ctrl+0x610
+1970: 09fe0000                 bl	serial_puts
+1974: 6d3a                     asr_s	%r1,%r13,2
+1976: b93d                     lsr_s	%r1,%r1,29
+1978: 61b8                     add_s	%r0,%r1,%r13
+197a: b8c2                     bmsk_s	%r0,%r0,2
+197c: 7822                     sub_s	%r0,%r0,%r1
+197e: e887                     brnz_s	%r0,0,0x198a = disp_arm_code+0x3e
+1980: 70cf 000022a8            mov_s	%r0,0x22a8		; 0x22a8 = get_uart_ctrl+0x614
+1986: 09ea0000                 bl	serial_puts
+198a: e501                     add_s	%r13,%r13,1
+198c: f1e8                     b_s	0x195c = disp_arm_code+16
+198e: 70cf 000022a8            mov_s	%r0,0x22a8		; 0x22a8 = get_uart_ctrl+0x614
+1994: 09da0000                 bl	serial_puts
+1998: 266f1043                 ror	%r14,1
+199c: dd01                     mov_s	%r13,1
+199e: 0d3512d3                 brge	%r13,11,0x19d0 = disp_arm_code+0x84
+19a2: 16041400                 ld.ab	%r0,[%r14,4]
+19a6: d920                     mov_s	%r1,32
+19a8: 0a2e0000                 bl	serial_put_hex
+19ac: 70cf 000022a4            mov_s	%r0,0x22a4		; 0x22a4 = get_uart_ctrl+0x610
+19b2: 09be0000                 bl	serial_puts
+19b6: 6d3a                     asr_s	%r1,%r13,2
+19b8: b93d                     lsr_s	%r1,%r1,29
+19ba: 61b8                     add_s	%r0,%r1,%r13
+19bc: b8c2                     bmsk_s	%r0,%r0,2
+19be: 7822                     sub_s	%r0,%r0,%r1
+19c0: e886                     brnz_s	%r0,0,0x19cc = disp_arm_code+0x80
+19c2: 70cf 000022a8            mov_s	%r0,0x22a8		; 0x22a8 = get_uart_ctrl+0x614
+19c8: 09a60000                 bl	serial_puts
+19cc: e501                     add_s	%r13,%r13,1
+19ce: f1e9                     b_s	0x199e = disp_arm_code+0x52
+19d0: 77fb                     mov_s	%blink,%r15
+19d2: c7c1                     pop_s	%r15
+19d4: c6c1                     pop_s	%r14
+19d6: c5c1                     pop_s	%r13
+19d8: 7ee0                     j_s	[%blink]
+19da: 78e0                     nop_s
+serial_set_pin_port:
+19dc: 1cfcb6c8                 push	%fp
+19e0: 230a3700                 mov	%fp,%sp
+19e4: 7308                     mov_s	%r3,%r0
+19e6: d800                     mov_s	%r0,0
+19e8: 72cf c80ffe04            mov_s	%r2,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+19ee: 12840e01                 ld.di	%r1,[%r2,0x210]
+19f2: 21050f81 00001800        or	%r1,%r1,0x1800		; 0x1800 = switch_clk81+0x6c
+19fa: 1a840078                 st.di	%r1,[%r2,0x210]
+19fe: 240a36c0                 mov	%sp,%fp
+1a02: 1404341b                 pop	%fp
+1a06: 7ee0                     j_s	[%blink]
+serial_clr_err:
+1a08: 71cf c8100600            mov_s	%r1,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1a0e: 11b38e00                 ld.di	%r0,[%r1,0xffff_fecc]
+1a12: 20040f80 00030000        and	%r0,%r0,0x3_0000		; 0x3_0000 = ddr_settings+0x2dcf4
+1a1a: e807                     brz_s	%r0,0,0x1a26 = serial_clr_err+0x1e
+1a1c: 11b28e00                 ld.di	%r0,[%r1,0xffff_fec8]
+1a20: b898                     bset_s	%r0,%r0,24
+1a22: 19b28038                 st.di	%r0,[%r1,0xffff_fec8]
+1a26: 7ee0                     j_s	[%blink]
+serial_init:
+1a28: c5e1                     push_s	%r13
+1a2a: c6e1                     push_s	%r14
+1a2c: c7e1                     push_s	%r15
+1a2e: 1cfcb408                 push	%r16
+1a32: 1cfcb6c8                 push	%fp
+1a36: 230a3700                 mov	%fp,%sp
+1a3a: 200a27c0                 mov	%r16,%blink
+1a3e: 7508                     mov_s	%r13,%r0
+1a40: 7728                     mov_s	%r15,%r1
+1a42: de00                     mov_s	%r14,0
+1a44: ef16                     brz_s	%r15,0,0x1a70 = serial_init+0x48
+1a46: 71cf c80ffe04            mov_s	%r1,0xc80f_fe04		; 0xc80f_fe04 = .regmask_lo+0x30081dc5
+1a4c: 118f0e00                 ld.di	%r0,[%r1,0x23c]
+1a50: b891                     bset_s	%r0,%r0,17
+1a52: 198f0038                 st.di	%r0,[%r1,0x23c]
+1a56: 118f0e00                 ld.di	%r0,[%r1,0x23c]
+1a5a: b8b1                     bclr_s	%r0,%r0,17
+1a5c: 198f0038                 st.di	%r0,[%r1,0x23c]
+1a60: d87d                     mov_s	%r0,125
+1a62: b808                     asl_s	%r0,%r0,8
+1a64: 0f2eff8f                 bl	delay_tick
+1a68: d87d                     mov_s	%r0,125
+1a6a: b808                     asl_s	%r0,%r0,8
+1a6c: 0f26ff8f                 bl	delay_tick
+1a70: 255312c0                 bmsk	%r0,%r13,11
+1a74: 20050f80 01c03000        or	%r0,%r0,0x1c0_3000		; 0x1c0_3000 = ddr_settings+0x1c00cf4
+1a7c: 240a0f80 c8100600        mov	%r4,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1a84: 1cb28038                 st.di	%r0,[%r4,0xffff_fec8]
+1a88: 14b48e00                 ld.di	%r0,[%r4,0xffff_fed0]
+1a8c: 20040f80 ff0fffff        and	%r0,%r0,0xff0f_ffff		; 0xff0f_ffff = .regmask_lo+0x67081fc0
+1a94: 25041f81 0000f000        and	%r1,%r13,0xf000		; 0xf000 = ddr_settings+0xccf4
+1a9c: b908                     asl_s	%r1,%r1,8
+1a9e: 7825                     or_s	%r0,%r0,%r1
+1aa0: 1cb48038                 st.di	%r0,[%r4,0xffff_fed0]
+1aa4: 70cf c81004c0            mov_s	%r0,0xc810_04c0		; 0xc810_04c0 = .regmask_lo+0x30082481
+1aaa: ffcd                     bl_s	serial_set_pin_port
+1aac: 14b28e00                 ld.di	%r0,[%r4,0xffff_fec8]
+1ab0: 20040f80 fe3fffff        and	%r0,%r0,0xfe3f_ffff		; 0xfe3f_ffff = .regmask_lo+0x66381fc0
+1ab8: 1cb28038                 st.di	%r0,[%r4,0xffff_fec8]
+1abc: 270a3400                 mov	%blink,%r16
+1ac0: 240a36c0                 mov	%sp,%fp
+1ac4: 1404341b                 pop	%fp
+1ac8: 14043410                 pop	%r16
+1acc: c7c1                     pop_s	%r15
+1ace: c6c1                     pop_s	%r14
+1ad0: c5c1                     pop_s	%r13
+1ad2: 7ee0                     j_s	[%blink]
+serial_putc:
+1ad4: 1cfcb6c8                 push	%fp
+1ad8: 230a3700                 mov	%fp,%sp
+1adc: 081f0291                 brne	%r0,10,0x1afa = serial_putc+0x26
+1ae0: 72cf c8100600            mov_s	%r2,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1ae6: 12b38e01                 ld.di	%r1,[%r2,0xffff_fecc]
+1aea: 21040f81 00200000        and	%r1,%r1,0x20_0000		; 0x20_0000 = ddr_settings+0x1fdcf4
+1af2: e9f8                     brnz_s	%r1,0,0x1ae0 = serial_putc+12
+1af4: d90d                     mov_s	%r1,13
+1af6: 1ab08078                 st.di	%r1,[%r2,0xffff_fec0]
+1afa: 72cf c8100600            mov_s	%r2,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1b00: 12b38e01                 ld.di	%r1,[%r2,0xffff_fecc]
+1b04: 21040f81 00200000        and	%r1,%r1,0x20_0000		; 0x20_0000 = ddr_settings+0x1fdcf4
+1b0c: e9f7                     brnz_s	%r1,0,0x1afa = serial_putc+0x26
+1b0e: 1ab08038                 st.di	%r0,[%r2,0xffff_fec0]
+1b12: 240a36c0                 mov	%sp,%fp
+1b16: 1404341b                 pop	%fp
+1b1a: 7ee0                     j_s	[%blink]
+serial_tstc:
+1b1c: 70cf c8100600            mov_s	%r0,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1b22: 10b38e00                 ld.di	%r0,[%r0,0xffff_fecc]
+1b26: b8c6                     bmsk_s	%r0,%r0,6
+1b28: 7ee0                     j_s	[%blink]
+1b2a: 78e0                     nop_s
+serial_getc:
+1b2c: 72cf c8100600            mov_s	%r2,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1b32: 12b38e01                 ld.di	%r1,[%r2,0xffff_fecc]
+1b36: b9c6                     bmsk_s	%r1,%r1,6
+1b38: e97a                     brz_s	%r1,0,serial_getc
+1b3a: 12b38e01                 ld.di	%r1,[%r2,0xffff_fecc]
+1b3e: 21040f81 00030000        and	%r1,%r1,0x3_0000		; 0x3_0000 = ddr_settings+0x2dcf4
+1b46: e90c                     brz_s	%r1,0,0x1b5c = serial_getc+0x30
+1b48: 12b28e01                 ld.di	%r1,[%r2,0xffff_fec8]
+1b4c: b998                     bset_s	%r1,%r1,24
+1b4e: 1ab28078                 st.di	%r1,[%r2,0xffff_fec8]
+1b52: 12b28e01                 ld.di	%r1,[%r2,0xffff_fec8]
+1b56: b9b8                     bclr_s	%r1,%r1,24
+1b58: 1ab28078                 st.di	%r1,[%r2,0xffff_fec8]
+1b5c: 72cf c8100600            mov_s	%r2,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1b62: 12b18e00                 ld.di	%r0,[%r2,0xffff_fec4]
+1b66: 780f                     extb_s	%r0,%r0
+1b68: 7ee0                     j_s	[%blink]
+1b6a: 78e0                     nop_s
+serial_puts:
+1b6c: c5e1                     push_s	%r13
+1b6e: c0f1                     push_s	%blink
+1b70: 1cfcb6c8                 push	%fp
+1b74: 230a3700                 mov	%fp,%sp
+1b78: 7508                     mov_s	%r13,%r0
+1b7a: 8d00                     ldb_s	%r0,[%r13]
+1b7c: e805                     brz_s	%r0,0,0x1b86 = serial_puts+0x1a
+1b7e: 15011480                 ldb.ab	%r0,[%r13,1]
+1b82: ffd5                     bl_s	serial_putc
+1b84: f1fb                     b_s	0x1b7a = serial_puts+14
+1b86: d87d                     mov_s	%r0,125
+1b88: b808                     asl_s	%r0,%r0,8
+1b8a: 0e0aff8f                 bl	delay_tick
+1b8e: 240a36c0                 mov	%sp,%fp
+1b92: 1404341b                 pop	%fp
+1b96: c0d1                     pop_s	%blink
+1b98: c5c1                     pop_s	%r13
+1b9a: 7ee0                     j_s	[%blink]
+serial_puts_no_delay:
+1b9c: 1cfcb6c8                 push	%fp
+1ba0: 230a3700                 mov	%fp,%sp
+1ba4: 240a07c0                 mov	%r4,%blink
+1ba8: 7308                     mov_s	%r3,%r0
+1baa: 8b00                     ldb_s	%r0,[%r3]
+1bac: e805                     brz_s	%r0,0,0x1bb6 = serial_puts_no_delay+0x1a
+1bae: 13010480                 ldb.ab	%r0,[%r3,1]
+1bb2: ffc9                     bl_s	serial_putc
+1bb4: f1fb                     b_s	0x1baa = serial_puts_no_delay+14
+1bb6: 270a3100                 mov	%blink,%r4
+1bba: 240a36c0                 mov	%sp,%fp
+1bbe: 1404341b                 pop	%fp
+1bc2: 7ee0                     j_s	[%blink]
+k_delay:
+1bc4: c0f1                     push_s	%blink
+1bc6: d87d                     mov_s	%r0,125
+1bc8: b808                     asl_s	%r0,%r0,8
+1bca: 0dcaff8f                 bl	delay_tick
+1bce: c0d1                     pop_s	%blink
+1bd0: 7ee0                     j_s	[%blink]
+1bd2: 78e0                     nop_s
+serial_put_hex:
+1bd4: 1cfcb6c8                 push	%fp
+1bd8: 230a3700                 mov	%fp,%sp
+1bdc: 270a07c0                 mov	%r7,%blink
+1be0: 70b8                     mov_s	%r5,%r0
+1be2: 71d8                     mov_s	%r6,%r1
+1be4: 26420104                 sub	%r4,%r6,4
+1be8: 0c390012                 brlt	%r4,0,0x1c20 = serial_put_hex+0x4c
+1bec: 2d010100                 lsr	%r0,%r5,%r4
+1bf0: e884                     brnz_s	%r0,0,0x1bf8 = serial_put_hex+0x24
+1bf2: d830                     mov_s	%r0,48
+1bf4: ffb8                     bl_s	serial_putc
+1bf6: f013                     b_s	0x1c1a = serial_put_hex+0x46
+1bf8: 2d010100                 lsr	%r0,%r5,%r4
+1bfc: b8c3                     bmsk_s	%r0,%r0,3
+1bfe: 7b0f                     extb_s	%r3,%r0
+1c00: 0b0f0293                 brge	%r3,10,0x1c0e = serial_put_hex+0x3a
+1c04: 23400c00                 add	%r0,%r3,48
+1c08: 780f                     extb_s	%r0,%r0
+1c0a: ffb3                     bl_s	serial_putc
+1c0c: f007                     b_s	0x1c1a = serial_put_hex+0x46
+1c0e: 23000f80 00000057        add	%r0,%r3,87		; 0x57 = clk_util_clk_msr+0x37
+1c16: 780f                     extb_s	%r0,%r0
+1c18: ffaf                     bl_s	serial_putc
+1c1a: 24420104                 sub	%r4,%r4,4
+1c1e: f1e6                     b_s	0x1be8 = serial_put_hex+0x14
+1c20: 270a31c0                 mov	%blink,%r7
+1c24: 240a36c0                 mov	%sp,%fp
+1c28: 1404341b                 pop	%fp
+1c2c: 7ee0                     j_s	[%blink]
+1c2e: 78e0                     nop_s
+do_exception:
+1c30: c5e1                     push_s	%r13
+1c32: c6e1                     push_s	%r14
+1c34: 1cfcb6c8                 push	%fp
+1c38: 230a3700                 mov	%fp,%sp
+1c3c: 76eb                     mov_s	%r14,%blink
+1c3e: 7508                     mov_s	%r13,%r0
+1c40: 70cf 000022ac            mov_s	%r0,0x22ac		; 0x22ac = get_uart_ctrl+0x618
+1c46: ffca                     bl_s	serial_puts
+1c48: 70cf 000022c0            mov_s	%r0,0x22c0		; 0x22c0 = get_uart_ctrl+0x62c
+1c4e: ffc8                     bl_s	serial_puts
+1c50: 70a9                     mov_s	%r0,%r13
+1c52: d920                     mov_s	%r1,32
+1c54: ffe0                     bl_s	serial_put_hex
+1c56: d80a                     mov_s	%r0,10
+1c58: ff9f                     bl_s	serial_putc
+1c5a: 70cf c1109778            mov_s	%r0,0xc110_9778		; 0xc110_9778 = .regmask_lo+0x2908b739
+1c60: 18620fb8 004f4240        st.di	0x4f_4240,[%r0,0x188]		; 0x4f_4240 = ddr_settings+0x4f1f34
+1c68: 76fb                     mov_s	%blink,%r14
+1c6a: 240a36c0                 mov	%sp,%fp
+1c6e: 1404341b                 pop	%fp
+1c72: c6c1                     pop_s	%r14
+1c74: c5c1                     pop_s	%r13
+1c76: 7ee0                     j_s	[%blink]
+disp_uart_ctrl:
+1c78: c0f1                     push_s	%blink
+1c7a: 70cf 000022c4            mov_s	%r0,0x22c4		; 0x22c4 = get_uart_ctrl+0x630
+1c80: ffbb                     bl_s	serial_puts
+1c82: 70cf c8100600            mov_s	%r0,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1c88: 10b28e00                 ld.di	%r0,[%r0,0xffff_fec8]
+1c8c: d920                     mov_s	%r1,32
+1c8e: ffd2                     bl_s	serial_put_hex
+1c90: c0d1                     pop_s	%blink
+1c92: 7ee0                     j_s	[%blink]
+get_uart_ctrl:
+1c94: 70cf c8100600            mov_s	%r0,0xc810_0600		; 0xc810_0600 = .regmask_lo+0x300825c1
+1c9a: 10b28e00                 ld.di	%r0,[%r0,0xffff_fec8]
+1c9e: b8cb                     bmsk_s	%r0,%r0,11
+1ca0: 7ee0                     j_s	[%blink]

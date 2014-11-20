@@ -1,0 +1,74 @@
+include $(TOPDIR)/config.mk
+ifdef SOC
+LDSCRIPT= $(TOPDIR)/firmware/$(ARCH)/$(CPU)/$(SOC)/u-boot.lds
+T=$(TOPDIR)/firmware/$(ARCH)/$(CPU)/$(SOC)/Makefile
+else
+LDSCRIPT= $(TOPDIR)/firmware/$(ARCH)/$(CPU)/u-boot.lds
+T=$(TOPDIR)/firmware/$(ARCH)/$(CPU)/Makefile
+endif
+LDFLAGS	= -Bstatic -T $(obj)u-boot.lds  $(PLATFORM_LDFLAGS)
+BURNLDFLAGS	= -Bstatic -T $(obj)burner.lds  $(PLATFORM_LDFLAGS) -o 10
+#AFLAGS	+= -DAML_DEBUG_ROM -DTEXT_BASE=$(TEXT_BASE)  -I$(OBJTREE)
+#CFLAGS	+= -DAML_DEBUG_ROM -DTEXT_BASE=$(TEXT_BASE)  -I$(OBJTREE)
+CFLAGS :=  -g --cpu cortex-a9  -Ospace  --c99 -W  --thumb \
+				 $(filter -D%,$(CFLAGS)) $(filter -I%,$(CFLAGS))
+#-Ospace 
+LDFLAGS = --cpu cortex-a9 --info totals --info unused --info inputs --scatter firmware.scat --entry _start --keep=rom_spl_arm.o\(.magic\)
+AFLAGS = -g --cpu cortex-a9  $(filter -I%,$(CFLAGS))
+
+#AFLAGS	+= -DCONFIG_AMLROM_SPL -DTEXT_BASE=$(TEXT_BASE) 
+CFLAGS	+= -DCONFIG_AMLROM_SPL -DTEXT_BASE=$(TEXT_BASE) 
+
+#CC=armcc --translate_gcc --gnu --c99 
+
+
+SOBJS	= rom_spl_arm.o 
+SRCS	:= $(addprefix $(obj),$(SOBJS:.o=.S) $(COBJS:.o=.c))
+OBJS	:= $(addprefix $(obj),$(SOBJS)  )
+__OBJS	:= $(SOBJS) $(COBJS)
+BURNOBJS:= $(addprefix $(obj),$(SOBJS) $(COBJS) burn.o )
+VPATH_LIST=	$(TOPDIR)/board/$(BOARDDIR) \
+						$(SRCTREE)/$(CPUDIR)/$(SOC) \
+						$(SRCTREE)/$(CPUDIR)/common	\
+						$(SRCTREE)/$(CPUDIR)  			\
+						$(SRCTREE)/common
+VPATH_LIST:=$(VPATH_LIST:%=%/firmware)											
+CFLAGS+=$(VPATH_LIST:%=-I%)					
+vpath %.c $(VPATH_LIST)
+vpath %.S $(VPATH_LIST)
+vpath %.s $(VPATH_LIST)
+
+ALL	= $(FIRMWARE) $(dir $(FIRMWARE))aml-debug-rom.bin \
+			$(basename $(FIRMWARE)).out $(dir $(FIRMWARE))aml-debug-rom.out
+ELFFILES=$(basename $(FIRMWARE)).out $(dir $(FIRMWARE))aml-debug-rom.out
+
+all:	 $(ALL) $(ELFFILES)
+
+
+	
+%.bin:	%.out
+	$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+
+
+	
+
+$(basename $(FIRMWARE)).out:$(OBJS) $(obj)spl.o firmware.scat
+$(dir $(FIRMWARE))aml-debug-rom.out:$(OBJS) $(obj)debugrom.o firmware.scat
+%.out:
+	armlink $(LDFLAGS) --map --list=$(@:%=%.map) $(filter %.o,$^) -o $@
+sinclude $(wildcard $(obj)*.d)
+
+$(obj)rom_spl_arm.o: $(obj)rom_spl_arm.s
+	armasm $(AFLAGS)	 -o $@  $< 
+$(obj)magic_arm.o: $(obj)magic_arm.s
+	armasm $(AFLAGS)	 -o $@  $< 
+
+$(obj)%.s: %.S
+		armcc $(CFLAGS)  -D__ASSEMBLY__ -o $@ -E $<
+$(obj)%.o: $(obj)%.s
+		armasm $(AFLAGS) 	 -o $@ -c $< 
+$(obj)%.o:%.c
+		
+		armcc $(CFLAGS)	--md --depend=$(@:%.o=%.d) -o $@ -c $< 
+
+#########################################################################

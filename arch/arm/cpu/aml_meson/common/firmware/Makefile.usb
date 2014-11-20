@@ -1,0 +1,72 @@
+
+
+include $(TOPDIR)/config.mk
+#$(warning $(PLATFORM_CPPFLAGS))
+
+PLATFORM_CPPFLAGS+=-DCONFIG_AMLROM_SPL
+LDFLAGS	= -Bstatic -T $(obj)usb_firmware.lds  $(PLATFORM_LDFLAGS)
+
+
+CFLAGS	:=$(CFLAGS:-marm=-mthumb)
+CFLAGS	:=$(CFLAGS:-fPIC=)
+CFLAGS	:=$(CFLAGS:-ffixed-r8=)
+CFLAGS	+=  -DCONFIG_AML_ROMBOOT_SPL  -MD -Wno-unused-function -mno-long-calls
+AFLAGS	+= -DCONFIG_AMLROM_SPL -DTEXT_BASE=$(TEXT_BASE) -MD
+
+SOBJS	 = usb_fw_start.o magic.o acs_entry.o
+COBJS	 = usb_firmware.o
+
+OBJS	:= $(addprefix $(obj),$(SOBJS)  )
+__OBJS	:= $(SOBJS) $(COBJS)
+
+ifdef CONFIG_SUPPORT_CUSOTMER_BOARD
+VPATH_LIST=	$(TOPDIR)/customer/board/$(BOARD) \
+						$(SRCTREE)/$(CPUDIR)/$(SOC) \
+						$(SRCTREE)/$(CPUDIR)/common	\
+						$(SRCTREE)/$(CPUDIR)  			\
+						$(SRCTREE)/common
+else
+VPATH_LIST=	$(TOPDIR)/board/$(BOARDDIR) \
+						$(SRCTREE)/$(CPUDIR)/$(SOC) \
+						$(SRCTREE)/$(CPUDIR)/common	\
+						$(SRCTREE)/$(CPUDIR)  			\
+						$(SRCTREE)/common
+endif
+
+VPATH_LIST:=$(VPATH_LIST:%=%/firmware)
+CFLAGS+=$(VPATH_LIST:%=-I%)
+vpath %.c $(VPATH_LIST)
+vpath %.S $(VPATH_LIST)
+vpath %.s $(VPATH_LIST)
+
+origin_LDS=$(abspath usb_firmware.lds)
+target_LDS=$(abspath $(obj)usb_firmware.lds)
+ifeq ( $(origin_LDS),$(target_LDS))
+	target_LDS=$(OBJTREE)/usb_firmware.lds
+endif
+
+ALL	=  $(dir $(FIRMWARE))usb_firmware.bin $(dir $(FIRMWARE))usb_firmware.out
+			
+ELFFILES= $(dir $(FIRMWARE))usb_firmware.out			
+
+all: $(ALL) $(ELFFILES)
+
+%.bin:	%.out
+	$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+
+$(dir $(FIRMWARE))usb_firmware.out:$(OBJS) $(obj)usb_firmware.o $(target_LDS)
+	$(LD) $(LDFLAGS) $(filter %.o,$^) $(PLATFORM_LIBGCC) $(UCL_BOOTLIBS) -Map $(@:%=%.map) --cref -o $@
+	
+%.out:
+	$(LD) $(LDFLAGS) $(filter %.o,$^) $(UCL_BOOTLIBS) $(PLATFORM_LIBGCC) \
+		-Map $(@:%=%.map) --cref \
+		-o $@
+		
+$(target_LDS):$(origin_LDS)
+	$(CPP) $(CPPFLAGS)   $(LDPPFLAGS) -std=c99 -D__ASSEMBLY__ -P - <$^ >$@
+
+sinclude $(wildcard $(obj)*.d)
+
+
+
+#########################################################################

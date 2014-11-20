@@ -1,0 +1,77 @@
+# ------------------------------------------------------------
+# Makefile for ROM BOOT CODE
+# ------------------------------------------------------------
+include $(TOPDIR)/config.mk
+ARCCC = arc-elf32-gcc
+ARCASM = arc-elf32-as
+ARCLD = arc-elf32-ld
+ifeq ($(OS),Windows_NT)
+MKDIR=if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+else
+MKDIR=mkdir -p $(1)
+endif
+
+ARCOBJCOPY = arc-elf32-objcopy
+ARCDUMPELF = arc-elf32-elfdump
+ARCDUMP_FLAGS = -z
+ARCCPP=arc-elf32-cpp
+
+ARCCC_FLAGS = -mA7 -mno-volatile-cache -O2 -D__ARC__ -DCONFIG_ARC -I. -Iinclude -Wall
+ARCCC_FLAGS += -g -MD -mno-sdata -fno-builtin -ffreestanding -nostdinc -isystem -pipe -fomit-frame-pointer
+AARCC_FLAGS += -Wstrict-prototypes -fno-stack-protector -D__KERNEL__ -mno-cond-exec
+
+ARCASM_FLAGS = -D__ASSEMBLY__ $(CC_FLAGS)
+
+ARCGCCLIBPATH=$(dir $(shell $(ARCCC) -print-libgcc-file-name))
+
+ARCCOPY_FLAGS= -I elf32-little -O binary
+
+obj =$(SRCTREE)/build/arc_testpd/
+
+ARCLD_FLAGS   =  -Bstatic -T $(obj)romboot.lds -L$(ARCGCCLIBPATH) -lgcc 
+ARCLD_FLAGS += -marcelf 
+define MAP_OUT_OPTION
+	  -Map $(obj)code_elf.map
+endef
+
+CSRCS = $(wildcard *.c lib/*.c)
+OBJS = $(CSRCS:%.c=$(obj)%.o)
+
+all : clean $(obj)code_elf.out 
+
+$(obj)code_elf.out: $(obj)romboot.lds Makefile  $(OBJS) $(obj)start_arc.o
+	$(ARCLD) $(ARCLD_FLAGS) $(filter %.o,$^)  $(MAP_OUT_OPTION) --cref -o $@
+ifneq ($(OS),Windows_NT)	
+	$(ARCOBJCOPY) -I elf32-little -O binary $@ $(@:%.out=%.bin)
+endif	
+#	./bin2code arc_testpd_code $(obj)code_elf.bin $(SRCTREE)/build/include2/arc_testpd.dat
+
+down: $(obj)code_elf.out	
+	mdb -jtag -OKN $<
+	
+$(obj)%.o:	%.s
+	@$(call MKDIR, $(@D))
+	$(ARCCC)  $(ARCASM_FLAGS)  \
+		-o $@ $< -c
+		
+$(obj)%.o:	%.S
+	@$(call MKDIR, $(@D))
+	$(ARCCC)   $(ASM_FLAGS)  \
+		-o $@ $< -c		
+		
+$(obj)%.S:	%.s
+	@$(call MKDIR, $(@D))
+	$(ARCCPP) -I. -ansi -D__ASSEMBLY__ -MD -MT $@ -E $< -o $@	
+	
+$(obj)%.o:	%.c
+	@$(call MKDIR, $(@D))
+	$(ARCCC)  $(ARCCC_FLAGS) -o $@ $< -c
+	
+clean:
+	rm -r -f $(obj)
+#	rm -f $(SRCTREE)/build/include2/arc_testpd.dat
+	
+$(obj)romboot.lds: romboot.lds
+	@$(call MKDIR, $(@D))	
+	$(ARCCPP) $(ARCCPPFLAGS) $(ARCLDPPFLAGS) -std=c99 -D__ASSEMBLY__ -P - <$^ >$@
+-include $(wildcard $(OBJS:%.o=%.d))

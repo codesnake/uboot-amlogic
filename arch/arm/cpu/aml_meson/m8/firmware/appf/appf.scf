@@ -1,0 +1,35 @@
+LOAD_REGION1 0x0ff00000 NOCOMPRESS ALIGN 4096 65536
+{
+    MAIN_TABLE +0x0 ALIGN 4096 2048
+    {
+        table_data.o(APPF_TABLE_DATA, +FIRST)
+        *.o(APPF_TABLE_DATA)
+    }
+    OS_ENTRY_POINT +0x0 ALIGN 1024 6144
+    {
+        entry.o(*, +FIRST)
+        *(APPF_ENTRY_POINT_CODE)
+	translation.o(*)
+        *(APPF_ENTRY_POINT_DATA)
+    }
+    TRANSLATION_TABLE2 +0x0 ALIGN 1024
+    {
+        *(APPF_TRANSLATION_TABLE2)
+    }
+    TRANSLATION_TABLE1 +0x0 ALIGN 16384
+    {
+        *(APPF_TRANSLATION_TABLE1)
+    }
+    APPF_CODE +0x0
+    {
+        *(+RO)
+    }
+    APPF_DATA +0x0
+    {
+        *(+ZI,+RW)
+    } 
+    APPF_DEVICE_MEMORY +0x0 ALIGN 4096 4096
+    {
+        *(APPF_DEVICE_MEMORY)
+    } 
+}

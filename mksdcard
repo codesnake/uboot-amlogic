@@ -1,0 +1,12 @@
+#!/bin/sh
+BUILD_DIR=$2
+SDCARD=$1
+BINFILE=u-boot.bin
+ 
+#aml-debug-rom-sd.bin
+#u-boot-aml.bin 
+sudo dd if=${BUILD_DIR}/${BINFILE} of=$1 bs=1 count=442 
+sudo dd if=${BUILD_DIR}/${BINFILE} of=$1 bs=512 skip=1 seek=1 
+sync
+sudo eject $1
+echo FINISH

@@ -1,0 +1,86 @@
+
+include $(TOPDIR)/config.mk
+#$(warning $(PLATFORM_CPPFLAGS))
+
+PLATFORM_CPPFLAGS+=-DCONFIG_AMLROM_SPL
+
+LDFLAGS	= -Bstatic -T $(obj)kreboot.lds  $(PLATFORM_LDFLAGS)
+BURNLDFLAGS	= -Bstatic -T $(obj)burner.lds  $(PLATFORM_LDFLAGS) 
+#AFLAGS	+= -DAML_DEBUG_ROM -DTEXT_BASE=$(TEXT_BASE)  -I$(OBJTREE)
+#CFLAGS	+= -DAML_DEBUG_ROM -DTEXT_BASE=$(TEXT_BASE)  -I$(OBJTREE)
+#CFLAGS :=  -g --cpu cortex-a9  -Ospace  --c99 -W  --thumb \
+#				 $(filter -D%,$(CFLAGS)) $(filter -I%,$(CFLAGS))
+#-Ospace 
+#LDFLAGS = --cpu cortex-a9 --info totals --info unused --info inputs --scatter firmware.scat --entry _start --keep=rom_spl_arm.o\(.magic\)
+#AFLAGS = -g --cpu cortex-a9  $(filter -I%,$(CFLAGS))
+ 
+CFLAGS	:=$(CFLAGS:-marm=-mthumb)
+#CFLAGS	:=$(CFLAGS:-mno-thumb-interwork=)
+CFLAGS	:=$(CFLAGS:-fPIC=)
+CFLAGS	:=$(CFLAGS:-ffixed-r8=)
+CFLAGS	+=  -DCONFIG_AML_ROMBOOT_SPL  -MD -Wno-unused-function -mno-long-calls
+AFLAGS	+= -DCONFIG_AMLROM_SPL -DTEXT_BASE=$(TEXT_BASE) -MD 
+#CONFIG_AML_ROMBOOT_SPL
+#CC=armcc --translate_gcc --gnu --c99 
+
+
+SOBJS	 = kreboot.o
+COBJS	 = 
+				
+OBJS	:= $(addprefix $(obj),$(SOBJS))
+__OBJS	:= $(SOBJS) $(COBJS)
+
+BURNOBJS:= $(addprefix $(obj),$(SOBJS) $(COBJS) burn.o )
+VPATH_LIST=	$(TOPDIR)/board/$(BOARDDIR) \
+						$(SRCTREE)/$(CPUDIR)/$(SOC) \
+						$(SRCTREE)/$(CPUDIR)/common	\
+						$(SRCTREE)/$(CPUDIR)  			\
+						$(SRCTREE)/common
+VPATH_LIST:=$(VPATH_LIST:%=%/firmware)											
+CFLAGS+=$(VPATH_LIST:%=-I%)					
+vpath %.c $(VPATH_LIST)
+vpath %.S $(VPATH_LIST)
+vpath %.s $(VPATH_LIST)
+origin_LDS=$(abspath kreboot.lds)
+target_LDS=$(abspath $(obj)kreboot.lds)
+ifeq ( $(origin_LDS),$(target_LDS))
+	target_LDS=$(OBJTREE)/kreboot.lds
+endif
+
+ALL	= $(FIRMWARE) $(dir $(FIRMWARE))aml-kreboot.bin \
+			 $(dir $(FIRMWARE))aml-kreboot.out \
+
+ELFFILES= $(dir $(FIRMWARE))aml-kreboot.out \
+
+all: clean $(ALL) $(ELFFILES)	 
+	
+%.bin:	%.out
+	@$(OBJCOPY) ${OBJCFLAGS} -O binary $< $@
+	@./bin2code arm_reboot $@ $(obj)/boot_code.dat	
+	@cp -f $(obj)/boot_code.dat $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/arc_power/
+	@rm -f $(dir $(FIRMWARE))aml-kreboot.out $(dir $(FIRMWARE))aml-kreboot.bin $(dir $(FIRMWARE))aml-kreboot.out.map
+
+
+$(dir $(FIRMWARE))aml-kreboot.out:$(OBJS) $(obj)kreboot.lds
+%.out:
+	
+	$(LD) $(LDFLAGS) $(filter %.o,$^) $(PLATFORM_LIBGCC)\
+		-Map $(@:%=%.map) --cref \
+		-o $@
+
+#$(target_LDS): $(origin_LDS)
+#	$(CPP) $(CPPFLAGS)   $(LDPPFLAGS) -std=c99 -D__ASSEMBLY__ -P - <$^ >$@
+	
+$(obj)kreboot.lds: $(origin_LDS)
+		$(CPP) $(CPPFLAGS)   $(LDPPFLAGS) -std=c99 -D__ASSEMBLY__ -P - <$^ >$@
+
+clean:
+	rm -f $(dir $(FIRMWARE))aml-kreboot.out
+	rm -f $(dir $(FIRMWARE))aml-kreboot.bin
+	rm -f $(dir $(FIRMWARE))aml-kreboot.out.map
+	
+sinclude $(wildcard $(obj)*.d)
+
+
+
+#########################################################################

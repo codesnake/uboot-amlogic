@@ -1,0 +1,34 @@
+BUILD_DIR = $(CURDIR)/build
+OBJTREE		:= $(BUILD_DIR)
+
+ifneq ($(OBJTREE),$(SRCTREE))
+obj := $(OBJTREE)/
+src := $(SRCTREE)/
+else
+obj :=
+src :=
+endif
+
+sinclude $(obj)include/autoconf.mk
+include $(obj)include/config.mk
+
+SRCTREE=$(CURDIR)
+TOPDIR= $(SRCTREE)
+CPUDIR=arch/$(ARCH)/cpu/$(CPU)
+BOARDDIR=$(VENDOR)/$(BOARD)
+export
+
+target= firmware_code
+
+all: $(target)
+		make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/arc_power
+		make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/appf
+#		make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/arc_testpd
+
+
+help:
+	make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/arc_power help
+
+$(target):
+	make -C $(SRCTREE) firmware
+

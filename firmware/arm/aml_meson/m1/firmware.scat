@@ -1,0 +1,35 @@
+INIT_SECTION 0x49000000 0x490001b0
+{
+    INIT 0x49000000 0x490001b0
+    {
+        rom_spl_arm.o (INIT, +FIRST)            ; Initialization code
+        rom_spl_arm.o (.rodata)
+         
+				
+    }
+    SETTING +0 0x490001b0
+    {
+    	    * (.setting)
+    	    * (.data)
+    }
+}
+MAGIC_SECTION 0x490001b0 0x49000200
+{
+    MAGIC   0x490001b0 0x49000200
+    {
+    	rom_spl_arm.o(.magic)
+    }
+}
+CODE_SECTION 0x49000200 0x49001c00
+{
+   	CODE +0 0x49001800
+   	{
+   	    * (+RO-CODE)
+   	   	* (+RO-DATA)
+   	}
+   	
+   	BSS +0  0x49001c00
+		{
+			* (.bss)
+		}
+}

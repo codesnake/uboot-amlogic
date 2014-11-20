@@ -1,0 +1,42 @@
+SECTIONS 
+{
+    . = 0x1FF00000; 
+    TRANSLATION_TABLE1 ALIGN(16384):
+    {
+        *(APPF_TRANSLATION_TABLE1)
+    }
+    MAIN_TABLE ALIGN(4096) : 
+    {
+        *table_data.o(APPF_TABLE_DATA)
+        *(APPF_TABLE_DATA)
+    }
+    OS_ENTRY_POINT ALIGN(1024) :
+    {
+        *entry.o(APPF_ENTRY_POINT_CODE)
+      	*(APPF_ENTRY_POINT_CODE)
+				*translation.o(.text .bss .data .rodata)
+        *(APPF_ENTRY_POINT_DATA)
+        *(.got .got.plt)
+      }
+     . = 0X1FF05800;
+  	OS_BOOT_ENTRY_POINT ALIGN(1024) :
+  	{
+  	 *(APPF_BOOT_ENTRY_POINT)
+  	}
+    TRANSLATION_TABLE2 ALIGN(1024):
+    {
+        *(APPF_TRANSLATION_TABLE2)
+    }
+    APPF_CODE : 
+    { 
+        *(.text)
+    }
+    APPF_DATA :
+    {
+        *(.bss .data .rodata)
+    } 
+    APPF_DEVICE_MEMORY ALIGN(4096) :
+    {
+        *(APPF_DEVICE_MEMORY)
+    } 
+}
