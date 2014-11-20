@@ -3,19 +3,19 @@
 # ------------------------------------------------------------
 include $(TOPDIR)/config.mk
 
-ARCCC = arc-elf32-em4-gcc
-ARCASM = arc-elf32-em4-as
-ARCLD = arc-elf32-em4-ld
+ARCCC = arc-elf32-gcc
+ARCASM = arc-elf32-as
+ARCLD = arc-elf32-ld
 ifeq ($(OS),Windows_NT)
 MKDIR=if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
 else
 MKDIR=mkdir -p $(1)
 endif
 
-ARCOBJCOPY = arc-elf32-em4-objcopy
-ARCDUMPELF = arc-elf32-em4-elfdump
+ARCOBJCOPY = arc-elf32-objcopy
+ARCDUMPELF = arc-elf32-elfdump
 ARCDUMP_FLAGS = -z
-ARCCPP=arc-elf32-em4-cpp
+ARCCPP=arc-elf32-cpp
 
 #ARCCC_FLAGS = -mA7 -mno-volatile-cache -O2 -D__ARC__ -DCONFIG_ARC -I. -Iinclude -Wall
 
