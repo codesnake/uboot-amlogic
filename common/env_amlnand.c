@@ -100,15 +100,13 @@ env_t *env_ptr = 0;
 #endif
 
 /* local functions */
-#ifdef CONFIG_ENV_OFFSET_REDUND
 #if !defined(ENV_IS_EMBEDDED)
 static void use_default(void);
-#endif
 #endif
 extern unsigned default_environment_size;
 DECLARE_GLOBAL_DATA_PTR;
 
-//static struct aml_nandenv_info_t aml_nandenv_info;
+static struct aml_nandenv_info_t aml_nandenv_info;
 /*typedef struct _env_blockmap{
 	u_char block_id;
 	u_char block_valid;
@@ -875,7 +873,7 @@ void nand_env_relocate_spec (void)
         	}
 		return;
 	}	
-	env_import((const char *)&env_buf, 1);
+	env_import(&env_buf, 1);
 	
 #endif /* ! ENV_IS_EMBEDDED */
 }
@@ -970,12 +968,10 @@ void env_relocate_spec (void)
 #endif /* CONFIG_ENV_OFFSET_REDUND */
 #endif /* CONFIG_ENV_OFFSET_REDUND */
 
-#ifdef CONFIG_ENV_OFFSET_REDUND
 #if !defined(ENV_IS_EMBEDDED)
-static void use_default(void)
+static void use_default()
 {
 	puts ("*** Warning - bad CRC or NAND, using default environment\n\n");
 	set_default_env(NULL);
 }
-#endif
 #endif

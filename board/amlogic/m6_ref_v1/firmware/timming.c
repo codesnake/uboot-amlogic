@@ -124,7 +124,7 @@ static struct ddr_set __ddr_setting={
             	                		//011 = 8 (1.5ns > tCK = 1.25ns)
                             [3]=0
                         },
-                    .mcfg =  (  1 |				   //[B0] burst length: 0 for 4; 1 for 8
+                    .mcfg =    1 |				   //[B0] burst length: 0 for 4; 1 for 8
                     		  (0 << 2) |		   //[B2] bl8int_en.   enable bl8 interrupt function.Only valid for DDR2
                     		  					   // and is ignored for mDDR/LPDDR2 and DDR3
                               (1 << 5) |      	   //[B5] 1: ddr3 protocal; 0 : ddr2 protocal
@@ -138,7 +138,7 @@ static struct ddr_set __ddr_setting={
                            #else
 						      (0xf << 8)      	   // [B15-B8]15 cycles empty will entry power down mode.
 						   #endif //CONFIG_DDR_LOW_POWER
-                           ),
+                           ,
                     .zqcr  = (( 1 << 24) | 0x11dd),   //0x11dd->22 ohm;0x1155->0 ohm
                     .zq0cr1 = 0x1b,   //auto ZQCR
          .ddr_pll_cntl = 0x10200 | (M6_DDR_CLK/12), //528MHz

@@ -142,23 +142,6 @@ uint32_t meson_trustzone_suspend_init(void)
 {
 	register uint32_t r0 asm("r0") = CALL_TRUSTZONE_MON;
 	register uint32_t r1 asm("r1") = TRUSTZONE_MON_SUSPNED_FIRMWARE_INIT;
-	do {
-		asm volatile(
-		    __asmeq("%0", "r0")
-		    __asmeq("%1", "r0")
-		    __asmeq("%2", "r1")
-		    "smc    #0  @switch to secure world\n"
-		    : "=r"(r0)
-		    : "r"(r0), "r"(r1));
-	} while (0);
-
-	return r0;
-}
-
-uint32_t meson_get_share_mem_base(void)
-{
-	register uint32_t r0 asm("r0") = CALL_TRUSTZONE_MON;
-	register uint32_t r1 asm("r1") = TRUSTZONE_MON_MEM_BASE;
 
 	do {
 		asm volatile(
@@ -210,7 +193,7 @@ ssize_t meson_trustzone_efuse_writepattern(const char *buf, size_t count)
 	arg.offset = 0;
 	arg.size=count;
 	arg.buffer_phy=(unsigned int)buf;
-	arg.retcnt_phy=(unsigned int)&retcnt;
+	arg.retcnt_phy=&retcnt;
 	int ret;
 	ret = meson_trustzone_efuse(&arg);
 	return ret;
@@ -245,7 +228,7 @@ int32_t meson_trustzone_storage(struct storage_hal_api_arg* arg)
 }
 #endif
 
-uint32_t meson_trustzone_read_socrev1(void)
+uint32_t meson_trustzone_read_socrev1()
 {
 	register uint32_t r0 asm("r0") = CALL_TRUSTZONE_MON;
 	register uint32_t r1 asm("r1") = TRUSTZONE_MON_CORE_RD_SOC_REV1;
@@ -262,7 +245,7 @@ uint32_t meson_trustzone_read_socrev1(void)
 	return r0;
 }
 
-uint32_t meson_trustzone_read_socrev2(void)
+uint32_t meson_trustzone_read_socrev2()
 {
 	register uint32_t r0 asm("r0") = CALL_TRUSTZONE_MON;
 	register uint32_t r1 asm("r1") = TRUSTZONE_MON_CORE_RD_SOC_REV2;
@@ -325,8 +308,8 @@ uint32_t meson_trustzone_boot_check(unsigned char *addr)
 	arg.cmd = SRAM_HAL_API_CHECK;
 	arg.req_len = 0x1000000;
 	arg.res_len = 0;
-	arg.req_phy_addr = (unsigned int)addr;
-	arg.res_phy_addr = (unsigned int)NULL;
+	arg.req_phy_addr = addr;
+	arg.res_phy_addr = NULL;
 
 	asm __volatile__("": : :"memory");
 
@@ -357,8 +340,8 @@ uint32_t meson_trustzone_efuse_check(unsigned char *addr)
 	arg.cmd = SRAM_HAL_API_CHECK_EFUSE;
 	arg.req_len = 0x1000000;
 	arg.res_len = 0;
-	arg.req_phy_addr = (unsigned int)addr;
-	arg.res_phy_addr = (unsigned int)NULL;
+	arg.req_phy_addr = addr;
+	arg.res_phy_addr = NULL;
 
 	asm __volatile__("": : :"memory");
 

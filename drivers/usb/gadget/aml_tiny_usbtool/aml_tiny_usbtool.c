@@ -35,7 +35,7 @@ int usb_boot(int clk_cfg, int time_out)
 	return 0;
 }
 
-int do_tiny_usbtool (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+int do_tiny_usbtool (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	int time_out = 0;
 	if(argc > 1)

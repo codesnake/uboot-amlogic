@@ -581,7 +581,7 @@ int nand_write_skip_bad(nand_info_t *nand, loff_t offset, loff_t *length,
 		}
 	}
 
-	len_incl_bad = get_len_incl_bad (nand, offset, (size_t *)length);
+	len_incl_bad = get_len_incl_bad (nand, offset, length);
 
 	if ((offset + len_incl_bad) > nand->size) {
 		printf ("Attempt to write outside the flash area\n");
@@ -702,7 +702,7 @@ int nand_read_skip_bad(nand_info_t *nand, loff_t offset, loff_t *length,
 	struct mtd_oob_ops oob_opts;
 	__u8 spareAsBytes[nand->oobsize];
 
-	len_incl_bad = get_len_incl_bad (nand, offset, (size_t *)length);
+	len_incl_bad = get_len_incl_bad (nand, offset, length);
 	if ((offset + len_incl_bad) > nand->size) {
 		printf ("Attempt to read outside the flash area\n");
 		return -EINVAL;
@@ -1156,7 +1156,7 @@ int nand_raw_read_nand_dev(nand_info_t *nand, loff_t offset, loff_t *length,
         memset(tmp_buf,0,nand->writesize+nand->oobsize);
         page_no = 0;
         addr_from = (block_num << chip->phys_erase_shift) + (page_no<<chip->page_shift);
-    	rval = nand_raw_read_factory_info(nand,addr_from,nand->writesize,&retlen,tmp_buf,(struct mtd_oob_ops *)&raw_ops);
+    	rval = nand_raw_read_factory_info(nand,addr_from,nand->writesize,&retlen,tmp_buf,&raw_ops);
     	if (rval && rval != -EUCLEAN) {
     		printf ("NAND read from offset %zx failed %d\n",
     			(size_t)offset, rval);
@@ -1174,7 +1174,7 @@ int nand_raw_read_nand_dev(nand_info_t *nand, loff_t offset, loff_t *length,
         memset(tmp_buf,0,nand->writesize+nand->oobsize);
         page_no = nand->erasesize/nand->writesize - 1;
         addr_from = ( block_num << chip->phys_erase_shift) + (page_no<<chip->page_shift);
-    	rval = nand_raw_read_factory_info(nand,addr_from,nand->writesize,&retlen,tmp_buf,(struct mtd_oob_ops *)&raw_ops);
+    	rval = nand_raw_read_factory_info(nand,addr_from,nand->writesize,&retlen,tmp_buf,&raw_ops);
     	if (rval && rval != -EUCLEAN) {
     		printf ("NAND read from offset %zx failed %d\n",
     			(size_t)offset, rval);

@@ -56,9 +56,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #include <amlogic/aml_pmu.h>
 #endif
 #endif
-#ifdef CONFIG_MESON_TRUSTZONE
-#include <arc_code.dat>
-#endif
+
 #if defined(AML_UBOOT_LOG_PROFILE)
 extern int __g_nTE1_4BC722B3__ ;
 extern int __g_nTE2_4BC722B3__ ;
@@ -295,7 +293,7 @@ static __inline__ int abortboot(int bootdelay)
 
 #undef BOOT_DELAY_UNIT_US
 
-    //unsigned int sect = get_timer(0);// 1---> 20ms
+    unsigned int sect = get_timer(0);// 1---> 20ms
    // printf("get_timer0 = %d \n",t1);
 
     while ((bootdelay > 0) && (!abort)) {
@@ -363,26 +361,6 @@ static __inline__ int abortboot(int bootdelay)
 # endif	/* CONFIG_AUTOBOOT_KEYED */
 #endif	/* CONFIG_BOOTDELAY >= 0  */
 
-void force_update(void) {
-    int ret=0;
-    char* enable = getenv("auto_update_enable");
-    if((enable == NULL) || (strcmp(enable, "true") != 0)) {
-        return;
-    }
-    char* str = getenv("force_auto_update");
-    if((str != NULL) && (strcmp(str, "false") == 0)) {
-    	setenv("force_auto_update", "true");
-        saveenv();
-        return;
-    }
-    ret = run_command("mmcinfo", 0);
-    if(ret) return;
-    ret = run_command("fatexist mmc 0:1 force_enter_recovery.aml", 0);
-    if(ret) return;
-    printf("force update.\n");
-    ret = run_command("run prepare;run storeargs;run recovery", 0);
-}
-
 /****************************************************************************/
 
 void main_loop (void)
@@ -415,11 +393,6 @@ void main_loop (void)
 	char efuse_data[20];
 	efuseinfo_item_t info;
 	int i;
-#endif
-
-#if defined(CONFIG_MESON_TRUSTZONE) && (CONFIG_AML_SUSPEND)
-	int j;
-	int *p_code;
 #endif
 
 
@@ -487,12 +460,6 @@ void main_loop (void)
 extern void init_suspend_firmware(void);
 	init_suspend_firmware();
 #else
-	extern uint32_t meson_get_share_mem_base(void);
-	p_code = (int *)meson_get_share_mem_base();
-	for(j=0;j<sizeof(arc_code)/sizeof(int);j++,p_code++)
-		*p_code=arc_code[j];
-	*(p_code-j+0x2000-1) = j;//Record the size at the tail of 32k.
-	extern uint32_t meson_trustzone_suspend_init(void);
 	meson_trustzone_suspend_init();
 #endif
 #endif
@@ -518,7 +485,7 @@ extern void init_secure_firmware(void);
 
 	AML_LOG_TE("main");
 
-#if (MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8)&&defined(CONFIG_EFUSE)&&defined(CONFIG_VIDEO_AMLTVOUT)
+#if defined(CONFIG_AML_MESON_8)&&defined(CONFIG_EFUSE)&&defined(CONFIG_VIDEO_AMLTVOUT)
 	extern void cvbs_trimming(void);
 	cvbs_trimming();
 #endif
@@ -527,8 +494,6 @@ extern void init_secure_firmware(void);
 	extern void cvbs_performance_config(void);
 	cvbs_performance_config();
 #endif
-
-	force_update();
 
 	AML_LOG_TE("main");
 
@@ -1524,7 +1489,7 @@ int run_command (const char *cmd, int flag)
 	char *str = cmdbuf;
 	char *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
 	int argc, inquotes;
-	//int repeatable = 1;
+	int repeatable = 1;
 	int rc = 0;
 
 #ifdef DEBUG_PARSER
@@ -1626,7 +1591,6 @@ int run_command (const char *cmd, int flag)
 
 		/* OK - call function to do the command */
 		rc = (cmdtp->cmd) (cmdtp, flag, argc, argv);
-#if 0
 /*
 		if ((cmdtp->cmd) (cmdtp, flag, argc, argv) != 0) {
 			rc = -1;
@@ -1634,10 +1598,10 @@ int run_command (const char *cmd, int flag)
 
 		repeatable &= cmdtp->repeatable;
 
-		// Did the user stop this? 
-		//if (had_ctrlc ())
-			return -1;	// if stopped then not repeatable */
-#endif
+		/* Did the user stop this? 
+		if (had_ctrlc ())
+			return -1;	/* if stopped then not repeatable */
+		
 	}
 
 	//return rc ? rc : repeatable;

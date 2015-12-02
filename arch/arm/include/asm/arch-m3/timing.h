@@ -1,7 +1,6 @@
 #ifndef __AML_BOOT_TIMING_H
 #define __AML_BOOT_TIMING_H
 #ifndef __ASSEMBLY__
-struct ddr_set;
 struct ddr_set{
         unsigned short cl; // cas latency
         unsigned short t_faw;
@@ -22,7 +21,7 @@ struct ddr_set{
         unsigned short t_xp;
         unsigned short t_xsrd;       // init to 0 so that if only one of them is defined, this is chosen
         unsigned short t_xsnr;
-        unsigned short t_exsr; 
+        unsigned short t_exsr;
         unsigned short t_al;     // Additive Latency
         unsigned short t_clr;    // cas_latency for DDR2 (nclk cycles)
         unsigned short t_dqs;    // distance between data phases to different ranks
@@ -36,8 +35,6 @@ struct ddr_set{
         unsigned short t_ccd;
         unsigned short pad;
         unsigned short mrs[4];
-        unsigned       mcfg;
-        unsigned       zqcr;
         unsigned       dllcr;
         unsigned       iocr;
         unsigned       ddr_ctrl;
@@ -61,16 +58,8 @@ struct pll_clk_settings{
 	unsigned sdio_time_short;//0x90
 	unsigned demod_pll400m_cntl;
 	unsigned uart;
+
 }__attribute__ ((packed));
-
-
-//wait for pll lock
-//must wait first (100us+) then polling lock bit to check
-#define M3_PLL_WAIT_FOR_LOCK(pll) \
-	do{\
-		__udelay(1000);\
-	}while((readl(pll)&0x80000000)==0);
-
 
 //extern struct ddr_set __ddr_setting;
 //extern struct pll_clk_settings __plls;
@@ -78,4 +67,3 @@ struct pll_clk_settings{
 //extern unsigned ddr_init (struct ddr_set * ddr_setting);
 #endif
 #endif
-

@@ -523,7 +523,7 @@ int board_init(void)
 #ifdef	BOARD_LATE_INIT
 int board_late_init(void)
 {
-	//unsigned char val;
+	unsigned char val;
 #ifdef CONFIG_AML_I2C  
 	board_i2c_init();
 #endif /*CONFIG_AML_I2C*/
@@ -573,7 +573,7 @@ int usb_get_update_result(void)
 {
 	unsigned long upgrade_step;
 	upgrade_step = simple_strtoul (getenv ("upgrade_step"), NULL, 16);
-	printf("upgrade_step = %d\n", (int)upgrade_step);
+	printf("upgrade_step = %d\n", upgrade_step);
 	if(upgrade_step == 1)
 	{
 		run_command("defenv", 1);

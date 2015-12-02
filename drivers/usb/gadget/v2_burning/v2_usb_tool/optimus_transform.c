@@ -308,16 +308,17 @@ int optimus_mem_md (int argc, char * const argv[], char *info)
 
 int set_low_power_for_usb_burn(int arg, char* buff)
 {
+    int ret = 0;
+
     if(OPTIMUS_WORK_MODE_USB_PRODUCE == optimus_work_mode_get()){
         return 0;//just return ok as usb producing mode as LCD not initialized yet!
     }
 
 #if defined(CONFIG_VIDEO_AMLLCD)
-    int ret1=0;
     //axp to low power off LCD, no-charging
     MYDBG("To close LCD\n");
-    ret1 = run_command("video dev disable", 0);
-    if(ret1){
+    ret = run_command("video dev disable", 0);
+    if(ret){
         if(buff) sprintf(buff, "Fail to close back light");
         printf("Fail to close back light\n");
         /*return __LINE__;*/
@@ -325,11 +326,10 @@ int set_low_power_for_usb_burn(int arg, char* buff)
 #endif// #if defined(CONFIG_VIDEO_AMLLCD)
 
 #if USB_BURN_POWER_CONTROL
-    int ret2=0;
     //limit vbus curretn to 500mA, i.e, if hub is 4A, 8 devices at most, arg3 to not set_env as it's not inited yet!!
     MYDBG("set_usbcur_limit 500 0\n");
-    ret2 = run_command("set_usbcur_limit 500 0", 0);
-    if(ret2){
+    ret = run_command("set_usbcur_limit 500 0", 0);
+    if(ret){
         if(buff) sprintf(buff, "Fail to set_usb_cur_limit");
         printf("Fail to set_usb_cur_limit\n");
         return __LINE__;
@@ -343,11 +343,11 @@ int set_low_power_for_usb_burn(int arg, char* buff)
 int optimus_erase_bootloader(char* info)
 {
     int ret = 0;
+    extern int device_boot_flag;
 
 #if ROM_BOOT_SKIP_BOOT_ENABLED
     optimus_enable_romboot_skip_boot();
 #else
-    extern int device_boot_flag;
     if(SPI_EMMC_FLAG == device_boot_flag || SPI_NAND_FLAG == device_boot_flag){
         run_command("sf probe 2", 0);
     }
@@ -367,46 +367,6 @@ int cb_4_dis_connect_intr(void)
     }
 
     return 0;
-}
-
-static int _cpu_temp_in_valid_range(int argc, char* argv[], char* errInfo)
-{
-        int ret = 0;
-        int minTemp = 0;
-        int maxTemp = 0;
-        int cpu_temp = 0;
-        char* env_cpu_temp = NULL;
-
-        if(3 > argc){
-                sprintf(errInfo, "argc %d < 3 is invalid\n", argc);
-                return __LINE__;
-        }
-        minTemp = simple_strtol(argv[1], NULL, 0);
-        maxTemp = simple_strtol(argv[2], NULL, 0);
-        if(minTemp <=0 || maxTemp <= 0 || minTemp >= maxTemp){
-                sprintf(errInfo, "Invalid:minTemp=%s, maxTemp=%s\n", argv[1], argv[2]);
-                return __LINE__;
-        }
-        ret = run_command("cpu_temp -p", 0);
-        if(ret < 0){
-                sprintf(errInfo, "cmd[cpu_temp] failed\n");
-                return __LINE__;
-        }
-        env_cpu_temp = getenv("tempa");
-        if(!env_cpu_temp){
-                sprintf(errInfo, "Can't get cpu_temp, cpu is not calibrated.\n");
-                return __LINE__;
-        }
-        cpu_temp = simple_strtol(env_cpu_temp, NULL, 0);
-        ret = (cpu_temp >= minTemp && cpu_temp <= maxTemp) ? 0 : __LINE__;
-        if(!ret){
-                sprintf(errInfo, "%s", env_cpu_temp);
-        }
-        else{
-                sprintf(errInfo, "%s is out of temp range[%d, %d], errInfo[%s]\n", env_cpu_temp, minTemp, maxTemp, getenv("err_info_tempa"));
-        }
-
-        return ret;
 }
 
 int optimus_working (const char *cmd, char* buff)
@@ -502,26 +462,6 @@ int optimus_working (const char *cmd, char* buff)
         else if(strncmp(cmd,"sha1sum",(sizeof("sha1sum")-1)) == 0)
         {
                 ret = optimus_sha1sum(argc, argv, buff);		
-        }
-        else if(!strcmp(optCmd, "support_tempcontrol"))
-        {
-#ifndef CONFIG_CMD_CPU_TEMP
-                ret = __LINE__;
-#else
-                ret = run_command("cpu_temp -p", 0);
-                if(ret <= 0){
-                        DWN_MSG("Fail in cmd[cpu_temp]\n");
-                        ret = __LINE__;
-                }
-                else{
-                        ret = 0;
-                }
-#endif// #ifdef CONFIG_CMD_CPU_TEMP
-                sprintf(buff + 7, "cpu temp control cmd %s supported.\n", ret ? "NOT" : "DO");//7 == strlen("failed")
-        }
-        else if(!strcmp(optCmd, "tempcontrol"))
-        {
-                ret = _cpu_temp_in_valid_range(argc, argv, buff + 7);
         }
         else
         {

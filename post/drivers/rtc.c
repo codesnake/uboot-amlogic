@@ -67,11 +67,6 @@ struct rtc_time pattern1 ={
 	.tm_sec = 3,
 };
 
-extern void aml_test_1s_clock(unsigned long* osc_clk_count1, unsigned long* osc_clk_count2);
-extern int ser_access_write(unsigned long addr, unsigned long data);
-extern unsigned int ser_access_read(unsigned long addr);
-extern unsigned aml_get_gpo_dig(void);
-
 //===============================================================
 static void write_rtc(struct rtc_time *pattern)
 {

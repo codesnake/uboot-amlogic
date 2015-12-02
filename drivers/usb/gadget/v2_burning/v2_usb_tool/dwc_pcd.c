@@ -78,6 +78,7 @@ static void dwc_otg_core_init() //Elvis Fool, add 'static'
     gusbcfg_data_t  usbcfg = {.d32 = 0 };
  //   gi2cctl_data_t  i2cctl = {.d32 = 0 };
 //    hcfg_data_t     hcfg;
+    dcfg_data_t     dcfg;
 #ifndef USE_FULL_SPEED
 	usbcfg.d32 = dwc_read_reg32(DWC_REG_GUSBCFG);
 
@@ -94,7 +95,6 @@ static void dwc_otg_core_init() //Elvis Fool, add 'static'
 	usbcfg.b.srpcap = 0;
 	usbcfg.b.hnpcap = 0;
 #ifdef USE_FULL_SPEED
-	dcfg_data_t     dcfg;
 	printf("Full Speed\n");
 	usbcfg.b.physel = 1;  // Work at full speed
 	dwc_write_reg32(DWC_REG_GUSBCFG, usbcfg.d32);

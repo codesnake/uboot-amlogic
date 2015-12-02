@@ -18,10 +18,6 @@
 #include <asm/arch/io.h>
 #endif /*CONFIG_AML_I2C*/
 
-#ifdef CONFIG_MESON_TRUSTZONE
-extern uint32_t meson_trustzone_rtc_read_reg32(uint32_t addr);
-extern uint32_t meson_trustzone_rtc_write_reg32(uint32_t addr, uint32_t value);
-#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -563,7 +559,7 @@ void power_off(void)
 	{
 		unsigned long upgrade_step;
 		upgrade_step = simple_strtoul (getenv ("upgrade_step"), NULL, 16);
-		printf("upgrade_step = %d\n", (int)upgrade_step);
+		printf("upgrade_step = %d\n", upgrade_step);
 		if(upgrade_step == 1)
 		{
 			run_command("defenv", 1);

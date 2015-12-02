@@ -14,7 +14,7 @@ int rn5t618_set_usb_current_limit(int limit);
 
 int rn5t618_init(void);
 int rn5t618_set_charging_current(int current);
-int rn5t618_get_charging_percent(void);
+int rn5t618_get_charging_percent();
 int rn5t618_charger_online(void);
-void rn5t618_power_off(void);
+void rn5t618_power_off();
 #endif      /* __RN5T618_H__ */

@@ -32,9 +32,7 @@ COBJS-$(CONFIG_AML_HDMI_TX) += hdmi_tx_set.o enc_clk_config.o
 
 ifdef CONFIG_AML_SUSPEND
 COBJS += suspend.o
-ifndef CONFIG_MESON_TRUSTZONE
 COBJS += firmwareld.o
-endif
 endif
 
 ifdef CONFIG_MESON_TRUSTZONE

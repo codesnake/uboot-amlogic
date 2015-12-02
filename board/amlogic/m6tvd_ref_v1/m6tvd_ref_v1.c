@@ -20,7 +20,7 @@
 #endif /*CONFIG_AML_I2C*/
 #include <asm/arch/gpio.h>
 #include <asm/arch/reboot.h>
-//#define reboot_mode *((volatile unsigned long*)0xc8100004)
+#define reboot_mode *((volatile unsigned long*)0xc8100004)
 DECLARE_GLOBAL_DATA_PTR;
 
 
@@ -931,7 +931,6 @@ struct aml_nand_device aml_nand_mid_device = {
 //@board schematic: m3_skt_v1.pdf
 //@pinmax: AppNote-M3-CorePinMux.xlsx
 //GPIOA_26 used to set VCCX2_EN: 0 to enable power and 1 to disable power
-#if 0
 static void gpio_set_vbus_power(char is_power_on)
 {
 	if(is_power_on)
@@ -957,7 +956,6 @@ static void gpio_set_vbus_power(char is_power_on)
 		set_gpio_val(GPIOA_bank_bit0_27(26), GPIOA_bit_bit0_27(26), 1);
 	}
 }
-#endif
 static int usb_charging_detect_call_back(char bc_mode)
 {
 	switch(bc_mode){
@@ -1022,7 +1020,7 @@ struct amlogic_usb_config g_usb_config_m6_skt_h={
 };
 #endif /*CONFIG_USB_DWC_OTG_HCD*/
 #ifdef CONFIG_IR_REMOTE
-void board_ir_init(void)
+void board_ir_init()
 {
 	writel(0x00005801,P_AO_RTI_PIN_MUX_REG);
 	writel(0x30fa0013,P_AO_IR_DEC_REG0);
@@ -1088,5 +1086,4 @@ inline int check_all_regulators(void)
 {
     printf("Check all regulator\n");
     //return check_axp_regulator_for_m6_board();
-    return 0;
 }

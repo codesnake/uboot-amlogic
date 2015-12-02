@@ -5,7 +5,6 @@
 #include <asm/io.h>
 #include "hdmi_tx_reg.h"
 
-extern int printf(const char *fmt, ...);
 
 #define check_div() \
     if(div == -1)\

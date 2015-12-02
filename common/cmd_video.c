@@ -14,11 +14,9 @@
 *
 *********************************************************************************************/
 extern void reset_console(void);
-extern int tvout_opt_cmd(int argc, char *argv[]);
 
 static GraphicDevice *gdev = NULL;	/* Graphic Device */
 
-#if 0
 static int dump_video_info(void)
 {
 	if(gdev == NULL)
@@ -33,8 +31,6 @@ static int dump_video_info(void)
 
 	return 0;
 }
-#endif
-
 static int do_video_open(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 //	printf("Video initializing...\n");
@@ -93,7 +89,7 @@ static int do_video_dev(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[
 #ifdef CONFIG_VIDEO_AMLTVOUT
 	if(strcmp(video_dev, "tvout") == 0)
 	{
-		return tvout_opt_cmd(--argc, (char **)(++argv));
+		return tvout_opt_cmd(--argc, ++argv);
 	}
 #endif
 	printf("ERROR:env video_dev invalid! video_dev is %s\n", video_dev);

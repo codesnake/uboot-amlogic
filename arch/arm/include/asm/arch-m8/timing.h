@@ -134,7 +134,7 @@ struct pll_clk_settings{
 			if(counter>MAX_PLL_TRY_TIMES){ \
 				serial_puts(__FILE__); \
 				serial_puts(__FUNCTION__); \
-				serial_put_dword(__LINE__); \
+				serial_put_dword(__LINE__); \				
 				AML_WATCH_DOG_START(); \
 			} \
 		}

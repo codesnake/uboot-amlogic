@@ -9,15 +9,6 @@
 
 #define VPU_VERION	"v03"
 
-extern void udelay(unsigned long usec);
-extern int printf(const char *fmt, ...);
-#ifdef CONFIG_OF_LIBFDT
-extern int fdt_path_offset(const void *fdt, const char *path);
-extern const char *fdt_strerror(int errval);
-extern const void *fdt_getprop(const void *fdt, int nodeoffset, const char *name, int *lenp);
-#endif
-extern int fdt_check_header(const void *fdt);
-
 typedef enum {
 	VPU_CHIP_M8 = 0,
 	VPU_CHIP_M8M2,
@@ -273,7 +264,7 @@ static void detect_vpu_chip(void)
 
 static int get_vpu_config(void)
 {
-	//int ret=0;
+	int ret=0;
 	int nodeoffset;
 	char * propdata;
 	
@@ -282,10 +273,10 @@ static int get_vpu_config(void)
 		nodeoffset = fdt_path_offset(dt_addr, "/vpu");
 		if(nodeoffset < 0) {
 			printf("vpu preset: not find /vpu node in dts %s.\n",fdt_strerror(nodeoffset));
-			return 0;
+			return ret;
 		}
 		
-		propdata = (char *)fdt_getprop(dt_addr, nodeoffset, "clk_level", NULL);
+		propdata = fdt_getprop(dt_addr, nodeoffset, "clk_level", NULL);
 		if(propdata == NULL){
 			vpu_config.clk_level = vpu_config.clk_level_dft;
 			printf("don't find to match clk_level in dts, use default setting.\n");
@@ -300,21 +291,22 @@ static int get_vpu_config(void)
 		vpu_config.clk_level = vpu_config.clk_level_dft;
 		printf("vpu clk_level = %u\n", vpu_config.clk_level);
 	}
-	return 0;
+	return ret;
 }
 
 int vpu_probe(void)
 {
+	int ret;
+
 	dts_ready = 0;
 #ifdef CONFIG_OF_LIBFDT
 #ifdef CONFIG_DT_PRELOAD
 #ifdef CONFIG_DTB_LOAD_ADDR
-	dt_addr = (char *)CONFIG_DTB_LOAD_ADDR;
+	dt_addr = CONFIG_DTB_LOAD_ADDR;
 #else
-	dt_addr = (char *)0x0f000000;
+	dt_addr = 0x0f000000;
 #endif
-	int ret;
-	ret = fdt_check_header((const void *)dt_addr);
+	ret = fdt_check_header(dt_addr);
 	if(ret < 0) {
 		printf("check dts: %s, load default vpu parameters\n", fdt_strerror(ret));
 	}

@@ -226,37 +226,144 @@ static int aml_nand_get_20nm_OTP_value(struct hw_controller *controller,  unsign
 	}
 	return check_flag;
 }
+
+
+static int _get_valid_otp_bit(unsigned char *sets, int set_cnt, int bit, unsigned char * _bit)
+{
+    int ret = 0;
+    int i, max;
+    int cnt_0 = 0;
+    int cnt_1 = 0;
+    
+    *_bit = 1;
+    for (i = 0; i < set_cnt; i++)
+    {
+        if ((sets[i] & (1 << bit)))
+        {
+            cnt_1++;
+        }
+        else 
+        {
+            cnt_0++;
+        }
+    }
+    max = cnt_1;
+    if (cnt_0 > cnt_1)
+    {
+        max = cnt_0;
+        *_bit = 0;
+    }
+    if (max <= 4)
+    {
+        ret = -1;
+    }
+    
+    return ret;
+}
+//get valid otp table from src, then copy it to the dst.
+static int _get_valid_otp(unsigned char * src,unsigned char * dst) 
+{
+    int ret = 0; 
+    int set_size = 32;
+    int set_cnt = 8;
+    int bit_cnt = 8;
+    int i, j, k;
+    unsigned char * _set_org;
+    unsigned char * _set_inv;
+    unsigned char _target_org[8];
+    unsigned char _target_inv[8];
+    unsigned char _M, _bit;
+    
+    if ((src == NULL) || (dst == NULL))
+    {
+        PRINT("%s() %d: invalid buffer param\n", __FUNCTION__, __LINE__);
+        return -1;
+    }
+    
+    _set_org = &src[16]; // org set 0.
+    _set_inv = &src[48]; // inv set 0
+    //all bytes in the set.
+    for (i = 0; i < set_size; i++)
+    {
+        for (j = 0; j < set_cnt; j++)
+        {
+            _target_org[j] = _set_org[j*set_size*2 + i];
+            _target_inv[j] = _set_inv[j*set_size*2 + i];
+        }
+#if	0        
+        printk("\t%02x %02x %02x %02x %02x %02x %02x %02x\n",
+					_target_org[0], _target_org[1], _target_org[2], _target_org[3], _target_org[4], _target_org[5], _target_org[6], _target_org[7]);
+				printk("\t%02x %02x %02x %02x %02x %02x %02x %02x\n",
+					_target_inv[0], _target_inv[1], _target_inv[2], _target_inv[3], _target_inv[4], _target_inv[5], _target_inv[6], _target_inv[7]);
+#endif					
+        _M = 0;
+        for (k = 0; k < bit_cnt; k++)
+        {
+            ret = _get_valid_otp_bit(_target_org, set_cnt, k, &_bit);
+            if (ret)
+            {
+                ret = _get_valid_otp_bit(_target_inv, set_cnt, k, &_bit);
+                if (ret)
+                {
+                    PRINT("%s() %d: get valid bit failed!\n", __FUNCTION__, __LINE__);
+                    return -1;
+                }
+                //_bit = ~_bit;
+                //invers it while the bit is come from invers set.
+                if (_bit == 0)
+                    _bit = 1;
+                else 
+                    _bit = 0;
+                
+            }
+            _M |= _bit << k;
+        }
+        dst[i] = _M;
+    }
+    return ret;
+}
+
 static int aml_nand_get_1ynm_OTP_value(struct hw_controller *controller,  unsigned char *buf,unsigned char chipnr)
 {
-	//int i, j, k,m, retry_cnt_otp, total_reg_cnt, 4 = 0;
-	int i, j, k,m;
+	int i, j, k, ret =0;
 	//unsigned char  *tmp_buf;
 	struct read_retry_info *retry_info =  &(controller->retry_info);
-	uchar retry_value_sta[32] ={0};
+	unsigned char  retry_value_sta[32] ={0};
 	memset(buf, 0, 528);
 	for(i=0; i<528; i++){
 		buf[i] = controller->readbyte(controller);
 		 NFC_SEND_CMD_IDLE(controller->chip_selected, 0);
 		  NFC_SEND_CMD_IDLE(controller->chip_selected, 0);
 	}
-	for(i=0; i<HYNIX_OTP_COPY; i++){
+
+//	unsigned char temp_orgin[8],temp_inverse[8];
+//
+//	for(i=0; i<32; i++)	//retry value number
+//	{
+//		for(j=0; j<HYNIX_OTP_COPY; j++){
+//			temp_orgin[j]=buf[16 + j];			//base ops 16
+//			temp_inverse[j]=buf[16 + j + 32];			//base ops 16  inverse offset 32
+//		}
+//		retry_value_sta[i] = get_valid_otp_byte(temp_orgin, temp_inverse);
+//		
+//	}
+		ret = _get_valid_otp(buf, retry_value_sta);
 		for(j=0;j<8;j++){
 			for(k=0;k<4;k++){
-				if(retry_value_sta[j*4+k] ==0) {
-					m = k+j*4+16+i*64;
-					if((unsigned char)(buf[m]^buf[m+32]) == 0xFF){
-					aml_nand_dbg("find %d group %d retry %d value ok,buf =0x%02x\n",i,j,k,buf[m]);
-						if(j ==0)
-							retry_info->reg_def_val[chipnr][k] = buf[m];
-						else
-						      	 retry_info->reg_offs_val_lp[chipnr][j-1][k] = buf[m];
-						retry_value_sta[j*4+k] = 1;
-				 }
-			    }
+				if(j == 0)
+					retry_info->reg_def_val[chipnr][k] = retry_value_sta[k];
+				else
+					retry_info->reg_offs_val_lp[chipnr][j-1][k] = retry_value_sta[k + j*4];
 			}
 		}
-	}	
-	for(j=0;j<retry_info->reg_cnt_lp;j++)
+		if(ret < 0){
+			aml_nand_msg("########!!!!!!!get retry table fail\n");
+			return 1;
+		}
+
+	
+	
+		for(j=0;j<retry_info->reg_cnt_lp;j++)
 			aml_nand_dbg("REG(0x%x):   value:0x%2x, for chip[%d]", retry_info->reg_addr_lp[j],
 			                   retry_info->reg_def_val[chipnr][j], chipnr);
 		for(j=0;j<retry_info->retry_cnt_lp;j++){
@@ -266,12 +373,7 @@ static int aml_nand_get_1ynm_OTP_value(struct hw_controller *controller,  unsign
 			}
 			aml_nand_dbg("retry_info->retry_cnt_lp:%d", retry_info->retry_cnt_lp);
 		}
-	for(i=0;i<32;i++)
-		if(retry_value_sta[i] ==0) {
-			aml_nand_msg("  chip[%d] flash %d vaule abnormal not safe !!!!!\n",chipnr,i);
-			return 1;
-	}
-	return 0;
+		return 0;
 }
 static int get_reg_value_formOTP_hynix(struct hw_controller *controller, unsigned char chipnr)
 {
@@ -304,7 +406,7 @@ static int get_reg_value_formOTP_hynix(struct hw_controller *controller, unsigne
 		goto error_exit1;
 	}
 
-	ret = operation->reset(aml_chip, chipnr);
+	ret = operation->reset(aml_chip, chipnr);
 
 	if(ret){
 		aml_nand_msg("reset chip failed chipnr:%d", chipnr);
@@ -414,7 +516,7 @@ static int get_reg_value_formOTP_hynix(struct hw_controller *controller, unsigne
 
 #endif
 
-	ret = operation->reset(aml_chip, chipnr);
+	ret = operation->reset(aml_chip, chipnr);
 
 	if(ret){
 		aml_nand_msg("reset chip failed chipnr:%d", chipnr);
@@ -428,18 +530,31 @@ static int get_reg_value_formOTP_hynix(struct hw_controller *controller, unsigne
 		ret = -NAND_BUSY_FAILURE;
 		goto error_exit1;
 	}
-if((flash->new_type == HYNIX_20NM_4GB) || (flash->new_type == HYNIX_20NM_8GB)) {
-	controller->cmd_ctrl(controller, 0x38, NAND_CTRL_CLE);			//end read otp mode
-
+	if((flash->new_type == HYNIX_20NM_4GB) || (flash->new_type == HYNIX_20NM_8GB)) {
+		controller->cmd_ctrl(controller, 0x38, NAND_CTRL_CLE);			//end read otp mode
+	
+		}
+	else if(flash->new_type == HYNIX_1YNM_8GB) {
+		controller->cmd_ctrl(controller, 0x36, NAND_CTRL_CLE);
+		controller->cmd_ctrl(controller, 0x38, NAND_CTRL_ALE);
+		NFC_SEND_CMD_IDLE(controller->chip_selected, 0);
+		controller->writebyte(controller, 0);	
+		NFC_SEND_CMD_IDLE(controller->chip_selected, 0);
+		controller->cmd_ctrl(controller, 0x16, NAND_CTRL_CLE);
+		
+		/*
+		hynix read otp data cmd sequence for dummy read ,don't care address 
+		*/
+		controller->cmd_ctrl(controller, NAND_CMD_READ0, NAND_CTRL_CLE);
+		controller->cmd_ctrl(controller, 0, NAND_CTRL_ALE);
+		controller->cmd_ctrl(controller, 0, NAND_CTRL_ALE);
+		controller->cmd_ctrl(controller, 0, NAND_CTRL_ALE);
+		controller->cmd_ctrl(controller, 0, NAND_CTRL_ALE);
+		controller->cmd_ctrl(controller, 0, NAND_CTRL_ALE);
+		controller->cmd_ctrl(controller, NAND_CMD_READSTART, NAND_CTRL_CLE);
+	
 	}
-else if(flash->new_type == HYNIX_1YNM_8GB) {
-	controller->cmd_ctrl(controller, 0x36, NAND_CTRL_CLE);
-	controller->cmd_ctrl(controller, 0x38, NAND_CTRL_ALE);
-	NFC_SEND_CMD_IDLE(controller->chip_selected, 0);
-	controller->writebyte(controller, 0);	
-	NFC_SEND_CMD_IDLE(controller->chip_selected, 0);
-	controller->cmd_ctrl(controller, 0x16, NAND_CTRL_CLE);
-}
+
 	ret = controller->quene_rb(controller, chipnr);
 	if(ret){
 		aml_nand_msg("quene rb failed chipnr:%d", chipnr);
@@ -447,10 +562,6 @@ else if(flash->new_type == HYNIX_1YNM_8GB) {
 		goto error_exit1;
 	}
 
-
-
-
-	
 	aml_nand_free(one_copy_buf);
 
 	return 0;
@@ -605,12 +716,14 @@ static int readretry_set_def_val_hynix(struct hw_controller *controller, unsigne
 		}
 		//for en-slc
 		udelay(2);
-		ret = set_reg_value_hynix(controller, &slc_info->reg_def_val[i][0], \
+
+		if(flash->new_type != HYNIX_1YNM_8GB){		
+			ret = set_reg_value_hynix(controller, &slc_info->reg_def_val[i][0], \
 								&slc_info->reg_addr[0], i, slc_info->reg_cnt);
-		if(ret < 0){
-			aml_nand_msg("set slc_info reg value failed for chip[%d]", i);
+			if(ret < 0){
+				aml_nand_msg("set slc_info reg value failed for chip[%d]", i);
+			}
 		}
-	//}
 
 	return ret;
 }
@@ -623,6 +736,9 @@ static int enslc_init_hynix(struct hw_controller *controller)
 	int i, ret = 0;
 	
 	if((flash->new_type == 0) ||(flash->new_type > HYNIX_20NM_8GB))
+		return NAND_SUCCESS;
+		
+	if(flash->new_type == HYNIX_1YNM_8GB)
 		return NAND_SUCCESS;
 
 	//aml_nand_dbg("flash->new_type:%d", flash->new_type);
@@ -657,7 +773,9 @@ static int enslc_enter_hynix(struct hw_controller *controller)
 
 	if((flash->new_type == 0) ||(flash->new_type > HYNIX_20NM_8GB))
 		return NAND_SUCCESS;
-	
+		
+	if(flash->new_type == HYNIX_1YNM_8GB)
+		return NAND_SUCCESS;	
 	//aml_nand_dbg("flash->new_type:%d", flash->new_type);
 
 	memset(&reg_value_tmp[0], 0, EN_SLC_REG_NUM);
@@ -689,6 +807,8 @@ static int enslc_exit_hynix(struct hw_controller *controller)
 	if((flash->new_type == 0) ||(flash->new_type > HYNIX_20NM_8GB))
 		return NAND_SUCCESS;
 	
+	if(flash->new_type == HYNIX_1YNM_8GB)
+		return NAND_SUCCESS;	
 	//aml_nand_dbg("flash->new_type:%d", flash->new_type);
 
 	for (i=0; i<controller->chip_num; i++) {

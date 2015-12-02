@@ -7,7 +7,7 @@
 #include <asm/arch/io.h>
 #include <asm/arch/register.h>
 
-int do_ddr2pll(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+int do_ddr2pll(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
 	char *endp;
 	unsigned long pll, zqcr;

@@ -12,8 +12,8 @@
 
 #define CMD_BUFF_SIZE		512
 
-int usb_pcd_init(void);
-int usb_pcd_irq(void);
+int usb_pcd_init();
+int usb_pcd_irq();
 
 // Vendor request defines
 #define AM_REQ_WRITE_MEM	0x01

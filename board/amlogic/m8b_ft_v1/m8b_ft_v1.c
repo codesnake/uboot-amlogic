@@ -98,7 +98,7 @@ int board_eth_init(bd_t *bis)
 }
 #endif /* (CONFIG_CMD_NET) */
 
-int  get_partition_table(void)
+int  get_partition_table()
 {
 	return -1;
 }
@@ -471,7 +471,7 @@ static int do_msr(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 	//printf("\n");
 	for(;((nIndex < 64) && nCounter);nCounter--,nIndex++)
-		printf("MSR clock[%d] = %dMHz\n",nIndex,(int)clk_util_clk_msr(nIndex));
+		printf("MSR clock[%d] = %dMHz\n",nIndex,clk_util_clk_msr(nIndex));
 
 	return 0;
 	

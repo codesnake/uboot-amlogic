@@ -95,9 +95,8 @@ do't not call big functions with some golbal variables;
 
 
 extern int dsp_main(void);
-extern void start_system( void );
 
-//static int test_arc_run=0;
+static int test_arc_run=0;
 volatile int stop=0;
 void dsp_c_entry(void )
 {

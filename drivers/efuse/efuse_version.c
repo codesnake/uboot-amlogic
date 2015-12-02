@@ -124,7 +124,7 @@ static efuseinfo_item_t efuseinfo_v0[] =
 		.bch_reverse = EFUSE_VERSION_BCH_REVERSE, //0,
 	},
 };
-//M3
+
 static efuseinfo_item_t efuseinfo_v1[] =
 {
 	{
@@ -133,7 +133,7 @@ static efuseinfo_item_t efuseinfo_v1[] =
 		.enc_len = V1_EFUSE_USID_ENC_LEN, //35,
 		.data_len = V1_EFUSE_USID_DATA_LEN, //33,
 		.we = 1,
-		.bch_en = V1_EFUSE_USID_BCH_EN, //1,
+		.bch_en = V1_EFUSE_USID_BCH_EN, //0,
 		.bch_reverse = V1_EFUSE_USID_BCH_REVERSE, //0,
 	},	
 	{
@@ -181,64 +181,6 @@ static efuseinfo_item_t efuseinfo_v1[] =
 		.bch_en = 1,
 		.bch_reverse = 0,
 	},
-	{
-		.title= "version",     //1B(version=1)+2B(machid)
-		.offset=EFUSE_VERSION_OFFSET, //380,
-		.enc_len = EFUSE_VERSION_ENC_LEN, //4,
-		.data_len = EFUSE_VERSION_DATA_LEN, //3,
-		.we = 1,
-		.bch_en = EFUSE_VERSION_BCH_EN, //1,
-		.bch_reverse = EFUSE_VERSION_BCH_REVERSE, //0,
-	},
-};
-//M3
-static efuseinfo_item_t efuseinfo_v3[] =
-{
-	{
-		.title = "usid",
-		.offset = V1_EFUSE_USID_OFFSET, //4,
-		.enc_len = V1_EFUSE_USID_ENC_LEN, //35,
-		.data_len = V1_EFUSE_USID_DATA_LEN, //33,
-		.we = 1,
-		.bch_en = V1_EFUSE_USID_BCH_EN, //1,
-		.bch_reverse = V1_EFUSE_USID_BCH_REVERSE, //0,
-	},	
-	{
-		.title = "mac_wifi",
-		.offset = 39,
-		.enc_len = 7,
-		.data_len = 6,
-		.we = 1,
-		.bch_en = 1,
-		.bch_reverse = 0,
-	},
-	{
-		.title = "mac_bt",
-		.offset = 46,
-		.enc_len = 7,
-		.data_len = 6,
-		.we=1,
-		.bch_en = 1,
-		.bch_reverse = 0,
-	},
-	{
-		.title = "mac",
-		.offset = 53,
-		.enc_len = 7,
-		.data_len = 6,
-		.we = 1,
-		.bch_en = 1,
-		.bch_reverse = 0,
-	},
-	{
-		.title = "licence",
-		.offset = 60,
-		.enc_len = 4,
-		.data_len = 3,
-		.we = 1,
-		.bch_en = 1,
-		.bch_reverse = 1,
-	},	
 	{
 		.title= "version",     //1B(version=1)+2B(machid)
 		.offset=EFUSE_VERSION_OFFSET, //380,
@@ -596,11 +538,6 @@ efuseinfo_t efuseinfo[] =
 		.efuseinfo_version = efuseinfo_v2,
 		.size = sizeof(efuseinfo_v2)/sizeof(efuseinfo_item_t),
 		.version = 2,
-	},
-	{
-		.efuseinfo_version = efuseinfo_v3,
-		.size = sizeof(efuseinfo_v3)/sizeof(efuseinfo_item_t),
-		.version = 3,
 	},
 #ifdef CONFIG_MESON_TRUSTZONE
 	{

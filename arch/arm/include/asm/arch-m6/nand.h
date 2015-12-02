@@ -31,7 +31,7 @@
  *
  */
 #define container_of(ptr, type, member) ({			\
-	const typeof( ((type *)0)->member ) *__mptr = (const typeof( ((type *)0)->member ) *)(ptr);	\
+	const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
 	(type *)( (char *)__mptr - offsetof(type,member) );})
 
 #define NAND_CMD                                ((0xc1108600-IO_CBUS_BASE)>>2)
@@ -175,7 +175,7 @@
 #define NFC_CMD_RB_INT(ce,time)        ((ce)|RB|(((ce>>10)^0xf)<<14)|(time&0x1f))
 #define NFC_CMD_RBIO(time,io)		   (RB|io|(time&0x1f))
 #define NFC_CMD_RBIO_INT(io,time)      (RB|(((io>>10)^0x7)<<14)|(time&0x1f))
-#define NFC_CMD_SEED(seed)			   ((SEED)|((0xc2)+((seed)&(0x7fff))))
+#define NFC_CMD_SEED(seed)			   (SEED|(0xc2 + seed&0x7fff))
 #define NFC_CMD_STS(tim) 			   (STS|(tim&3))
 #define NFC_CMD_M2N(ran,ecc,sho,pgsz,pag)      ((ran?M2N:M2N_NORAN)|(ecc<<14)|(sho<<13)|((pgsz&0x7f)<<6)|(pag&0x3f))
 #define NFC_CMD_N2M(ran,ecc,sho,pgsz,pag)      ((ran?N2M:N2M_NORAN)|(ecc<<14)|(sho<<13)|((pgsz&0x7f)<<6)|(pag&0x3f))
@@ -284,7 +284,7 @@
 #define NAND_INFO_DATA_1INFO(a)   ((a)&0xff)
 
 
-//#define NAND_DEFAULT_OPTIONS			(NAND_TIMING_MODE5 | NAND_ECC_BCH8_512_MODE)
+#define NAND_DEFAULT_OPTIONS			(NAND_TIMING_MODE5 | NAND_ECC_BCH8_512_MODE)
 
 
 #define AML_NORMAL						0

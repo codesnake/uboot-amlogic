@@ -15,68 +15,6 @@
 #endif /*CONFIG_AML_I2C*/
 
 DECLARE_GLOBAL_DATA_PTR;
-const char * env_args_reserve[]=
-{
-"480poutputx",
-"480poutputx",
-"480poutputy",
-"480poutputwidth",
-"480poutputheight",
-"480ioutputx",
-"480ioutputy",
-"480ioutputwidth",
-"480ioutputheight",
-"576poutputx",
-"576poutputy",
-"576poutputwidth",
-"576poutputheight",
-"576ioutputx",
-"576ioutputy",
-"576ioutputwidth",
-"576ioutputheight",
-"720poutputx",
-"720poutputy",
-"720poutputwidth",
-"720poutputheight",
-"1080poutputx",
-"1080poutputy",
-"1080poutputwidth",
-"1080poutputheight",
-"1080ioutputx",
-"1080ioutputy",
-"1080ioutputwidth",
-"1080ioutputheight",
-"4k2k24hz_x",
-"4k2k24hz_y",
-"4k2k24hz_width",
-"4k2k24hz_height",
-"4k2k25hz_x",
-"4k2k25hz_y",
-"4k2k25hz_width",
-"4k2k25hz_height",
-"4k2k30hz_x",
-"4k2k30hz_y",
-"4k2k30hz_width",
-"4k2k30hz_height",
-"4k2ksmpte_x",
-"4k2ksmpte_y",
-"4k2ksmpte_width",
-"4k2ksmpte_height",
-"digitaudiooutput",
-"defaulttvfrequency",
-"has.accelerometer",
-"cecconfig",
-"cvbsmode",
-"hdmimode",
-"outputmode",
-"auto_update_enable",
-"disp.fromleft",
-NULL
-};
-
-struct gpio_chip;
-extern int gpio_amlogic_requst(struct gpio_chip *chip,unsigned offset);
-extern int gpio_amlogic_direction_output(struct gpio_chip *chip,unsigned offset, int value);
 
 #if defined(CONFIG_CMD_NET)
 /*************************************************
@@ -622,6 +560,13 @@ int board_init(void)
 	aml_set_reg32_mask(P_PERIPHS_PIN_MUX_9,0x1<<19);//set mode GPIOX_10-->CLK_OUT3
 	WRITE_CBUS_REG(PWM_PWM_E, 0x16d016d);
 	WRITE_CBUS_REG(PWM_MISC_REG_EF, 0x8001);
+	/* init led out put */
+	//red off
+    gpio_amlogic_requst(NULL, GPIOAO_2);
+    gpio_amlogic_direction_output(NULL, GPIOAO_2, 1);
+	//green on
+    gpio_amlogic_requst(NULL, GPIOAO_13);
+    gpio_amlogic_direction_output(NULL, GPIOAO_13, 0);  
 #endif
 	
 
@@ -703,7 +648,7 @@ static int do_msr(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 	//printf("\n");
 	for(;((nIndex < 64) && nCounter);nCounter--,nIndex++)
-		printf("MSR clock[%d] = %dMHz\n",nIndex,(int)clk_util_clk_msr(nIndex));
+		printf("MSR clock[%d] = %dMHz\n",nIndex,clk_util_clk_msr(nIndex));
 
 	return 0;
 	
@@ -786,27 +731,37 @@ void board_dt_id_process(void)
 		mem_size += gd->bd->bi_dram[i].size;
 	}
 	mem_size = mem_size >> 20;	//MB
-	unsigned char dt_name[64] = {0};
-	strcat(dt_name, "m8b_m201_");  //please change this name when you add a new config
-	debug_print("aml_dt: %s\n", getenv("aml_dt"));
+	char dt_name[64] = {0};
+	//strcat(dt_name, "m8b_m201_");  //please change this name when you add a new config
+	//debug_print("aml_dt: %s\n", getenv("aml_dt"));
 	switch(mem_size){
-		case 2048: //2GB
-			strcat(dt_name, "2g");
-			break;
 		case 1024: //1GB
-			strcat(dt_name, "1g");
+			strcat(dt_name, "m8b_m201_1G");
 			break;
 		case 512: //512MB
-			strcat(dt_name, "512m");
+			strcat(dt_name, "m8b_m201C_512M");
 			break;
 		case 256:
-			strcat(dt_name, "256m");
+			strcat(dt_name, "m8b_m201_256M");
 			break;
 		default:
-			strcat(dt_name, "v1");
+			strcat(dt_name, "m8b_m201_v1");
 			break;
 	}
 	setenv("aml_dt", dt_name);
-	debug_print("aml_dt: %s\n", getenv("aml_dt"));
+	//debug_print("aml_dt: %s\n", getenv("aml_dt"));
 }
 #endif
+
+static int do_checkhw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+{
+#ifdef CONFIG_AUTO_SET_MULTI_DT_ID
+	board_dt_id_process();
+#endif
+	return 0;
+}
+
+U_BOOT_CMD(
+        checkhw, 1, 1, do_checkhw,
+        "Get the hardware revsion","[<string>]\n"
+);

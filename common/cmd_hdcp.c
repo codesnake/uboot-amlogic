@@ -94,7 +94,7 @@ static int do_hdcp_prefetch(cmd_tbl_t * cmdtp, int flag, int argc, char * const 
     printf("hdcp get form storage medium: %s\n", argv[1]);
     if(!strncmp(argv[1], "nand", strlen("nand")) || !strncmp(argv[1], "emmc", strlen("emmc"))) {
 #if defined(CONFIG_SECURITYKEY)
-        ret = uboot_key_get(argv[1], "hdcp", (char *)hdcp_keys_prefetch, 308, 0);
+        ret = uboot_key_get(argv[1], "hdcp", hdcp_keys_prefetch, 308, 0);
 #endif
         if(ret >= 0)
             prefetch_flag = 1;
@@ -104,7 +104,7 @@ static int do_hdcp_prefetch(cmd_tbl_t * cmdtp, int flag, int argc, char * const 
     else if(!strncmp(argv[1], "efuse", strlen("efuse"))) {
         const char *Argv[3] = {"efuse", "read", "hdcp"};
         int Argc = 3;
-        ret = cmd_efuse(Argc, (char * const*)Argv, (char *)hdcp_keys_prefetch);
+        ret = cmd_efuse(Argc, Argv, hdcp_keys_prefetch);
         if(!ret)
             prefetch_flag = 1;
         else

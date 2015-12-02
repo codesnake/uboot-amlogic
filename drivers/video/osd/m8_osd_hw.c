@@ -46,9 +46,7 @@
 //static DECLARE_WAIT_QUEUE_HEAD(osd_vsync_wq);
 static bool vsync_hit = false;
 static bool osd_vf_need_update = false;
-#ifdef CONFIG_AM_VIDEO
 static struct vframe_provider_s osd_vf_prov;
-#endif
 static int  g_vf_visual_width;
 static int  g_vf_width;
 static int  g_vf_height;
@@ -219,9 +217,7 @@ static const struct vframe_operations_s osd_vf_provider =
     .put  = NULL,
 };
 
-#ifdef CONFIG_AM_VIDEO
 static unsigned char osd_vf_prov_init = 0;
-#endif
 
 static inline void  osd_update_3d_mode(int enable_osd1,int enable_osd2)
 {
@@ -1250,13 +1246,13 @@ static void osd1_update_coef(void)
 	int *hf_coef, *vf_coef;
 
 	if (vf_coef_idx == 0){
-		vf_coef = (int *)filt_coef0;
+		vf_coef = filt_coef0;
 	}else if (vf_coef_idx == 1){
-		vf_coef = (int *)filt_coef1;
+		vf_coef = filt_coef1;
 	}else if (vf_coef_idx == 2){
-		vf_coef = (int *)filt_coef2;
+		vf_coef = filt_coef2;
 	}else{
-		vf_coef = (int *)filt_coef0;
+		vf_coef = filt_coef0;
 	}
 
 	if (vf_coef_wren) {
@@ -1268,13 +1264,13 @@ static void osd1_update_coef(void)
 	}
 
 	if (hf_coef_idx == 0){
-		hf_coef = (int *)filt_coef0;
+		hf_coef = filt_coef0;
 	}else if (hf_coef_idx == 1){
-		hf_coef = (int *)filt_coef1;
+		hf_coef = filt_coef1;
 	}else if (hf_coef_idx == 2){
-		hf_coef = (int *)filt_coef2;
+		hf_coef = filt_coef2;
 	}else{
-		hf_coef = (int *)filt_coef0;
+		hf_coef = filt_coef0;
 	}
 
 	if (hf_coef_wren) {
@@ -1391,13 +1387,13 @@ static void osd2_update_coef(void)
 	int *hf_coef, *vf_coef;
 
 	if (vf_coef_idx == 0){
-		vf_coef = (int *)filt_coef0;
+		vf_coef = filt_coef0;
 	}else if (vf_coef_idx == 1){
-		vf_coef = (int *)filt_coef1;
+		vf_coef = filt_coef1;
 	}else if (vf_coef_idx == 2){
-		vf_coef = (int *)filt_coef2;
+		vf_coef = filt_coef2;
 	}else{
-		vf_coef = (int *)filt_coef0;
+		vf_coef = filt_coef0;
 	}
 
 	if (vf_coef_wren) {
@@ -1409,13 +1405,13 @@ static void osd2_update_coef(void)
 	}
 
 	if (hf_coef_idx == 0){
-		hf_coef = (int *)filt_coef0;
+		hf_coef = filt_coef0;
 	}else if (hf_coef_idx == 1){
-		hf_coef = (int *)filt_coef1;
+		hf_coef = filt_coef1;
 	}else if (hf_coef_idx == 2){
-		hf_coef = (int *)filt_coef2;
+		hf_coef = filt_coef2;
 	}else{
-		hf_coef = (int *)filt_coef0;
+		hf_coef = filt_coef0;
 	}
 
 	if (hf_coef_wren) {
@@ -1472,7 +1468,7 @@ static   void  osd1_update_enable(void)
 			clrreg_mask(P_VPP_MISC,VPP_OSD1_POSTBLEND);
 		}
 	}else{
-	u32  video_enable=0;
+	u32  video_enable;
     _debug("---osd_hw.enable[OSD1] = %d(0x%08x)\n", osd_hw.enable[OSD1], osd_hw.enable[OSD1]);
 	video_enable |= readl(P_VPP_MISC)&VPP_VD1_PREBLEND;
 	if(osd_hw.enable[OSD1]==ENABLE)
@@ -1519,7 +1515,7 @@ static   void  osd2_update_enable(void)
 			clrreg_mask(P_VPP_MISC,VPP_OSD1_POSTBLEND);
 		}
 	}else{
-	u32  video_enable=0;
+	u32  video_enable;
     _debug("---osd_hw.enable[OSD2] = %d(0x%08x)\n", osd_hw.enable[OSD2], osd_hw.enable[OSD2]);
 	video_enable |= readl(P_VPP_MISC)&VPP_VD1_PREBLEND;
 	if(osd_hw.enable[OSD2]==ENABLE)

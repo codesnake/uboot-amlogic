@@ -603,7 +603,7 @@ static void board_i2c_init(void)
 #endif
 }
 
-void wifi_power_init(void)
+void wifi_power_init()
 {
 	printf("-- set usb wifi power off in uboot --\n");
 	amlogic_gpio_direction_output(GPIOX_11,1);
@@ -710,7 +710,7 @@ static int do_msr(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 	//printf("\n");
 	for(;((nIndex < 64) && nCounter);nCounter--,nIndex++)
-		printf("MSR clock[%d] = %dMHz\n",nIndex,(int)clk_util_clk_msr(nIndex));
+		printf("MSR clock[%d] = %dMHz\n",nIndex,clk_util_clk_msr(nIndex));
 
 	return 0;
 	

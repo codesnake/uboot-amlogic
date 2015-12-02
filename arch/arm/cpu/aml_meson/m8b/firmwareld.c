@@ -4,6 +4,7 @@
 #include <asm/arch/io.h>
 #include <power_firmware.dat>
 //#include <../appf/power_firmware.dat>
+
 void init_suspend_firmware(void)
 {
 	//1. load source code to memory: 64M kernel + 16M reserve space. Suspend firmware 

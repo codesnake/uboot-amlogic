@@ -111,11 +111,7 @@ int optimus_buf_manager_tplcmd_init(const char* mediaType,  const char* partName
     _bufManager.destMediaType   = OPTIMUS_MEDIA_TYPE_STORE;
     if(!strcmp("mem", mediaType))
     {
-        /*writeBackUnitSz             = OPTIMUS_MEMORY_WRITE_BACK_SZ;*/
-            writeBackUnitSz             = pktSz4BufManager + _bufManager.transferUnitSz - 1;
-            writeBackUnitSz             >>= OPTIMUS_DOWNLOAD_SLOT_SZ_SHIFT_BITS;
-            writeBackUnitSz             <<= OPTIMUS_DOWNLOAD_SLOT_SZ_SHIFT_BITS;
-
+        writeBackUnitSz             = OPTIMUS_MEMORY_WRITE_BACK_SZ;
         _bufManager.destMediaType   = OPTIMUS_MEDIA_TYPE_MEM;
 
         if(partBaseOffset>>32){

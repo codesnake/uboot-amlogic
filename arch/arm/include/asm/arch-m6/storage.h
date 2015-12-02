@@ -6,15 +6,14 @@
 #define __STORAGE_H
 
 #include <linux/types.h>
-#include <asm/sizes.h>
-#include <asm/arch/romboot.h>
+
 #ifndef __ASSEMBLY__
 
 //Partition table defines
 #define 	NAND_PART_SIZE_FULL  		-1
 #define 	MAX_PART_NUM			16
 #define	 MAX_PART_NAME_LEN		 16
-//#define 	SZ_1M 					0x100000
+#define 	SZ_1M 					0x100000
 
 #define 	STORE_CODE 				1
 #define	STORE_CACHE				(1<<1)
@@ -31,8 +30,8 @@
 #define CARD_TYPE_SHIFT             4
 #define CARD_TYPE_MASK              0xf
 #define CARD_TYPE_UNKNOWN           0        /* unknown */
-//#define CARD_TYPE_MMC               1        /* MMC card */
-//#define CARD_TYPE_SD                2        /* SD card */
+#define CARD_TYPE_MMC               1        /* MMC card */
+#define CARD_TYPE_SD                2        /* SD card */
 #define CARD_TYPE_SDIO              3        /* SDIO card */
 #define CARD_TYPE_SD_COMBO          4        /* SD combo (IO+mem) card */
 #define CARD_TYPE_NON_SDIO          5        /* NON sdio device (means SD/MMC card) */

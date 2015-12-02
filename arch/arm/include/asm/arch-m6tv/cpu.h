@@ -176,9 +176,4 @@
 
 #define MESON_CPU_TYPE	MESON_CPU_TYPE_MESON6TV
 
-#define EFUSE_BITS             (512*8)
-#define EFUSE_BYTES				512   //(EFUSE_BITS/8)
-#define EFUSE_DWORDS		128   //(EFUSE_BITS/32)
-
-
 #endif /* _CPU_H */

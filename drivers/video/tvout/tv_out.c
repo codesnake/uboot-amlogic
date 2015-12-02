@@ -9,10 +9,9 @@
 #include "tv_out.h"
 
 static int tvmode = -1;
-//static int used_audio_pll=-1;
+static int used_audio_pll=-1;
 unsigned int system_serial_low=0xA;
 
-#if 0
 static unsigned long get_xtal_clock(void)
 {
 	unsigned long clk;
@@ -21,8 +20,6 @@ static unsigned long get_xtal_clock(void)
 	clk=clk*1000*1000;
 	return clk;
 }
-#endif
-
 typedef  enum{
 	INTERALCE_COMPONENT=0,
 	CVBS_SVIDEO,
@@ -116,7 +113,6 @@ void  change_vdac_setting(unsigned int  vdec_setting,int  mode)
 	
 }
 
-#if 0
 static void enable_vsync_interrupt(void)
 {
 	
@@ -171,9 +167,8 @@ static void enable_vsync_interrupt(void)
         WRITE_MPEG_REG(VENC_INTCTRL, 0x2);
     }
 }
-#endif
 
-#if (MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8)
+#if CONFIG_AML_MESON_8
 static unsigned int vdac_cfg_valid = 0, vdac_cfg_value = 0;
 static unsigned int cvbs_get_trimming_version(unsigned int flag)
 {
@@ -243,7 +238,7 @@ void cvbs_trimming(void)
 {
 	char cvbs_buf[2] = {0,0}, cvbs_value[8];
 	int ret;
-	//int fake;
+	int fake;
 
 	ret = efuse_read_intlItem("cvbs_trimming", cvbs_buf, 2);
 
@@ -347,13 +342,12 @@ void cvbs_performance_config(void)
 	return ;
 }
 
-#if MESON_CPU_TYPE == MESON_CPU_TYPE_MESON8
-static const reg_t tvregs_576cvbs_china_sarft_m8[] =
+static const reg_t tvregs_576cvbs_china_sarft[] =
 {
 	{MREG_END_MARKER,            	0      }
 };
 
-static const reg_t tvregs_576cvbs_china_telecom_m8[] =
+static const reg_t tvregs_576cvbs_china_telecom[] =
 {
 	{P_ENCI_SYNC_ADJ,				0x8060	},
     {P_ENCI_VIDEO_SAT,              0xfe	},
@@ -361,7 +355,7 @@ static const reg_t tvregs_576cvbs_china_telecom_m8[] =
 	{MREG_END_MARKER,            	0		}
 };
 
-static const reg_t tvregs_576cvbs_china_mobile_m8[] =
+static const reg_t tvregs_576cvbs_china_mobile[] =
 {
 	{P_ENCI_SYNC_ADJ,				0x8060	},
     {P_ENCI_VIDEO_SAT,              0xfe	},
@@ -369,113 +363,25 @@ static const reg_t tvregs_576cvbs_china_mobile_m8[] =
 	{MREG_END_MARKER,            	0       }
 };
 
-static const reg_t *tvregs_576cvbs_performance_m8[] =
+static const reg_t *tvregs_576cvbs_performance[] =
 {
-	tvregs_576cvbs_china_sarft_m8,
-	tvregs_576cvbs_china_telecom_m8,
-	tvregs_576cvbs_china_mobile_m8
+	tvregs_576cvbs_china_sarft,
+	tvregs_576cvbs_china_telecom,
+	tvregs_576cvbs_china_mobile
 };
-
-static const reg_t tvregs_576cvbs_china_sarft_m8m2[] =
-{
-	{P_ENCI_YC_DELAY,				0x343  },
-	{MREG_END_MARKER,            	0      }
-};
-
-static const reg_t tvregs_576cvbs_china_telecom_m8m2[] =
-{
-	{P_ENCI_YC_DELAY,				0x343   },
-	{P_ENCI_SYNC_ADJ,				0x8080	},
-    {P_ENCI_VIDEO_SAT,              0xfd	},
-    {P_VENC_VDAC_DAC0_FILT_CTRL1,   0xf850	},
-	{MREG_END_MARKER,            	0		}
-};
-
-static const reg_t tvregs_576cvbs_china_mobile_m8m2[] =
-{
-	{P_ENCI_YC_DELAY,				0x343   },
-	{P_ENCI_SYNC_ADJ,				0x8080	},
-    {P_ENCI_VIDEO_SAT,              0xfd	},
-    {P_VENC_VDAC_DAC0_FILT_CTRL1,   0xf850	},
-	{MREG_END_MARKER,            	0       }
-};
-
-static const reg_t *tvregs_576cvbs_performance_m8m2[] =
-{
-	tvregs_576cvbs_china_sarft_m8m2,
-	tvregs_576cvbs_china_telecom_m8m2,
-	tvregs_576cvbs_china_mobile_m8m2
-};
-
-#elif MESON_CPU_TYPE == MESON_CPU_TYPE_MESON8B
-
-static const reg_t tvregs_576cvbs_china_sarft_m8b[] =
-{
-	{P_ENCI_YC_DELAY,				0x343  },
-	{MREG_END_MARKER,            	0      }
-};
-
-static const reg_t tvregs_576cvbs_china_telecom_m8b[] =
-{
-	{P_ENCI_YC_DELAY,				0x343   },
-	{P_ENCI_SYNC_ADJ,				0x8080	},
-    {P_ENCI_VIDEO_SAT,              0xfd	},
-    {P_VENC_VDAC_DAC0_FILT_CTRL1,   0xf850	},
-	{MREG_END_MARKER,            	0		}
-};
-
-static const reg_t tvregs_576cvbs_china_mobile_m8b[] =
-{
-	{P_ENCI_YC_DELAY,				0x343   },
-	{P_ENCI_SYNC_ADJ,				0x8080	},
-    {P_ENCI_VIDEO_SAT,              0xfd	},
-    {P_VENC_VDAC_DAC0_FILT_CTRL1,   0xf850	},
-	{MREG_END_MARKER,            	0       }
-};
-
-static const reg_t *tvregs_576cvbs_performance_m8b[] =
-{
-	tvregs_576cvbs_china_sarft_m8b,
-	tvregs_576cvbs_china_telecom_m8b,
-	tvregs_576cvbs_china_mobile_m8b
-};
-
-#endif
 
 static void cvbs_performance_enhancement(int mode)
 {
 	const reg_t *s;
 	unsigned int index = CONFIG_CVBS_PERFORMANCE_ACTIVED;
-	unsigned int max = 0;
-	unsigned int type = 0;
+	unsigned int max = sizeof(tvregs_576cvbs_performance)/sizeof(reg_t*);
 
 	if( VMODE_576CVBS != mode )
 		return ;
 
-#if MESON_CPU_TYPE == MESON_CPU_TYPE_MESON8
-	if( IS_MESON_M8M2_CPU )
-	{
-		max = sizeof(tvregs_576cvbs_performance_m8m2)/sizeof(reg_t*);
-		index = (index>=max)?0:index;
-		s = tvregs_576cvbs_performance_m8m2[index];
-		type = 2;
-	}
-	else
-	{
-		max = sizeof(tvregs_576cvbs_performance_m8)/sizeof(reg_t*);
-		index = (index>=max)?0:index;
-		s = tvregs_576cvbs_performance_m8[index];
-		type = 0;
-	}
-#elif MESON_CPU_TYPE == MESON_CPU_TYPE_MESON8B
-	max = sizeof(tvregs_576cvbs_performance_m8b)/sizeof(reg_t*);
 	index = (index>=max)?0:index;
-	s = tvregs_576cvbs_performance_m8b[index];
-	type = 1;
-#endif
-
-	printf("cvbs performance type = %d, table = %d\n", type, index);
-
+	printf("cvbs performance use table = %d\n", index);
+	s = tvregs_576cvbs_performance[index];
 	while (MREG_END_MARKER != s->reg)
 	{
     	setreg(s++);
@@ -484,69 +390,6 @@ static void cvbs_performance_enhancement(int mode)
 }
 
 #endif // end of CVBS_PERFORMANCE_COMPATIBILITY_SUPPORT
-
-#if MESON_CPU_TYPE == MESON_CPU_TYPE_MESON8B
-static void tv_out_gate_config(int mode)
-{
-	switch(mode)
-	{
-		case VMODE_480CVBS:
-		case VMODE_576CVBS:
-			// close hdmi pixel clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 5, 1);
-			// close encp clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 2, 1);
-			// open enci clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 1, 0, 1);
-			// open vdac clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 1, 4, 1);
-			break;
-		case VMODE_480I:
-		case VMODE_576I:
-			// open hdmi pixel clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 1, 5, 1);
-			// close encp clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 2, 1);
-			// open enci clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 1, 0, 1);
-			// close vdac clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 4, 1);
-			break;
-		case VMODE_480P:
-		case VMODE_576P:
-    	case VMODE_720P:
-    	case VMODE_1080I:
-    	case VMODE_1080P:
-    	case VMODE_720P_50HZ:
-    	case VMODE_1080I_50HZ:
-    	case VMODE_1080P_50HZ:
-    	case VMODE_1080P_24HZ:
-			// open hdmi pixel clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 1, 5, 1);
-			// open encp clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 1, 2, 1);
-			// close enci clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 0, 1);
-			// close vdac clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 4, 1);
-			break;
-		default:
-			// close hdmi pixel clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 5, 1);
-			// close encp clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 2, 1);
-			// close enci clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 0, 1);
-			// close vdac clk gate
-			WRITE_CBUS_REG_BITS(HHI_VID_CLK_CNTL2, 0, 4, 1);
-			break;
-	}
-
-	return ;
-}
-
-#endif
-
 
 int tv_out_open(int mode)
 {
@@ -563,12 +406,8 @@ int tv_out_open(int mode)
 		m6_enable_vdac_hw_switch(mode);
 #endif
 
-#if (MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8)
+#if CONFIG_AML_MESON_8
 		cvbs_cntl_output(0);
-#endif
-
-#if MESON_CPU_TYPE == MESON_CPU_TYPE_MESON8B
-		tv_out_gate_config(mode);
 #endif
 
         s = tvregsTab[mode];
@@ -579,7 +418,7 @@ int tv_out_open(int mode)
 		cvbs_performance_enhancement(mode);
 #endif
 
-#if (MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8)
+#if CONFIG_AML_MESON_8
 		if( (mode==VMODE_480CVBS) || (mode==VMODE_576CVBS) )
 		{
 			WRITE_MPEG_REG(HHI_GCLK_OTHER, READ_MPEG_REG(HHI_GCLK_OTHER) | (0x1<<10) | (0x1<<8)); //enable CVBS GATE, DAC_CLK:bit[10] = 1;VCLK2_ENCI:bit[8] = 1;

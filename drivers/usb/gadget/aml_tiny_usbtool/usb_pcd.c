@@ -20,9 +20,7 @@
 #define DRIVER_PRODUCT_ID	0xC003
 #define DRIVER_VERSION       0x0100
 
-extern void usb_memcpy(char * dst,char * src,int len);
-extern int burn_board(const char *dev, void *mem_addr, u64 offset, u64 size);
-extern int usb_run_command (const char *cmd, char *buffer);
+
 
 #define STRING_MANUFACTURER	1
 #define STRING_PRODUCT		2
@@ -182,7 +180,7 @@ static const char dt_string_serial[DT_STRING_SERIAL_LEN]={
 	'6',
 	0
 };
-int usb_pcd_init(void)
+int usb_pcd_init()
 {
 	return dwc_core_init();
 }
@@ -206,7 +204,7 @@ void usb_parameter_init(int time_out)
 	}
 }
 
-int usb_pcd_irq(void)
+int usb_pcd_irq()
 {
 	if(need_check_timeout){
 		if(get_timer(need_check_timeout) > time_out_val){
@@ -342,7 +340,6 @@ void do_vendor_request( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 	u16			w_index = ctrl->wIndex;
 	u16			w_value = ctrl->wValue;
 	u16			w_length = ctrl->wLength;
-        unsigned* _u32Buf = (unsigned*)buff;
 	
 	switch (ctrl->bRequest) {
 
@@ -377,8 +374,7 @@ void do_vendor_request( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 		value = (w_value << 16) + w_index;
 
 		//data = _lr(value);
-		/**(unsigned int *)buff = data;*/
-                _u32Buf[0] = data;
+		*(unsigned int *)buff = data;
 		
 		_pcd->buf = buff;
 		_pcd->length = w_length;
@@ -449,7 +445,6 @@ void do_vendor_out_complete( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 	u16			w_length = ctrl->wLength;
 	void (*fp)(void);
 	char * buf; 
-        unsigned* _u32Buf = (unsigned*)buff;
 
 	//USB_DBG("do_vendor_out_complete()\n");
 	switch (ctrl->bRequest) {
@@ -500,8 +495,8 @@ void do_vendor_out_complete( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 	  	value = 1; // is_out = 1
 	  case AM_REQ_RD_LARGE_MEM:
 	  	_pcd->bulk_out = value; // read or write
-	  	_pcd->bulk_buf = (char *)_u32Buf[0];//(*(unsigned int*)buff); // board address
-	  	_pcd->bulk_data_len = _u32Buf[1];//(*(unsigned int*) &buff[4]); // data length
+	  	_pcd->bulk_buf = (char *)(*(unsigned int*)buff); // board address
+	  	_pcd->bulk_data_len = (*(unsigned int*) &buff[4]); // data length
 	  	start_bulk_transfer(_pcd);
 	  	break;
 	  case AM_REQ_TPL_CMD:
@@ -510,7 +505,7 @@ void do_vendor_out_complete( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 			char dev[16] = {0};
 			u64 offset = 0;
 			u64 tmp = 0;
-			u32 mem_addr = _u32Buf[0];//(u32)(*(unsigned int*)buff);
+			u32 mem_addr = (*(unsigned int*)buff);
 
 			offset |= (*(unsigned int*)&buff[16]);
 			tmp = (*(unsigned int*)&buff[20]);
@@ -518,7 +513,7 @@ void do_vendor_out_complete( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 
 			u32 size = (*(unsigned int*)&buff[12]);
 			usb_memcpy(dev,&buff[32],16);
-			burn_board(dev, (void *)mem_addr, offset, size);
+			burn_board(dev, mem_addr, offset, size);
 		}
 		else if(w_index == 1){
 			char cmd[CMD_BUFF_SIZE];

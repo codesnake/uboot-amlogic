@@ -1935,23 +1935,6 @@
 #define ASYNC_FIFO2_REG1                           0x2315
 #define ASYNC_FIFO2_REG2                           0x2316
 #define ASYNC_FIFO2_REG3                           0x2317
-
-// ----------------------------
-// SDIO_AHB_CBUS (2)
-// ----------------------------
-// bit   17    -- arc_ahb_cbus_int_en
-// bit   16    -- amrisc_ahb_cbus_int_en
-// bit 15:8    -- SDIO_FIFO_count
-// bit  7:4    -- m_req_count
-// bit    3    -- reserved
-// bit    2    -- m_write_cbus
-// bit    1    -- m_req_cbus
-// bit    0    -- sdio_ahb_cbus_enable
-#define SDIO_AHB_CBUS_CTRL                         0x2318
-// m_rd_data[31:0] when (m_write_cbus == 0)  CBUS write
-// m_wr_data[31:0] when (m_write_cbus == 1)  CBUS read
-#define SDIO_AHB_CBUS_M_DATA                       0x2319
-
 // ----------------------------
 // SPI 
 // ----------------------------
@@ -2355,7 +2338,6 @@
 #define HHI_GCLK_MPEG1                             0x1051
 #define HHI_GCLK_MPEG2                             0x1052
 #define HHI_GCLK_OTHER                             0x1054
-#define HHI_GCLK_AO                                0x1055
 // PLL Controls
 #define HHI_SYS_PLL_CNTL3                          0x1056
 #define HHI_AUD_PLL_CNTL3                          0x1057
@@ -7601,14 +7583,5 @@
 //
 // Closing file:  ./register_map.h
 //
-//by Hisun 2014.09.30 
-//just for compile pass
 
-#define RESET5_REGISTER                            0x1106
-    #define DDR_PLL_RESET     (1<<0)    
-    #define MISC_PLL_RESET    (1<<1)     
-    #define SYS_PLL_RESET     (1<<2)	    
-    #define HPLL_PLL_RESET    (1<<3)	
-    #define AUDIO_PLL_RESET   (1<<4)
-	#define VIID_PLL_RESET    (1<<5)
 #endif

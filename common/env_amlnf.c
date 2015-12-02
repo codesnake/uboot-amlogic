@@ -44,8 +44,6 @@
 #include <errno.h>
 #include "../drivers/amlnf/include/amlnf_dev.h"
 
-extern int amlnf_env_save(unsigned char *buf,int len);
-extern int amlnf_env_read(unsigned char *buf,int len);
 
 #if defined(CONFIG_CMD_SAVEENV) && defined(CONFIG_CMD_NAND)
 #define CMD_SAVEENV
@@ -103,15 +101,13 @@ env_t *env_ptr = 0;
 #endif
 
 /* local functions */
-#ifdef CONFIG_ENV_OFFSET_REDUND
 #if !defined(ENV_IS_EMBEDDED)
 static void use_default(void);
-#endif
 #endif
 extern unsigned default_environment_size;
 DECLARE_GLOBAL_DATA_PTR;
 
-//static struct aml_nandenv_info_t aml_nandenv_info;
+static struct aml_nandenv_info_t aml_nandenv_info;
 /*typedef struct _env_blockmap{
 	u_char block_id;
 	u_char block_valid;
@@ -222,10 +218,10 @@ int saveenv(void)
 #endif
 {
 	//struct aml_nftl_dev *nftl_dev;
-	//struct amlnf_dev* nftl_dev;
-	unsigned char *env_data;//, * name = "env"; 
+	struct amlnf_dev* nftl_dev;
+	unsigned char *env_data, * name = "env"; 
    	 env_t  *env_ptr = NULL;
-	 int ret=0,len;//, sector, page_sector;
+	 int ret ,len, sector, page_sector;
 	 aml_nand_dbg("saveenv");
 
 	
@@ -236,7 +232,7 @@ int saveenv(void)
 	}
 
 	env_data = (unsigned char *)(&env_ptr->data);
-	len = hexport_r(&env_htab, '\0', (char **)&env_data, ENV_SIZE);
+	len = hexport_r(&env_htab, '\0', &env_data, ENV_SIZE);
 	if (len < 0){
 		aml_nand_msg("Cannot export environment");
 		goto exit_error0;
@@ -300,13 +296,13 @@ exit_error0:
 int readenv (u_char * buf)
 {
 	//struct aml_nftl_dev *nftl_dev;
-	//struct amlnf_dev* nftl_dev;
+	struct amlnf_dev* nftl_dev;
 	
     	env_t	 * env_ptr = (env_t *)buf;
 	uint32_t crc;
 
-	//unsigned char * name = "env"; 
-	 int ret;// ,len, sector;
+	unsigned char * name = "env"; 
+	 int ret ,len, sector;
 #if 0
 	aml_nand_dbg("readenv");
 	nftl_dev = aml_nftl_get_dev(name);
@@ -325,7 +321,7 @@ int readenv (u_char * buf)
 	}
 	
 #else
-	//unsigned char *env_magic = "nenv";
+	unsigned char *env_magic = "nenv";
 	aml_nand_dbg("readenv :#####");
 	ret = amlnf_env_read((unsigned char *)env_ptr,CONFIG_ENV_SIZE);
 	if(ret){	
@@ -417,15 +413,7 @@ void env_relocate_spec (void)
 #if !defined(ENV_IS_EMBEDDED)
 	int ret;
 	env_t env_buf;
-	//only init once for env relocate
-	static int flag=0;
-	if(flag == 0){
-		flag = 1;
-	}
-	else{
-		printf("nand env have been init already, just retun here\n");
-		return ;
-	}
+	
 	memset(env_buf.data, 0, ENV_SIZE);
 	ret = readenv((u_char *) &env_buf);
 	if (ret ) {
@@ -441,13 +429,12 @@ void env_relocate_spec (void)
 		}
 		return;
 	}	
-	env_import((const char *)&env_buf, 1);
+	env_import(&env_buf, 1);
 	
 #endif /* ! ENV_IS_EMBEDDED */
 }
 #endif /* CONFIG_ENV_OFFSET_REDUND */
 
-#ifdef CONFIG_ENV_OFFSET_REDUND
 #if !defined(ENV_IS_EMBEDDED)
 static void use_default()
 {
@@ -455,4 +442,4 @@ static void use_default()
 	set_default_env(NULL);
 }
 #endif
-#endif
+

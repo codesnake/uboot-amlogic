@@ -14,7 +14,7 @@
 #include <ddr.c>
 
 #if !defined(CONFIG_M6_SECU_BOOT)
-//#include <mtddevices.c>
+#include <mtddevices.c>
 #include <sdio.c>
 #include <debug_rom.c>
 #else

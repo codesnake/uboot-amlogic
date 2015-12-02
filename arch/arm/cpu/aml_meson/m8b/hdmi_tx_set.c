@@ -6,9 +6,6 @@
 #include <amlogic/aml_tv.h>
 #include <amlogic/enc_clk_config.h>
 
-extern void set_vmode_clk(vmode_t mode);
-extern vmode_t vic_to_vmode(HDMI_Video_Codes_t vic);
-
 #define HDMI_SOURCE_DESCRIPTION 0
 #define HDMI_PACKET_VEND        1
 #define HDMI_MPEG_SOURCE_INFO   2

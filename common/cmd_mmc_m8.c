@@ -29,9 +29,6 @@
 #include <partition_table.h>
 #include <emmc_partitions.h>
 
-extern int find_dev_num_by_partition_name (char *name);
-extern bool emmckey_is_protected (struct mmc *mmc);
-
 unsigned emmc_cur_partition = 0;
 
 static int get_off_size(struct mmc * mmc, char * name, uint64_t offset, uint64_t  size, u64 * blk, u64 * cnt, u64 * sz_byte)
@@ -62,7 +59,7 @@ static int get_off_size(struct mmc * mmc, char * name, uint64_t offset, uint64_t
 static int get_partition_size(unsigned char* name, uint64_t* addr)
 {
 	struct partitions *part_info = NULL;
-	part_info = find_mmc_partition_by_name((char *)name);
+	part_info = find_mmc_partition_by_name(name);
 	if(part_info == NULL){
 		printf("get partition info failed !!\n");
 		return -1;
@@ -243,7 +240,6 @@ int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			u32 n=0;
 			bool is_part = false;//is argv[2] partition name 
 			bool protect_cache = false;
-			bool non_loader = false;
             int blk_shift;
 			u64 cnt=0, blk =0,start_blk =0;
             struct partitions *part_info;
@@ -256,10 +252,6 @@ int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 					name = "logo";
 					dev = find_dev_num_by_partition_name (name);
 					protect_cache = true;
-				} 
-				else if(!strcmp(argv[2], "non_loader")){
-                    dev = 1;
-                    non_loader = true;                                      
 				} 
 				else{
 					name = argv[2];						
@@ -306,60 +298,43 @@ int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 				    cnt = part_info->size>> blk_shift;				
                 n = mmc->block_dev.block_erase(dev, blk, cnt);
 			} else { // erase the whole card if possible
-
-                if(non_loader){
-                    part_info = find_mmc_partition_by_name(MMC_BOOT_NAME);
-	                if(part_info == NULL){
-                        start_blk = 0;
-                        printf("no uboot partition for eMMC boot, just erase from 0\n");
-                    }
-                    else{
-                        start_blk = (part_info->offset + part_info->size) >> blk_shift;
-                    }
-                }
-                else{
-                    start_blk = 0;
-                }
-                    			    
                 if (emmckey_is_protected(mmc)) {
                     part_info = find_mmc_partition_by_name(MMC_RESERVED_NAME);
                     if(part_info == NULL){
                         return 1;
                     }
-                    
                     blk = part_info->offset;
                     if (blk > 0) { // it means: there should be other partitions before reserve-partition.
                         blk -= PARTITION_RESERVED;
                     }
                     blk >>= blk_shift;				
                     
-                    n=0;                      
+                    n=0;
                     
                     // (1) erase all the area before reserve-partition
                     if (blk > 0) {
-                        n = mmc->block_dev.block_erase(dev, start_blk, blk);
+                        n = mmc->block_dev.block_erase(dev, 0, blk);
                         // printf("(1) erase blk: 0 --> %llx %s\n", blk, (n == 0) ? "OK" : "ERROR");
                     }
                     if (n == 0) { // not error
                         // (2) erase all the area after reserve-partition
                         if(protect_cache){
-    			            part_info = find_mmc_partition_by_name(MMC_CACHE_NAME);
-    			            if(part_info == NULL){
-                           	        return 1;
-                            }
-    			        }
-    		            start_blk = (part_info->offset + part_info->size + PARTITION_RESERVED) >> blk_shift;
-                            u64 erase_cnt = (mmc->capacity >> blk_shift) - 1 - start_blk;
-                            n = mmc->block_dev.block_erase(dev, start_blk, erase_cnt);
-                            // printf("(2) erase blk: %#llx --> %#llx %s\n", start_blk, start_blk+erase_cnt, (n == 0) ? "OK" : "ERROR");
+			    part_info = find_mmc_partition_by_name(MMC_CACHE_NAME);
+			    if(part_info == NULL){
+                       	        return 1;
+                 	             }
+			}
+		     start_blk = (part_info->offset + part_info->size + PARTITION_RESERVED) >> blk_shift;
+                        u64 erase_cnt = (mmc->capacity >> blk_shift) - 1 - start_blk;
+                        n = mmc->block_dev.block_erase(dev, start_blk, erase_cnt);
+                        // printf("(2) erase blk: %#llx --> %#llx %s\n", start_blk, start_blk+erase_cnt, (n == 0) ? "OK" : "ERROR");
                     }
-                    
                 } else {
-                    n = mmc->block_dev.block_erase(dev, start_blk, 0); // erase the whole card
+                    n = mmc->block_dev.block_erase(dev, 0, 0); // erase the whole card
                 }
-                               
+                
                 //erase boot partition
-                if(mmc->boot_size && (n == 0) && (non_loader == false)){
+                if(mmc->boot_size && (n == 0)){
                     
                     for(cnt=0;cnt<2;cnt++){
                         rc = mmc_switch_partition(mmc, cnt+1);
@@ -425,7 +400,7 @@ int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
             uint64_t* addr =NULL;
             name = argv[2];
             addr = (uint64_t *)simple_strtoul(argv[3], NULL, 16);
-            return get_partition_size((unsigned char *)name, addr);
+            return get_partition_size(name, addr);
         }
         
         return cmd_usage(cmdtp);
@@ -467,7 +442,7 @@ int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
             void *addr =NULL;
             u32 flag =0;
             u64 cnt =0,n =0, blk =0, sz_byte =0;
-            char *name=NULL;
+            char *name;
             u64 offset =0,size =0;
 
 			if(argc != 6){
@@ -557,7 +532,7 @@ int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			void *addr =NULL;
 			u32 flag =0;
 			u64 cnt =0,n =0, blk =0,sz_byte =0;
-			char *name=NULL;
+			char *name;
 			u64 offset =0,size =0;
 
 			if(argc != 6){
@@ -641,10 +616,10 @@ int do_mmcops(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		}
 		else if (strcmp(argv[1], "erase") == 0) {
 
-			int dev=0;
+			int dev;
 			u32 flag=0;
 			u64 cnt = 0, blk = 0, n = 0, sz_byte =0; 
-			char *name=NULL;
+			char *name;
 			u64 offset_addr =0, size=0;
 
 			if(argc != 5){

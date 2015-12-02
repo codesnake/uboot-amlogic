@@ -6,7 +6,7 @@
 #include <linux/rand_ext.h>
 
 
-int do_random_gen(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+int do_random_gen(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 {
 	unsigned int seed,len,addr;
 	const char *cmd;

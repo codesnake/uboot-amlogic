@@ -324,7 +324,7 @@ static char *mem_get_line(char *in, char *buf, int size, int copy_size)
 
 static int parse_battery_para(char *base, int size)
 {
-    //int i; 
+    int i; 
     char *offset = base;
     char *value;
     char *tmp1, *tmp2;
@@ -651,7 +651,7 @@ int get_member_from_dtb(char *addr, void *value, char *name, int type, int offse
     int   i;
     int  *array;
 
-    data = (void *)fdt_getprop(addr, offset, name, NULL);
+    data = fdt_getprop(addr, offset, name, NULL);
     if (data == NULL) {
         printf("Got %s failed, ", name);
         if (err_level) {
@@ -773,8 +773,8 @@ int parse_battery_parameters(void)
         dt_addr = (char *)0x83000000;
     #endif
     } else {
-        dt_addr = (char *)simple_strtoul (getenv ("dtbaddr"), NULL, 16);    
-        printf("Get dtb addr %p from env\n", dt_addr);
+        dt_addr = simple_strtoul (getenv ("dtbaddr"), NULL, 16);    
+        printf("Get dtb addr %x from env\n", dt_addr);
     }
     if (!get_battery_para_form_dtb(dt_addr, &board_battery_para)) {
         if (check_parsed_parameters()) {
@@ -801,7 +801,7 @@ int parse_battery_parameters(void)
         printf("Not find "BATTERY_PARA_SIZE"\n");
         return  -1;
     }
-    ssscanf(base_pointer, TYPE_HEX, (int *)&offset);
+    ssscanf(base_pointer, TYPE_HEX, &offset);
     ssscanf(env_offset, TYPE_HEX, &size);
     
     if (parse_battery_para(offset, size) < 0) {
@@ -830,7 +830,7 @@ int get_battery_para_flag(void)
 void set_battery_para_flag(int val)
 {
     if (val > PARA_PARSE_SUCCESS || val < PARA_PARSE_FAILED) {
-        printf("wrong input val:%d\n", val);
+        printf("%s, wrong input val:%d\n", val);
         return ;
     }
     para_flag = val;

@@ -22,10 +22,8 @@
 #define MESON8X_CPU_ID_REG_ADDR		0xc11081a8 /*long id address, only for m8x*/
 
 /*chip id type define, return 1 or 0*/
-#define IS_MESON_M8_CPU				((MESON_CPU_ID_IN_REG_M8 == readl(MESON_CPU_ID_REG_ADDR)) && \
-									((MESON_CPU_ID_IN_REG_M8_REVA == readl(MESON8X_CPU_ID_REG_ADDR)) || \
+#define IS_MESON_M8_CPU				((MESON_CPU_ID_IN_REG_M8_REVA == readl(MESON8X_CPU_ID_REG_ADDR)) || \
 									(MESON_CPU_ID_IN_REG_M8_REVB == readl(MESON8X_CPU_ID_REG_ADDR)) || \
-									(MESON_CPU_ID_IN_REG_M8_REVC == readl(MESON8X_CPU_ID_REG_ADDR))))
+									(MESON_CPU_ID_IN_REG_M8_REVC == readl(MESON8X_CPU_ID_REG_ADDR)))
 #define IS_MESON_M8BABY_CPU			((MESON_CPU_ID_IN_REG_M8BABY == readl(MESON_CPU_ID_REG_ADDR)))
-#define IS_MESON_M8M2_CPU			((MESON_CPU_ID_IN_REG_M8 == readl(MESON_CPU_ID_REG_ADDR)) && \
-									(MESON_CPU_ID_IN_REG_M8M2_REVA == readl(MESON8X_CPU_ID_REG_ADDR)))
+#define IS_MESON_M8M2_CPU			((MESON_CPU_ID_IN_REG_M8M2_REVA == readl(MESON8X_CPU_ID_REG_ADDR)))

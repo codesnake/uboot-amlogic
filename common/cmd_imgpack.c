@@ -132,7 +132,7 @@ static int do_unpackimg(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[
                 sprintf(env_data, "0x%x", pack_header_p->size);
                 setenv(env_name, env_data);
 
-        }while((pos = pack_header_p->next));
+        }while(pos = pack_header_p->next);
 
         return 0;
 }

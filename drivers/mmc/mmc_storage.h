@@ -21,14 +21,14 @@
 //#define STORE_DBG 
 
 #ifdef STORE_DBG
-#define store_dbg(fmt, ...) printk( "%s: line:%d " fmt "\n", \
+#define store_dbg(fmt, ...) printf( "%s: line:%d " fmt "\n", \
 				  __func__, __LINE__, ##__VA_ARGS__)
 
-#define store_msg(fmt, ...) printk( "%s: line:%d " fmt "\n", \
+#define store_msg(fmt, ...) printf( "%s: line:%d " fmt "\n", \
 				  __func__, __LINE__, ##__VA_ARGS__)				  
 #else
 #define store_dbg(fmt, ...)
-#define store_msg(fmt, ...) printk( fmt "\n",  ##__VA_ARGS__)
+#define store_msg(fmt, ...) printf( fmt "\n",  ##__VA_ARGS__)
 #endif
 
 #define MMC_CONFIG_SIZE 			16*1024

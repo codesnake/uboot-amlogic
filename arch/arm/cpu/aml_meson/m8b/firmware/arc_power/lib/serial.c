@@ -19,22 +19,19 @@ void delay_ms(int usec);
 
 #ifndef CONFIG_AML_ROMBOOT_SPL
 #define UART_PORT_CONS UART_PORT_AO
-#if 0
 static int serial_set_pin_port(unsigned port_base)
 {
     setbits_le32(P_AO_RTI_PIN_MUX_REG,3<<11);
     return 0;
 }
 #endif
-#endif
 
-#if 0
+
 static void serial_clr_err(void)
 {
     if(readl(P_UART_STATUS(UART_PORT_CONS))&(UART_STAT_MASK_PRTY_ERR|UART_STAT_MASK_FRAM_ERR))
 	    setbits_le32(P_UART_CONTROL(UART_PORT_CONS),UART_CNTL_MASK_CLR_ERR);
 }
-#endif
 
 void __udelay(int n)
 {	
@@ -71,8 +68,6 @@ void uart_reset()
 	__udelay(100);
 	}
 }
-
-#if 0
 static void serial_init(unsigned set,unsigned tag)
 {
 	if(arc_param->serial_disable)
@@ -105,7 +100,6 @@ static void serial_init(unsigned set,unsigned tag)
 	    UART_CNTL_MASK_RST_TX | UART_CNTL_MASK_RST_RX | UART_CNTL_MASK_CLR_ERR);
 
 }
-#endif
 extern struct ARC_PARAM *arc_param;
 
 static void serial_putc(const char c)

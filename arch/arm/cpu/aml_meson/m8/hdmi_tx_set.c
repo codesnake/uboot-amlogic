@@ -33,7 +33,6 @@
         while(i--);     \
     }while(0)
 
-extern vmode_t vic_to_vmode(HDMI_Video_Codes_t vic);
 static void hdmi_wr_reg(unsigned int addr, unsigned int data);
 static unsigned int hdmi_rd_reg(unsigned int addr);
 static unsigned int modulo(unsigned int a, unsigned int b);

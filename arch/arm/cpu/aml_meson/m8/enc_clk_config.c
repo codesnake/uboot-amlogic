@@ -6,11 +6,6 @@
 #include <asm/cpu_id.h>
 #include "hdmi_tx_reg.h"
 
-extern void aml_write_reg32_op(unsigned int _reg, const unsigned _value);
-extern int printf(const char *fmt, ...);
-extern unsigned int aml_read_reg32_op(unsigned int _reg);
-extern void aml_set_reg32_bits_op(uint32_t _reg, const uint32_t _val, const uint32_t _start, const uint32_t _len);
-
 #define check_div() \
     if(div == -1)\
         return ;\

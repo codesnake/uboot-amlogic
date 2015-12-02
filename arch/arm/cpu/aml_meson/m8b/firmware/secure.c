@@ -71,7 +71,6 @@ static int aml_m8_sec_boot_check(unsigned char *pSRC,unsigned char *pkey1,int nk
 #else
 	#define AML_MSG_FAIL ("IMG fail!\n")
 	#define AML_MSG_PASS ("IMG pass!\n")
-	extern int printf(const char *fmt, ...);
 	#define MSG_SHOW printf
 #endif
 
@@ -149,18 +148,18 @@ static int aml_m8_sec_boot_check(unsigned char *pSRC,unsigned char *pkey1,int nk
 
 	fp_13(g_action[g_nStep][14],0,4);
 
-	fp_01((int)&cb1_ctx,0,0);
+	fp_01(&cb1_ctx,0,0);
 
 	if(pkey1 && pkey2)
 	{
-		if(fp_02((int)cb1_ctx.szBuf1,(int)pkey1,nkey1Len) ||	fp_02((int)cb1_ctx.szBuf2,(int)pkey2,nkey2Len))
+		if(fp_02(cb1_ctx.szBuf1,pkey1,nkey1Len) ||	fp_02(cb1_ctx.szBuf2,pkey2,nkey2Len))
 			goto exit;
-		cb1_ctx.len = ( fp_12((int) cb1_ctx.szBuf1 ) + 7 ) >> 3;			
+		cb1_ctx.len = ( fp_12( cb1_ctx.szBuf1 ) + 7 ) >> 3;			
 	}
 	else
 	{
 		unsigned int nState  = 0;
-		fp_03((int)&nState,0,4);
+		fp_03(&nState,0,4);
 		if(pState)
 			*pState = nState;
 		if(!(nState & (1<<7)))
@@ -168,14 +167,14 @@ static int aml_m8_sec_boot_check(unsigned char *pSRC,unsigned char *pkey1,int nk
 			nRet = 0;
 			goto exit;
 		}
-		fp_04((int)&cb1_ctx,(nState & (1<<23)) ? 1 : 0);
+		fp_04(&cb1_ctx,(nState & (1<<23)) ? 1 : 0);
 		cb1_ctx.len = (nState & (1<<23)) ? 256 : 128;
 	}
 
-	fp_10((int)(unsigned char*)&chk_blk,(int)(unsigned char*)pSRC,sizeof(chk_blk));
+	fp_10((unsigned char*)&chk_blk,(unsigned char*)pSRC,sizeof(chk_blk));
 
 	for(i = 0;i< sizeof(chk_blk);i+=cb1_ctx.len)
-		if(fp_05((int)&cb1_ctx, (int)(pBuf+i), (int)(pBuf+i) ))
+		if(fp_05(&cb1_ctx, pBuf+i, pBuf+i ))
 			goto exit;
 
 	if(AMLOGIC_CHKBLK_ID != chk_blk.unAMLID ||
@@ -191,21 +190,21 @@ static int aml_m8_sec_boot_check(unsigned char *pSRC,unsigned char *pkey1,int nk
 		goto exit;
 
 	if(chk_blk.nLength2)
-		fp_10((int)(void*)pSRC,(int)(void*)(pSRC+chk_blk.nLength1),
+		fp_10((void*)pSRC,(void*)(pSRC+chk_blk.nLength1),
 			chk_blk.nLength2);
 
-	fp_10((int)(void*)szkey,(int)(void*)chk_blk.szkey2,sizeof(szkey));
+	fp_10((void*)szkey,(void*)chk_blk.szkey2,sizeof(szkey));
 
-	fp_06( (int)&cb2_ctx, (int)szkey );
+	fp_06( &cb2_ctx, szkey );
 
-	fp_07((int)&szkey[32]);
+	fp_07(&szkey[32]);
 
 	for (i=0; i<(chk_blk.nLength4)/16; i++)
-		fp_08 ((int) &cb2_ctx,(int) &szkey[32],(int) &ct32[i*4],(int) &ct32[i*4] );
+		fp_08 ( &cb2_ctx, &szkey[32], &ct32[i*4], &ct32[i*4] );
 
-	fp_09((int) pSRC,chk_blk.nLength3,(int) szkey, 0 );	
+	fp_09( pSRC,chk_blk.nLength3, szkey, 0 );	
 
-	if(fp_11((int)szkey,(int)chk_blk.szkey1,32))
+	if(fp_11(szkey,chk_blk.szkey1,32))
 		goto exit;
 
 	nRet = 0;
@@ -241,7 +240,6 @@ int aml_sec_boot_check(unsigned char *pSRC)
 #else
 	#define AML_MSG_FAIL ("IMG fail!\n")
 	#define AML_MSG_PASS ("IMG pass!\n")
-	extern int printf(const char *fmt, ...);
 	#define MSG_SHOW printf
 #endif
 #endif
@@ -277,11 +275,11 @@ int aml_sec_boot_check(unsigned char *pSRC)
 	t_func_v4 fp_9 = (t_func_v4)g_action[g_nStep][9];
 	t_func_r3 fp_11 = (t_func_r3)g_action[g_nStep][11];
 
-	fp_3((int)szCheck,452,36);
+	fp_3(szCheck,452,36);
 
-	fp_9((int)pblk->sz2,260,(int)szHash, 0 );
+	fp_9(pblk->sz2,260,szHash, 0 );
 
-	nRet = fp_11((int)(szCheck+2),(int)szHash,32);
+	nRet = fp_11(szCheck+2,szHash,32);
 
 	if(nRet)
 	{
@@ -303,9 +301,9 @@ int aml_sec_boot_check(unsigned char *pSRC)
 		goto exit;
 	}
 
-	fp_9((int)(0xd9000000+pblk->nSPLStartOffset),pblk->splLenght,(int)szHash, 0 );
+	fp_9(0xd9000000+pblk->nSPLStartOffset,pblk->splLenght,szHash, 0 );
 
-	nRet = fp_11((int)pblk->sz4,(int)szHash,32);
+	nRet = fp_11(pblk->sz4,szHash,32);
 
 	if(nRet)
 	{
@@ -412,20 +410,20 @@ int aml_img_key_check(unsigned char *pSRC,int nLen)
 
 	fp_13(g_action[g_nStep][14],0,4);
 
-	fp_01((int)&cb1_ctx,0,0);
+	fp_01(&cb1_ctx,0,0);
 
-	fp_03((int)&nState,0,4);
+	fp_03(&nState,0,4);
 	if(!(nState & (1<<7)))
 		goto exit;
 
-	fp_04((int)&cb1_ctx,(nState & (1<<23)) ? 1 : 0);
+	fp_04(&cb1_ctx,(nState & (1<<23)) ? 1 : 0);
 
 	cb1_ctx.len = (nState & (1<<23)) ? 256 : 128;
 
-	fp_10((int)(unsigned char*)&chk_blk,(int)(unsigned char*)(pSRC+nLen-sizeof(chk_blk)),sizeof(chk_blk));
+	fp_10((unsigned char*)&chk_blk,(unsigned char*)(pSRC+nLen-sizeof(chk_blk)),sizeof(chk_blk));
 
 	for(i = 0;i< sizeof(chk_blk);i+=cb1_ctx.len)
-		if(fp_05((int)&cb1_ctx,(int)(pBuf+i),(int)(pBuf+i) ))
+		if(fp_05(&cb1_ctx, pBuf+i, pBuf+i ))
 			goto exit;
 
 	if(AMLOGIC_CHKBLK_ID != chk_blk.unAMLID ||
@@ -437,9 +435,9 @@ int aml_img_key_check(unsigned char *pSRC,int nLen)
 		chk_blk.nSizeT != chk_blk.nSizeH)
 		goto exit;
 
-	fp_09( (int)pSRC,chk_blk.nLength3,(int) szkey, 0 );
+	fp_09( pSRC,chk_blk.nLength3, szkey, 0 );
 
-	nRet = fp_11((int)szkey,(int)chk_blk.szkey1,32);
+	nRet = fp_11(szkey,chk_blk.szkey1,32);
 
 exit:
 
@@ -447,7 +445,7 @@ exit:
 }
 #endif
 
-int aml_is_secure_set(void)
+int aml_is_secure_set()
 {
 	int nRet = 0;
 	int nState = 0;
@@ -475,7 +473,7 @@ int aml_is_secure_set(void)
 	t_func_v3 fp_13 = (t_func_v3)g_action[g_nStep][13];
 
 	fp_13(g_action[g_nStep][13],0,4);
-	fp_03((int)&nState,0,4);
+	fp_03(&nState,0,4);
 	if((nState & (1<<7)))
 	{
 		nRet = 1;

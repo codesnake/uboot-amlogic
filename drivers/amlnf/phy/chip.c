@@ -570,6 +570,11 @@ unsigned amlnand_chip_init(struct amlnand_chip *aml_chip)
 		goto error_exit0;
 	}
 	
+	/*only check nand circult is ok*/
+	if(aml_chip->init_flag == NAND_SCAN_ID_INIT)
+		goto error_exit0;
+		
+	
 	//amlchip_dumpinfo(aml_chip);
 
 	ret = nand_buf_init(aml_chip);

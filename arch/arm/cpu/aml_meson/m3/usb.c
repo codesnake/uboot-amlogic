@@ -28,7 +28,7 @@
 #include <asm/arch/usb.h>
 
 #ifdef CONFIG_USB_DWC_OTG_HCD
-static amlogic_usb_config_t * g_usb_cfg[BOARD_USB_MODE_MAX][USB_PHY_PORT_MAX];
+static amlogic_usb_config_t * g_usb_cfg = 0;
 static char * g_clock_src_name_m3[]={
 		"XTAL input",
 		"XTAL input divided by 2",
@@ -221,40 +221,27 @@ void set_usb_phy_reset(amlogic_usb_config_t * usb_cfg,int is_on)
         }
   	}
 }
-amlogic_usb_config_t * board_usb_start(int mode,int index)
+amlogic_usb_config_t * board_usb_start(void)
 {
-	if(mode < 0 || mode >= BOARD_USB_MODE_MAX||!g_usb_cfg[mode][index])
+	if(!g_usb_cfg)
 		return 0;
 
-	set_usb_phy_id_mode(g_usb_cfg[mode][index]);
-	set_usb_phy_clock(g_usb_cfg[mode][index]);
-	set_usb_phy_reset(g_usb_cfg[mode][index],1);//on
+	set_usb_phy_id_mode(g_usb_cfg);
+	set_usb_phy_clock(g_usb_cfg);
+	set_usb_phy_reset(g_usb_cfg,1);//on
 	
-	return g_usb_cfg[mode][index];
+	return g_usb_cfg;
 }
 
-int board_usb_stop(int mode,int index)
+int board_usb_stop(void)
 {
-	printf("board_usb_stop cfg: %d\n",mode);
-	if(mode < 0 || mode >= BOARD_USB_MODE_MAX)
-		return 1;
-	set_usb_phy_reset(g_usb_cfg[mode][index],0);//off
+	printf("board_usb_stop!\n");
+	set_usb_phy_reset(g_usb_cfg,0);//off
 
 	return 0;
 }
-void board_usb_init(amlogic_usb_config_t * usb_cfg,int mode)
+void board_usb_init(amlogic_usb_config_t * usb_cfg)
 {
-	static int usb_index = 0;
-	if(mode < 0 || mode >= BOARD_USB_MODE_MAX || !usb_cfg)
-		return ;
-	
-	if(mode == BOARD_USB_MODE_HOST){		
-		if(usb_index >= USB_PHY_PORT_MAX)
-			return;
-		g_usb_cfg[mode][usb_index] = usb_cfg;
-		usb_index++;
-	}else
-		g_usb_cfg[mode][0] = usb_cfg;
-	printf("register usb cfg[%d][%d] = %p\n",mode,(mode==BOARD_USB_MODE_HOST)?usb_index:0,usb_cfg);
+	g_usb_cfg = usb_cfg;
 }
 #endif //CONFIG_USB_DWC_OTG_HCD

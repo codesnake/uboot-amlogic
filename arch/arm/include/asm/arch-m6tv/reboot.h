@@ -29,7 +29,6 @@
 #define	AMLOGIC_SAFE_REBOOT				0x07070707
 #define	AMLOGIC_LOCK_REBOOT				0x08080808
 #define	MESON_USB_BURNER_REBOOT			0x09090909
-#define MESON_UBOOT_SUSPEND             0x0b0b0b0b
 #define	AMLOGIC_REBOOT_CLEAR			0xdeaddead
 
 #define reboot_mode_clear()		do{reboot_mode = AMLOGIC_REBOOT_CLEAR;}while(0)

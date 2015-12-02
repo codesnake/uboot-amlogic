@@ -36,10 +36,10 @@ extern void hard_i2c_write168(unsigned char SlaveAddr, unsigned short RegAddr, u
     #define DEVID 0x6A
     #define PMU_NAME    "aml1218"
 #else
-    //#warning no PMU device is selected
+    #warning no PMU device is selected
     #define PMU_NAME    "NONE"
 #endif
-extern void memset(void *,int,int);
+
 static char format_buf[12] = {};
 static char *format_dec_value(uint32_t val)
 {
@@ -189,7 +189,6 @@ int axp20_set_dcdc_voltage(int dcdc, int voltage)
         __udelay(100);                                          // atleast delay 100uS
     }
     __udelay(1 * 1000);
-    return 0;
 }
 
 static int find_ldo4(int voltage) 
@@ -210,9 +209,9 @@ static int find_ldo4(int voltage)
 
 static void axp20_ldo_voltage(int ldo, int voltage)
 {
-    int addr=0, size=0, start=0, step=0;
-    int idx_to, idx_cur, mask=0;
-    int shift=0;
+    int addr, size, start, step;
+    int idx_to, idx_cur, mask;
+    int shift;
 
     switch (ldo) {
     case 2:
@@ -331,8 +330,8 @@ void aml_pmu_set_voltage(int dcdc, int voltage)
     int idx_to = 0xff;
     int idx_cur;
     unsigned char val;
-    unsigned char addr = 0;
-    unsigned int *table = NULL;
+    unsigned char addr;
+    unsigned int *table;
 
     if (dcdc < 0 || dcdc > AML_PMU_DCDC2 || voltage > 2100 || voltage < 840) {
         return ;                                                // current only support DCDC1&2 voltage adjust
@@ -340,7 +339,7 @@ void aml_pmu_set_voltage(int dcdc, int voltage)
     if (dcdc == AML_PMU_DCDC1) {
         addr  = 0x2f; 
         table = dcdc1_voltage_table;
-    } else if (dcdc == AML_PMU_DCDC2) {
+    } else if (dcdc = AML_PMU_DCDC2) {
         addr  = 0x38;
         table = dcdc2_voltage_table;
     }
@@ -408,14 +407,13 @@ int rn5t618_set_dcdc_voltage(int dcdc, int voltage)
     print_voltage_info("DC", dcdc, voltage, idx_cur, idx_to, addr);
     hard_i2c_write8(DEVID, addr, idx_to);
     __udelay(5 * 1000);
-    return 0;
 }
 
 #define LDO_RTC1        10 
 #define LDO_RTC2        11
 int rn5t618_set_ldo_voltage(int ldo, int voltage)
 {
-    int addr=0;
+    int addr;
     int idx_to, idx_cur;
     int start = 900;
 
@@ -448,7 +446,6 @@ int rn5t618_set_ldo_voltage(int ldo, int voltage)
     print_voltage_info("LDO", ldo, voltage, idx_cur, idx_to, addr);
     hard_i2c_write8(DEVID, addr, idx_to);
     __udelay(5 * 100);
-    return 0;
 }
 
 void rn5t618_power_init(int init_mode)
@@ -559,7 +556,6 @@ int aml1216_set_vddEE_voltage(int voltage)
 
     hard_i2c_write168(DEVID, addr, val);
     __udelay(5 * 100);
-    return 0;
 }
 
 void aml1216_set_bits(uint32_t add, uint8_t bits, uint8_t mask)
@@ -818,7 +814,6 @@ int aml1216_set_ldo_voltage(int ldo, int voltage)
     print_voltage_info("LDO", ldo, voltage, idx_cur, idx_to, attr[i].addr);
     aml1216_set_bits(attr[i].addr, (uint8_t)idx_to, attr[i].mask);
     __udelay(5 * 100);
-    return 0;
 }
 
 void aml1216_check_vbat(int init)
@@ -992,7 +987,6 @@ int aml1218_set_vddEE_voltage(int voltage)
 
     hard_i2c_write168(DEVID, addr, val);
     __udelay(5 * 100);
-    return 0;
 }
 
 void aml1218_set_bits(uint32_t add, uint8_t bits, uint8_t mask)
@@ -1253,7 +1247,6 @@ int aml1218_set_ldo_voltage(int ldo, int voltage)
     print_voltage_info("LDO", ldo, voltage, idx_cur, idx_to, attr[i].addr);
     aml1218_set_bits(attr[i].addr, (uint8_t)idx_to, attr[i].mask);
     __udelay(5 * 100);
-    return 0;
 }
 
 void aml1218_check_vbat(int init)
@@ -1446,7 +1439,7 @@ int m8b_pwm_set_vddEE_voltage(int voltage)
     serial_puts("\n");
 #endif
     pwm_duty_cycle_set(duty_high,28);
-    return 0;
+
 }
 #endif
 

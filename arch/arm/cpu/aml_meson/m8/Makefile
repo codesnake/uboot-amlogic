@@ -36,9 +36,7 @@ COBJS-$(CONFIG_AML_HDMI_TX) += hdmi_tx_set.o enc_clk_config.o
 
 ifdef CONFIG_AML_SUSPEND
 COBJS += suspend.o
-ifndef CONFIG_MESON_TRUSTZONE
 COBJS += firmwareld.o
-endif
 endif
 
 ifdef CONFIG_MESON_TRUSTZONE
@@ -58,9 +56,7 @@ $(LIB):	$(OBJS)
 ifdef CONFIG_AML_SUSPEND
 $(OBJS): power_firmware.dat
 power_firmware.dat: arc_code
-ifndef CONFIG_MESON_TRUSTZONE
 		make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/appf
-endif
 
 arc_code:
 		make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/arc_power

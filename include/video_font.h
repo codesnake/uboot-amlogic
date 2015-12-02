@@ -29,7 +29,7 @@
 #define VIDEO_FONT_HEIGHT	16
 #define VIDEO_FONT_SIZE		(VIDEO_FONT_CHARS * VIDEO_FONT_HEIGHT)
 
-volatile static unsigned char video_fontdata[VIDEO_FONT_SIZE] = {
+static unsigned char video_fontdata[VIDEO_FONT_SIZE] = {
 
 	/* 0 0x00 '^@' */
 	0x00, /* 00000000 */

@@ -21,7 +21,6 @@ void print_storage_node_info(void)
 	return;	
 }
 
-#if 0
 static void show_data_buf(unsigned char *data_buf)
 {
 	int i= 0;
@@ -30,7 +29,6 @@ static void show_data_buf(unsigned char *data_buf)
 	}
 	return;
 }
-#endif
 
 static unsigned  mmc_checksum(unsigned char *buf,unsigned int lenth)
 {
@@ -45,7 +43,7 @@ static unsigned  mmc_checksum(unsigned char *buf,unsigned int lenth)
 
 static inline void init_magic(unsigned char * magic)
 {
-	unsigned char  *source_magic=(unsigned char *)MMC_STORAGE_MAGIC;
+	unsigned char  *source_magic=MMC_STORAGE_MAGIC;
 	int i=0;
 	for(i = 0; i < 11; i++){
 		magic[i] = source_magic[i];
@@ -58,7 +56,7 @@ static int check_data(void * cmp)
 	struct mmc_storage_head_t * head = (struct mmc_storage_head_t * )cmp;
 	int ret =0;
 	store_dbg("check_data :head->checksum = %d",head->checksum);
-	if(head->checksum != mmc_checksum((unsigned char *)&(head->data[0]),MMC_STORAGE_AREA_VALID_SIZE)){
+	if(head->checksum != mmc_checksum(&(head->data[0]),MMC_STORAGE_AREA_VALID_SIZE)){
 		ret = -1;
 		store_msg("mmc storage data check_sum failed\n");
 	}
@@ -214,7 +212,7 @@ int mmc_storage_write(struct mmc *device, unsigned char * buf, int len)
 	storage_data.version = 0;
 	memcpy(&storage_data.data[0], buf, len);
 	
-	storage_data.checksum = mmc_checksum((unsigned char *)&storage_data.data[0],MMC_STORAGE_AREA_VALID_SIZE);
+	storage_data.checksum = mmc_checksum(&storage_data.data[0],MMC_STORAGE_AREA_VALID_SIZE);
 
 	//show_data_buf(&storage_data);
 	list_for_each_entry(storage_node,&storage_node_list,storage_list){
@@ -249,7 +247,7 @@ int mmc_storage_write(struct mmc *device, unsigned char * buf, int len)
 int mmc_storage_init(struct mmc *device)
 {
 	struct mmc_storage_head_t *data_buf = NULL;
-	//struct mmc_storage_info_t storage_info;
+	struct mmc_storage_info_t storage_info;
 	struct storage_node_t part0_node, part1_node;
 	int cnt_num = 0, part_num = 0,ret = 0;
 	int dev, n, blk, cnt, blk_shift;
@@ -536,7 +534,7 @@ int mmc_storage_exit(void * mmc)
 int mmc_secure_storage_ops(unsigned char * buf, int len, int wr_flag)
 {
 	struct mmc *device = storage_device;
-	int err;//, right_port = 0;
+	int err, right_port = 0;
 
 	mmc_init(device);
 	
@@ -617,10 +615,10 @@ int mmc_storage_test(struct mmc * mmc)
 #endif
 int secure_storage_emmc_read(char *buf,unsigned int len)
 {
-	return mmc_secure_storage_ops((unsigned char *)buf, len, 0);
+	return mmc_secure_storage_ops(buf, len, 0);
 }
 int secure_storage_emmc_write(char *buf,unsigned int len)
 {
-	return mmc_secure_storage_ops((unsigned char *)buf, len, 1);
+	return mmc_secure_storage_ops(buf, len, 1);
 }
 

@@ -81,19 +81,10 @@ extern int securestore_key_write(char *keyname, char *keybuf,unsigned int keylen
 *    return: 0: successful; others: failed. 
 */
 extern int securestore_key_query(char *keyname, unsigned int *query_return);
-/*
-*    securestore_key_verify - query whether key was burned.
-*    @keyname : key name will be queried.
-*    @query_result: query return value, 0: key exist and hash right; -1: hash error, -2:key not exist; others: reserved.
-*    @hashval : hash value
-*    @hashlen : hash value len(byte unit)
-*    return: 0: successful; others: failed. 
-*/
-extern int securestore_key_verify(char *keyname, unsigned int *query_return,char *hashval,int hashlen);
 /*function name: securestore_key_uninit
  *functiion : 
  * */
-extern int securestore_key_uninit(void);
+extern int securestore_key_uninit();
 #else
 static inline int securestore_key_init( char *seed,int len)
 {
@@ -111,11 +102,7 @@ static inline int securestore_key_query(char *keyname, unsigned int *query_retur
 {
 	return -1;
 }
-static int securestore_key_verify(char *keyname, unsigned int *query_return,char *hashval,int hashlen)
-{
-	return -1;
-}
-static inline int securestore_key_uninit(void)
+static inline int securestore_key_uninit()
 {
 	return -1;
 }

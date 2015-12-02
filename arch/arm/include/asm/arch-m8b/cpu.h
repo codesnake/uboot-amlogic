@@ -345,13 +345,4 @@
 #define CONFIG_AML_MESON_8		1
 #define CONFIG_AML_SMP
 
-#define CONFIG_SARADC 1
-#define CONFIG_CMD_SARADC
-
-#define EFUSE_BITS             (512*8)
-#define EFUSE_BYTES				512   //(EFUSE_BITS/8)
-#define EFUSE_DWORDS		128   //(EFUSE_BITS/32)
-
-
-
 #endif /* _CPU_H */

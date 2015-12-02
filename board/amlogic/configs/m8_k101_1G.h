@@ -100,7 +100,6 @@
 #endif	//#ifdef CONFIG_AML_I2C
 
 #define CONFIG_CMD_AML
-#define CONFIG_CMD_CPU_TEMP
 /*
  * PMU definitions, all PMU devices must be include involved
  * in CONFIG_PLATFORM_HAS_PMU
@@ -198,11 +197,12 @@
 	"console=ttyS0,115200n8\0" \
 	"bootm_low=0x00000000\0" \
 	"bootm_size=0x40000000\0" \
+	"mmcargs=setenv bootargs console=${console} " \
 	"boardname=m8_board\0" \
 	"chipname=8726m8\0" \
 	"upgrade_step=0\0" \
 	"initrd_high=30000000\0" \
-	"bootargs=init=/init console=ttyS0,115200n8 no_console_suspend ramoops.mem_address=0x04e00000 ramoops.mem_size=0x100000 ramoops.record_size=0x8000 ramoops.console_size=0x4000 logo=osd1,loaded,panel,debug\0" \
+	"bootargs=init=/init console=ttyS0,115200n8 no_console_suspend logo=osd1,loaded,panel,debug\0" \
     "preloaddtb=imgread dtb boot ${loadaddr}\0" \
 	"video_dev=panel\0" \
 	"display_width=768\0" \

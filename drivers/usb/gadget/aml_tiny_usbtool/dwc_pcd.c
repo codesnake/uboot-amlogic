@@ -13,7 +13,7 @@
 
 pcd_struct_t this_pcd;
 dwc_ep_t g_dwc_eps[NUM_EP]; 
-int dwc_core_init(void)
+int dwc_core_init()
 {
 
     int32_t         snpsid;
@@ -52,7 +52,7 @@ int dwc_core_init(void)
 }
 
 int
-dwc_otg_irq(void)
+dwc_otg_irq()
 {
 	dwc_common_irq();
 	dwc_pcd_irq();
@@ -64,12 +64,13 @@ void dwc_otg_pullup(int is_on)
 		dwc_modify_reg32(DWC_REG_DCTL,2,0);// connect data line
     else dwc_modify_reg32(DWC_REG_DCTL,0,2);// disconnect data line
 }
-static void dwc_otg_core_init(void) //Elvis Fool, add 'static'
+static void dwc_otg_core_init() //Elvis Fool, add 'static'
 {
     gahbcfg_data_t  ahbcfg = {.d32 = 0 };
     gusbcfg_data_t  usbcfg = {.d32 = 0 };
  //   gi2cctl_data_t  i2cctl = {.d32 = 0 };
 //    hcfg_data_t     hcfg;
+    dcfg_data_t     dcfg;
 #ifndef USE_FULL_SPEED
 	usbcfg.d32 = dwc_read_reg32(DWC_REG_GUSBCFG);
 
@@ -97,7 +98,6 @@ static void dwc_otg_core_init(void) //Elvis Fool, add 'static'
 	dwc_write_reg32(&_core_if->host_if->host_global_regs->hcfg, hcfg.d32);
 */
 // for Device
-	dcfg_data_t     dcfg;
 	dcfg.d32 = dwc_read_reg32(DWC_REG_DCFG);
 	dcfg.b.devspd = 1;//Hi speed phy run at Full speed
 	dwc_write_reg32(DWC_REG_DCFG, dcfg.d32);
@@ -137,7 +137,7 @@ static void dwc_otg_core_init(void) //Elvis Fool, add 'static'
  * This function initialized the PCD portion of the driver.
  *
  */
-static int  dwc_otg_pcd_init(void)
+static int  dwc_otg_pcd_init()
 {
         return 0;
 }
@@ -147,7 +147,7 @@ static int  dwc_otg_pcd_init(void)
  * Do core a soft reset of the core.  Be careful with this because it
  * resets all the internal state machines of the core.
  */
-static void dwc_otg_core_reset(void)		//Elvis Fool, add 'static'
+static void dwc_otg_core_reset()		//Elvis Fool, add 'static'
 {
     grstctl_t greset = {.d32 = 0 };
     int             count = 0;
@@ -186,7 +186,7 @@ static void dwc_otg_core_reset(void)		//Elvis Fool, add 'static'
     wait_ms(10);
 }
 
-static void dwc_otg_enable_common_interrupts(void)
+static void dwc_otg_enable_common_interrupts()
 {
         gintmsk_data_t intr_mask = { 0};
         /* Clear any pending OTG Interrupts */
@@ -212,7 +212,7 @@ static void dwc_otg_enable_common_interrupts(void)
  *
  * @param _core_if Programming view of DWC_otg controller
  */
-static void dwc_otg_enable_device_interrupts(void)
+static void dwc_otg_enable_device_interrupts()
 {
         gintmsk_data_t intr_mask = {  0};
 
@@ -242,7 +242,7 @@ static void dwc_otg_enable_device_interrupts(void)
  *
  * @param[in] _core_if Programming view of DWC_otg controller.
  */
-static void dwc_otg_enable_global_interrupts(void)
+static void dwc_otg_enable_global_interrupts( )
 {
         gahbcfg_data_t ahbcfg = { 0};
         ahbcfg.b.glblintrmsk = 1; /* Enable interrupts */
@@ -257,7 +257,7 @@ static void dwc_otg_enable_global_interrupts(void)
  * @param _core_if Programming view of DWC_otg controller
  *
  */
-static void dwc_otg_core_dev_init(void)
+static void dwc_otg_core_dev_init()
 {
         dcfg_data_t dcfg = { 0};
         grstctl_t resetctl = { 0 };
@@ -378,7 +378,7 @@ static void dwc_otg_flush_tx_fifo( const int _num ) 	//Elvis Fool, add 'static'
  *
  * @param _core_if Programming view of DWC_otg controller.
  */
-static void dwc_otg_flush_rx_fifo(void) 
+static void dwc_otg_flush_rx_fifo( ) 
 {
         grstctl_t greset = { 0};
         int count = 0;

@@ -7,8 +7,6 @@
 #include <linux/err.h>
 #include <emmc_partitions.h>
 
-extern struct mmc *find_mmc_device_by_port (unsigned sdio_port);
-
 //extern struct partitions *part_table;
 struct partitions * part_table = NULL;
 
@@ -277,7 +275,7 @@ int mmc_get_partition_table (struct mmc *mmc)
         }
 		part_num++;
 	}
-	strncpy((char *)mmc_config_of->version, MMC_UBOOT_VERSION, MAX_MMC_PART_NAME_LEN);
+	strncpy(mmc_config_of->version, MMC_UBOOT_VERSION, MAX_MMC_PART_NAME_LEN);
 	mmc_config_of->part_num = part_num + 1;
 	mmc_config_of->private_data = mmc;
 
@@ -351,7 +349,6 @@ static struct partitions* find_partition_by_name (struct partitions *part_tbl, i
 
 #endif
 
-#ifdef TV_DUMP_MMC_INFO
 static void dump_partition(struct mmc_partitions_fmt *pt_fmt)
 {
         int i = 0;
@@ -372,11 +369,11 @@ static void dump_partition(struct mmc_partitions_fmt *pt_fmt)
         }
         printk("------------------------\n");
 }
-#endif
+
 
 int mmc_write_partition_tbl (struct mmc *mmc, struct mmc_config *mmc_cfg, struct mmc_partitions_fmt *pt_fmt)
 {
-    int ret=0, start_blk, size, blk_cnt=0;
+    int ret=0, start_blk, size, blk_cnt, i;
     char *buf, *src;
     struct partitions *pp;
 
@@ -455,7 +452,7 @@ exit_err:
 
 int mmc_read_partition_tbl (struct mmc *mmc, struct mmc_partitions_fmt *pt_fmt)
 {
-    int ret=0, start_blk, size, blk_cnt=0;
+    int ret=0, start_blk, size, blk_cnt;
     char *buf, *dst;
 	struct partitions *pp;
 
@@ -540,7 +537,7 @@ int mmc_partition_verify (struct mmc_config * mmc_cfg, struct mmc_partitions_fmt
     // printf("version: %s\n", mmc_cfg->version);
     // show_mmc_patition(mmc_cfg->partitions, mmc_cfg->part_num);
 
-    if ((strncmp((const char *)mmc_cfg->version, (const char *)pt_fmt->version, sizeof(pt_fmt->version)) == 0x00)
+    if ((strncmp(mmc_cfg->version, pt_fmt->version, sizeof(pt_fmt->version)) == 0x00)
             && (mmc_cfg->part_num == pt_fmt->part_num)) {  //pt_fmt_v->version, "01.00.00"
         pp1 = mmc_cfg->partitions;
         pp2 = pt_fmt->partitions;
@@ -642,12 +639,12 @@ int find_dev_num_by_partition_name (char *name)
 static int init_mmc_partion_tbl(struct mmc_partitions_fmt *pt_fmt_v)
 {
     int i=0;
-    strncpy((char *)(&pt_fmt_v->magic[0]),"MPT",sizeof(pt_fmt_v->magic));
-	strncpy((char *)pt_fmt_v->version, "01.00.00", MAX_MMC_PART_NAME_LEN);
+    strncpy(&pt_fmt_v->magic[0],"MPT",sizeof(pt_fmt_v->magic));
+	strncpy(pt_fmt_v->version, "01.00.00", MAX_MMC_PART_NAME_LEN);
     pt_fmt_v->part_num = sizeof(partitions_emmc)/sizeof(partitions_emmc[i]);
     pt_fmt_v->checksum = 0x12;
 
-    //struct partitions *pt = &(pt_fmt_v->partitions[0]);
+    struct partitions *pt = &(pt_fmt_v->partitions[0]);
 
     //partitions_emmc[i]
     for(i = 0;i < pt_fmt_v->part_num;i++){
@@ -664,7 +661,7 @@ static int init_device_mmc_config_of(struct mmc_config * mmc_cfg)
     if(mmc_cfg == NULL)
         return 1;
 
-    strncpy((char *)(mmc_cfg->version), "01.00.00", MAX_MMC_PART_NAME_LEN);
+    strncpy(mmc_cfg->version, "01.00.00", MAX_MMC_PART_NAME_LEN);
     mmc_cfg->part_num = sizeof(partitions_emmc)/sizeof(partitions_emmc[0]);
     memcpy(mmc_cfg->partitions,partitions_emmc, MAX_MMC_PART_NUM*sizeof(mmc_cfg->partitions[0]));
 

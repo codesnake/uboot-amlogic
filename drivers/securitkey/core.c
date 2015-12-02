@@ -58,7 +58,7 @@ int32_t aml_keys_register(int32_t version, aml_keys_schematic_t * schematic)
 #define PROVIDERS_NUM	5
 static aml_keybox_provider_t * providers[5]={NULL};
 
-
+static void trigger_key_init(void);
 
 int32_t aml_keybox_provider_register(aml_keybox_provider_t * provider)
 {
@@ -69,7 +69,7 @@ int32_t aml_keybox_provider_register(aml_keybox_provider_t * provider)
 			continue;
 		providers[i] = provider;
 		printk("i=%d,register --- %s\n", i,provider->name);
-
+		//trigger_key_init();
 		break;
 	}
 	if(i<ARRAY_SIZE(providers)){
@@ -279,7 +279,6 @@ static int aml_key_hash(unsigned char *hash, const char *data, unsigned int len)
     return 0;
 }
 #else
-#if 0
 extern int hash_sha256(unsigned char *buf,int len,unsigned char *hash);
 static int aml_key_hash(unsigned char *hash, const char *data, unsigned int len)
 {
@@ -287,7 +286,6 @@ static int aml_key_hash(unsigned char *hash, const char *data, unsigned int len)
 	ret = hash_sha256((unsigned char *)data,(int)len,hash);
 	return ret;
 }
-#endif
 static uint16_t aml_key_checksum(char *data,int lenth)
 {
 	uint16_t checksum;
@@ -502,10 +500,10 @@ int register_aes_algorithm(int storage_version)
 /**
  * @todo key process , identy the key version
  */
-//static int debug_mode = 1;//1:debug,0:normal
+static int debug_mode = 1;//1:debug,0:normal
 static int postpone_write = 0; //1:postpone, 0:normal once write
-//static int rewrite_nandkey=1;//1:disable,0:enable
-#if 0
+static int rewrite_nandkey=1;//1:disable,0:enable
+
 static ssize_t mode_show(struct device *dev, struct device_attribute *attr,
                          char *buf)
 {
@@ -566,7 +564,6 @@ static ssize_t mode_store(struct device *dev, struct device_attribute *attr,
     }
     return count;
 }
-#endif
 //static DEVICE_ATTR(mode, 0660, mode_show, mode_store);
 
 #ifdef CRYPTO_DEPEND_ON_KERENL
@@ -631,7 +628,6 @@ static int aml_key_read_hash(aml_key_t * key, char * hash)
     return 0;
 }
 #else
-#if 0
 static int aml_key_write_hash(aml_key_t * key, uint8_t * hash)
 {
 	struct aml_key_hash_s key_hash;
@@ -670,7 +666,6 @@ static int aml_key_read_hash(aml_key_t * key, uint8_t * hash)
 	memcpy(hash, key_hash.hash, sizeof(key_hash.hash));
 	return 0;
 }
-#endif
 #endif
 
 static ssize_t key_core_show(struct device *dev, struct device_attribute *attr,
@@ -887,7 +882,7 @@ static ssize_t aml_key_store(aml_key_t * key, const char *buf, size_t count)
     key->checksum = checksum;
 
 	if(aes_algorithm_encrypt){
-		if(aes_algorithm_encrypt(enc_data, (size_t*)&key->storage_size, data, readbuff_validlen))
+		if(aes_algorithm_encrypt(enc_data, &key->storage_size, data, readbuff_validlen))
 			aml_key_store_error_return(-EINVAL, store_error_return);
 	}
 	else{
@@ -929,7 +924,6 @@ store_error_return:
 #endif
     return err;
 }
-#if 0
 static ssize_t key_core_store(struct device *dev, struct device_attribute *attr,
                               const char *buf, size_t count)
 {
@@ -977,7 +971,6 @@ static int key_check_inval(aml_key_t * key)
     }
     return 0;
 }
-#endif
 static ssize_t key_node_set(struct device *dev);
 
 #ifdef CRYPTO_DEPEND_ON_KERENL
@@ -992,8 +985,7 @@ int32_t aml_keys_set_version(char *dev, uint8_t version, int storer)
 #else
     char *keyfile = dev;
 #endif
-    //int i;
-    int ret;
+    int i, ret;
     int keyfile_index;
     //if (keys_version > 0 && keys_version < 256) ///has been initial
     //   return 0;
@@ -1034,7 +1026,7 @@ int32_t aml_keys_set_version(char *dev, uint8_t version, int storer)
 
     keys = key_schematic[keys_version]->keys;
 
-    ret = key_node_set((struct device*)dev);
+    ret = key_node_set(dev);
     if (ret < 0){
 		printk("creat key dev fail,%s:%d\n",__func__,__LINE__);
 		return -EINVAL;
@@ -1169,7 +1161,7 @@ static ssize_t version_store(struct device *dev, struct device_attribute *attr,
     return count;
 }
 #endif
-#if 0
+
 static ssize_t storer_show(struct device *dev, struct device_attribute *attr,
                             char *buf)
 {
@@ -1214,7 +1206,7 @@ static ssize_t storer_store(struct device *dev, struct device_attribute *attr,
     printk("storer_store\n");
     return count;
 }
-#endif
+
 static ssize_t key_list_show(struct device *dev, struct device_attribute *attr,
                             char *buf)
 {
@@ -1232,12 +1224,12 @@ static ssize_t key_list_show(struct device *dev, struct device_attribute *attr,
 	buf[n] = 0;
 	return n;
 }
-#if 0
 static ssize_t key_list_store(struct device *dev, struct device_attribute *attr,
                              const char *buf, size_t count)
 {
 	return -1;
 }
+
 static ssize_t key_name_show(struct device *dev, struct device_attribute *attr,
                             char *buf)
 {
@@ -1250,29 +1242,80 @@ static ssize_t key_name_show(struct device *dev, struct device_attribute *attr,
 	n += sprintf(&buf[n], "\n");
 	return n;
 }
-#endif
 static char security_key_name[AML_KEY_NAMELEN];
 static ssize_t key_name_store(struct device *dev, struct device_attribute *attr,
                              const char *buf, size_t count)
 {
 	aml_key_t * keys;
-	int i,cnt;
-	char *name;
+	int i,cnt,suffix;
 	char *cmd,*oldname=NULL,*newname;
-	if(keys_version == 0){
-		return -EINVAL;
-	}
 	keys = key_schematic[keys_version]->keys;
-	
-	name = kzalloc(count+1, GFP_KERNEL);
-	if(!name){
-		printk("don't kzalloc mem,%s:%d\n",__func__,__LINE__);
-		return -EINVAL;
+	if (strncmp(buf, "rename", 6) == 0)
+	{
+		cmd = &buf[6];
+		for(i=0;i<key_schematic[keys_version]->count;i++)
+		{
+			oldname = strstr(cmd,keys[i].name);
+			if(oldname){
+				suffix = i;
+				break;
+			}
+		}
+		if(oldname)
+		{
+			while(*oldname != ' '){
+				oldname++;
+			}
+			newname = oldname;
+			while(*newname == ' '){
+				newname++;
+			}
+			oldname = newname;
+			cnt=0;
+			while((*oldname != ' ')&&(*oldname !='\n')&&(*oldname !='\r')&&(*oldname !=0)){
+				cnt++;
+				oldname++;
+			}
+			newname[cnt]=0;
+			if(cnt >= AML_KEY_NAMELEN){
+				newname[AML_KEY_NAMELEN-1]=0;
+			}
+			for(i=0;i<key_schematic[keys_version]->count;i++)
+			{
+				if(strcmp(newname,keys[i].name) == 0){
+					printk("name exist,%s:%d\n",__func__,__LINE__);
+					return -EINVAL;
+				}
+			}
+			//printk("newname:%s,keys[%d].name:%s,%s:%d\n",newname,i,keys[i].name,__func__,__LINE__);
+			strcpy(keys[suffix].name,newname);
+			//printk("keys[%d].name:%s,%s:%d\n",i,keys[i].name,__func__,__LINE__);
+		}
+		else {
+			printk("don't have old key name,%s:%d\n",__func__,__LINE__);
+			return -EINVAL;
+		}
+		return count;
 	}
-	memcpy(name,buf,count+1);
-	
-	//cmd = &buf[0];
-	cmd = &name[0];
+	else if(strncmp(buf, "set", 3) == 0)
+	{
+		cmd = &buf[3];
+		for(i=0;i<key_schematic[keys_version]->count;i++)
+		{
+			oldname = strstr(cmd,keys[i].name);
+			if(oldname){
+				curkey = &keys[i];
+				break;
+			}
+		}
+		if(oldname == NULL){
+			printk("don't have the key name,%s:%d\n",__func__,__LINE__);
+			return -EINVAL;
+		}
+		return count;
+	}
+
+	cmd = &buf[0];
 	newname = cmd;
 	oldname = cmd;
 	cnt=0;
@@ -1304,24 +1347,19 @@ static ssize_t key_name_store(struct device *dev, struct device_attribute *attr,
 		}
 		if(curkey == NULL){
 			printk("key count too much,%s:%d\n",__func__,__LINE__);
-			if(name)
-				kfree(name);
 			return -EINVAL;
 		}
 		strcpy(security_key_name,newname);
 	}
-	if(name)
-		kfree(name);
 
 	return count;
 }
-#if 0
+
 static ssize_t key_write_show(struct device *dev, struct device_attribute *attr,
                             char *buf)
 {
 	return -1;
 }
-#endif
 static ssize_t key_write_store(struct device *dev, struct device_attribute *attr,
                              const char *buf, size_t count)
 {
@@ -1346,13 +1384,11 @@ static ssize_t key_read_show(struct device *dev, struct device_attribute *attr,
 	err = key_core_show(dev, (struct device_attribute*)curkey,buf);
 	return err;
 }
-#if 0
 static ssize_t key_read_store(struct device *dev, struct device_attribute *attr,
                              const char *buf, size_t count)
 {
 	return -1;
 }
-#endif
 
 #ifdef CRYPTO_DEPEND_ON_KERENL
 struct key_new_node{
@@ -1449,16 +1485,16 @@ void trigger_key_init(void)
 
 }
 #else
-//static struct device * key_device= NULL;
-//void trigger_key_init(void)
-//{
-    //printk("amlkeys=%d\n", keys_version);
+static struct device * key_device= NULL;
+void trigger_key_init(void)
+{
+    printk("amlkeys=%d\n", keys_version);
     //if (key_device == NULL)
     //    return;
     //aml_keys_set_version(key_device, version_check(), -1);
     //register_reboot_notifier(&aml_keys_notify);
     //version_dirty = 0;
-//}
+}
 #endif
 
 struct device_type_s{
@@ -1742,8 +1778,8 @@ ssize_t uboot_key_get(char *device,char *key_name, char *key_data,int key_data_l
 			}
 			memset(data,0,CONFIG_MAX_VALID_KEYSIZE);
 			error = uboot_key_read(key_name, data);
-			for(i=0,j=0;i<key_data_len;i++,j+=2){
-				key_data[i]= (((asc_to_hex(data[j]))<<4) | (asc_to_hex(data[j+1])));
+			for(i=0,j=0;i<key_data_len;i++,j++){
+				key_data[i]= (((asc_to_hex(data[j]))<<4) | (asc_to_hex(data[++j])));
 			}
 			kfree(data);
 		}

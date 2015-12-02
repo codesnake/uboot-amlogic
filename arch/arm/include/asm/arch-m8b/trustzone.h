@@ -58,10 +58,6 @@
 #define TRUSTZONE_MON_RTC_RD_REG_INDEX          0x501
 #define TRUSTZONE_MON_RTC_WR_REG_INDEX          0x502
 
-
-#define TRUSTZONE_MON_MEM                       0x700
-#define TRUSTZONE_MON_MEM_BASE                  0x701
-
 /* Secure HAL APIs */
 #define TRUSTZONE_HAL_TYPE_MASK                 0xF00
 #define TRUSTZONE_HAL_API_EFUSE                 0x100
@@ -99,7 +95,6 @@ struct storage_hal_api_arg{
 #ifdef CONFIG_MESON_STORAGE_DEBUG
 #define STORAGE_HAL_API_READ            3
 #endif
-#define STORAGE_HAL_API_VERIFY          4
 
 #endif
 

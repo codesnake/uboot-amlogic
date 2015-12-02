@@ -13,22 +13,22 @@ struct acs_setting __acs_set={
 					.ddr_magic		= "ddr_",
 					.ddr_set_version= 1,
 					.ddr_set_length	= sizeof(__ddr_setting),
-					.ddr_set_addr	= (unsigned int)&__ddr_setting,
+					.ddr_set_addr	= &__ddr_setting,
 
 					.pll_magic		= "pll_",
 					.pll_set_version= 1,
 					.pll_set_length	= sizeof(__plls),
-					.pll_set_addr	= (unsigned int)&__plls,
+					.pll_set_addr	= &__plls,
 
 					.partition_table_magic		= "part",
 					.partition_table_version	= 1,
-					.partition_table_length		= sizeof(partition_table),
-					.partition_table_addr		= (unsigned int)&partition_table,
+					.partition_table_length		= (MAX_PART_NUM*sizeof(struct partitions)),
+					.partition_table_addr		= & partition_table,
 
 					.store_config_magic 		="stor",
 					.store_config_version		= 1,
 					.store_config_length		= sizeof(store_configs),
-					.store_config_addr		= (unsigned int)&store_configs,
+					.store_config_addr		=& store_configs,
 };
 
 #endif

@@ -88,13 +88,12 @@ static int get_off_size(int argc, char *argv[],  loff_t *off, loff_t *size)
 }
 
 
-int do_boot(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+int do_boot(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 {
-	//int i, dev, ret = 0;
-	int ret = 0;
-	//ulong addr;
-	//loff_t off, size;
-	char *cmd;//, *s;
+	int i, dev, ret = 0;
+	ulong addr;
+	loff_t off, size;
+	char *cmd, *s;
 
 	cmd = argv[1];
 	if (argc < 3)
@@ -103,29 +102,17 @@ int do_boot(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 	if (strcmp(cmd, "erase") == 0){
 
 		printk(" %s %d\n",__func__,__LINE__);
-#ifdef CONFIG_STORE_COMPATIBLE 		
-		if(device_boot_flag == NAND_BOOT_FLAG){
-#else
 		if(POR_NAND_BOOT()){
-#endif
 			printk("NAND BOOT,erase uboot : %s %d\n",__func__,__LINE__);
 			run_command("nand device 0",0);
 			run_command("nand erase  0",0);
 			printk("nand erase  uboot \n");
-#ifdef CONFIG_STORE_COMPATIBLE
-		}else if(device_boot_flag == SPI_BOOT_FLAG){
-#else
 		}else if(POR_SPI_BOOT()){
-#endif
 			printk("SPI BOOT,spi_env_relocate_spec : %s %d \n",__func__,__LINE__);
 			run_command("sf probe 2",0);
 			run_command("sf erase 0 200000",0);
 			printk("spi erase  uboot \n");
-#ifdef CONFIG_STORE_COMPATIBLE
-		}else if(device_boot_flag == EMMC_BOOT_FLAG) {
-#else
-		}else if(POR_EMMC_BOOT()){
-#endif
+		}else if(POR_EMMC_BOOT()) {
 			printk("MMC BOOT, %s %d \n",__func__,__LINE__);
 			run_command("mmcinfo 1",0);
 			//write 1M 0xff from 0 addr
@@ -170,20 +157,19 @@ U_BOOT_CMD(boot, CONFIG_SYS_MAXARGS, 1, do_boot,
 	"erase uboot in nand or spi\n"
 );
 
-int do_data(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+int do_data(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 {
-	//int i, dev, ret = 0;
-	int ret = 0;
-	//ulong addr;
+	int i, dev, ret = 0;
+	ulong addr;
 	loff_t off, size;
-	char *cmd;//, *s;
+	char *cmd, *s;
 	char	str[128];
 
 	cmd = argv[1];
 	if (argc < 3)
 		goto usage;
 	
-	if (get_off_size(argc - 2, (char **)(argv + 2),  &off, &size) != 0)
+	if (get_off_size(argc - 2, argv + 2,  &off, &size) != 0)
 		return 1;
 
 	printk("erase data : %s %d  off =%llx ,size=%llx\n",__func__,__LINE__, off, size);
@@ -191,11 +177,7 @@ int do_data(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 	if (strcmp(cmd, "erase") == 0){
 
 		printk(" %s %d\n",__func__,__LINE__);
-#ifdef CONFIG_STORE_COMPATIBLE
-		if(device_boot_flag == NAND_BOOT_FLAG){
-#else
 		if(POR_NAND_BOOT()){
-#endif
 			printk("NAND BOOT,nand_env_relocate_spec : %s %d \n",__func__,__LINE__);
 			if(size == 0){
 				sprintf(str, "nand erase 0x%llx", off);
@@ -209,11 +191,7 @@ int do_data(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 				run_command(str, 0);
 			}
 			printk("nand erase data \n");
-#ifdef CONFIG_STORE_COMPATIBLE
-		}else if(device_boot_flag == EMMC_BOOT_FLAG) {
-#else
-		}else if(POR_EMMC_BOOT()){
-#endif
+		}else if(POR_EMMC_BOOT()) {
 			printk("MMC BOOT, %s %d \n",__func__,__LINE__);
 			if(size == 0){
 				run_command("mmc erase 1", 0);
@@ -254,12 +232,10 @@ usage:
 
 
 
-U_BOOT_CMD(
-	data, CONFIG_SYS_MAXARGS, 1, do_data,
+U_BOOT_CMD(data, CONFIG_SYS_MAXARGS, 1, do_data,
 	"SPI-NAND-COMPATIBLE || SPI-NAND-EMMC-COMPATIBLE",
 	"data erase - addr off|partition size\n"
-	"data erase - addr off|partition abcd\n"
-	"erase data in nand, spi, mmc"
+	"erase data in nand, spi, mmc\n"
 );
 
 

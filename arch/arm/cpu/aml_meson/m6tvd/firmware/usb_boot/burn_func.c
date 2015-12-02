@@ -136,7 +136,7 @@ unsigned long simple_strtoul(const char *cp,char **endp,unsigned int base)
 	return result;
 }
 
-extern void  memset(void * s,int ,int);
+extern void * memset(void * s,int c,size_t count);
 u32 checkcum_32(const unsigned char *buf, u32 len)
 {
 	u32 fake_len, chksum = 0;

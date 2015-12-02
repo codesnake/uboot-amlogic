@@ -770,11 +770,6 @@ void sdio_register(struct mmc* mmc,struct aml_card_sd_info * aml_priv)
 	mmc->f_max = 50000000;
     mmc->is_inited = false;
 	mmc_register(mmc);
-#if defined(CONFIG_M3)
-	if(aml_priv->sdio_port == SDIO_PORT_B){
-		mmc->block_dev.if_type = IF_TYPE_SD;
-	}
-#endif
 	
 	//WRITE_CBUS_REG(RESET6_REGISTER, (1<<8));
         WRITE_CBUS_REG(SDIO_AHB_CBUS_CTRL, 0);

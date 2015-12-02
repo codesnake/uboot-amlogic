@@ -22,11 +22,7 @@ int rn5t618_battery_calibrate(void);
 
 #define DBG(format, args...) printf("[RN5T618]"format,##args)
 static int rn5t618_curr_dir = 0;
-#if defined(CONFIG_UBOOT_BATTERY_PARAMETERS) || defined(CONFIG_UBOOT_BATTERY_PARAMETER_TEST)
 static int rn5t618_battery_test = 0;
-#endif
-
-extern int aml_i2c_xfer_slow(struct i2c_msg *msgs, int num);
 
 int rn5t618_write(int add, uint8_t val)
 {
@@ -158,7 +154,7 @@ int rn5t618_get_charge_status(int print)
     uint16_t val = 0;
     uint8_t status;
 
-    rn5t618_read(0x00BD, (uint8_t *)&val);
+    rn5t618_read(0x00BD, &val);
     if (rn5t618_curr_dir < 0) {
         val |= 0x8000;    
     }
@@ -178,7 +174,6 @@ int rn5t618_get_charge_status(int print)
     return 0;
 }
 
-#ifdef CONFIG_UBOOT_BATTERY_PARAMETER_TEST
 static int rn5t618_get_coulomber(void)
 {
     uint8_t val[4];
@@ -194,7 +189,6 @@ static int rn5t618_get_coulomber(void)
     result = result / (3600);                                           // to mAh
     return result;
 }
-#endif
 
 int rn5t618_get_battery_current(void)
 {
@@ -233,14 +227,14 @@ int rn5t618_get_gpio(int gpio, int *val)
         DBG("%s, wrong input of GPIO:%d\n", __func__, gpio);
         return -1;
     }
-    rn5t618_read(0x0097, (uint8_t *)&value);                           // read status
+    rn5t618_read(0x0097, &value);                           // read status
     *val = (value & (1 << gpio)) ? 1 : 0;
     return 0;
 }
 
 #define RN5T618     0
 #define RN5T567     1
-int ricoh_check_pmu_type(void)
+int ricoh_check_pmu_type()
 {
     uint8_t val[2] = {};
 
@@ -256,7 +250,7 @@ int ricoh_check_pmu_type(void)
     return -1;
 }
 
-void rn5t618_power_off(void)
+void rn5t618_power_off()
 {
     uint8_t reg_coulomb[4];
     uint8_t reg_save[4];
@@ -364,14 +358,15 @@ int rn5t618_get_ocv(int rdc, int cnt)
 }
 #endif
 
-int rn5t618_get_charging_percent(void)
+int rn5t618_get_charging_percent()
 {
-#ifdef CONFIG_UBOOT_BATTERY_PARAMETERS
     int rest_vol;
+#ifdef CONFIG_UBOOT_BATTERY_PARAMETERS
     int i;
     int ocv = 0;
     int ocv_diff, percent_diff, ocv_diff2;
     int percent1, percent2;
+    int charge_status;
     int para_flag;
     static int ocv_full  = 0;
     static int ocv_empty = 0;
@@ -496,7 +491,7 @@ int rn5t618_set_charging_current(int current)
 int rn5t618_charger_online(void)
 {
     int val;
-    rn5t618_read(0x00BD, (uint8_t *)&val);
+    rn5t618_read(0x00BD, &val);
     if (val & 0xc0) {
         return 1;    
     } else {
@@ -873,7 +868,7 @@ int rn5t618_calculate_rdc(void)
     int32_t i_lo, i_hi;
     int32_t v_lo, v_hi;
     int32_t rdc_cal = 0;
-    int32_t avg=0;
+    int32_t avg;
     static int32_t rdc_avg = 0;
     static int32_t rdc_cnt = 0;
 
@@ -972,7 +967,7 @@ int rn5t618_update_calibrate(int charge)
     return rdc_c;
 }
 
-struct energy_array {
+static struct energy_array {
     int     ocv;                            // mV
     int     coulomb;                        // mAh read 
     int     coulomb_p;                      // mAh @ 3700mV
@@ -1143,15 +1138,15 @@ extern struct panel_operations panel_oper;
 
 int rn5t618_battery_calibrate(void)
 {
-    uint64_t energy_c = 0;
-    uint64_t energy_p = 0;
+    int64_t energy_c = 0;
+    int64_t energy_p = 0;
     int     prev_coulomb = 0;
     int     prev_ocv  = 0;
     int     prev_ibat = 0;
     int     key;
     int     ibat_cnt = 0;
     int     i;
-    int64_t energy_top;//, energy_visible;
+    int64_t energy_top, energy_visible;
     int     base, offset, range_charge, percent, range_discharge;
     char    buf[200] = {};
     int     size;

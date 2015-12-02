@@ -73,11 +73,6 @@ int do_get_rebootmode (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 			setenv("reboot_mode","usb_burning");
 			break;
 		}
-		case MESON_UBOOT_SUSPEND:
-		{
-			setenv("reboot_mode","suspend_off");
-			break;
-		}
 		default:
 		{
 			setenv("reboot_mode","charging");

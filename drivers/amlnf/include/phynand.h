@@ -525,7 +525,7 @@ struct hw_controller{
 	unsigned char (*readbyte)(struct hw_controller *controller);	
 	void (*writebyte)(struct hw_controller *controller, unsigned char data);
 	void	(*cmd_ctrl)(struct hw_controller *controller, unsigned cmd,  unsigned ctrl);
-	int (*quene_rb)(struct hw_controller *controller, unsigned char chipnr);
+	int (*quene_rb)(struct hw_controller *controller, unsigned char chipnr);
 
 	int	(*dma_read)(struct hw_controller *controller, unsigned len, unsigned char bch_mode);		
 	int	(*dma_write)(struct hw_controller *controller, unsigned char *buf, unsigned len, unsigned char bch_mode);

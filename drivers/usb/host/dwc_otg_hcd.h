@@ -590,7 +590,7 @@ typedef struct dwc_otg_device
 	uint8_t common_irq_installed;
   
   int disabled;
-	int index;
+
 } dwc_otg_device_t;
 /**
  * Reads the content of a register.

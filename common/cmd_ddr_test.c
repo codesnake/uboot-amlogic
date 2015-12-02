@@ -183,7 +183,7 @@ static void ddr_read(void *buff, unsigned m_length)
 #define DDR_TEST_START_ADDR CONFIG_SYS_MEMTEST_START
 #define DDR_TEST_SIZE 0x2000000
 
-int do_ddr_test(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
+int do_ddr_test(cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {
     char *endp;
     unsigned long loop = 1;

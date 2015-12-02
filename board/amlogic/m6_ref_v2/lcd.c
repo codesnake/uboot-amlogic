@@ -76,10 +76,7 @@ const static unsigned bl_pwm_pinmux_clr[][2] = {{1, 0x10000000}};
 #define VADJ_CONTRAST		0x80	/** video adjust contrast */
 #define VADJ_SATURATION		0x100	/** video adjust saturation */
 
-#if defined(GAMMA_EN)
-#undef GAMMA_EN
 #define GAMMA_EN			1		/** 0=disable gamma table, 1=enable gamma table */
-#endif
 #define GAMMA_REVERSE		0		/** 0=normal, 1=reverse */
 #define GAMMA_MULTI			0		/** gamma_multi(0=single gamma, RGB are same, 1=multi gamma, RGB are different) */
 									/** if gamma_multi=1, there must be 3 gamma tables, named as gamma_table_r, gamma_table_g, gamma_table_b */

@@ -191,7 +191,7 @@ typedef __u64    __be64;
 #define USB_DBG(x...)   PRINTF(x)
 
 
-//static void set_usb_phy_config(int cfg);
+static void set_usb_phy_config(int cfg);
 void close_usb_phy_clock(int cfg);
 void usb_parameter_init(int timeout);
 int chip_utimer_set(int val);

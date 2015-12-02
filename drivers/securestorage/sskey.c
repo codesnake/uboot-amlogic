@@ -12,10 +12,6 @@
 #endif
 
 #ifdef SECUREOS_INTERFACE
-extern int32_t meson_trustzone_storage(struct storage_hal_api_arg* arg);
-#endif
-
-#ifdef SECUREOS_INTERFACE
 #if defined(CONFIG_M8) || defined(CONFIG_M8B)
 #define AESKEY_SIZE   0x30
 #else
@@ -31,7 +27,7 @@ struct sstorekey_device_op_s{
 	int (*write)(char *buf, unsigned  int len);
 };
 static struct sstorekey_device_op_s sstorekey_device_op;
-//static int sstorekey_device_status=0;//0: prohibit, 1:permit
+static int sstorekey_device_status=0;//0: prohibit, 1:permit
 
 #if defined(CONFIG_M8) || defined(CONFIG_M8B)
 static int auto_find_device(void)
@@ -42,7 +38,7 @@ static int auto_find_device(void)
 	int POR_SPI_BOOT = (((R_BOOT_DEVICE_FLAG & 7) == 5) || ((R_BOOT_DEVICE_FLAG & 7) == 4));
 	int POR_EMMC_BOOT = (((R_BOOT_DEVICE_FLAG & 7) == 3) || ((R_BOOT_DEVICE_FLAG & 7) == 2) 
 						|| ((R_BOOT_DEVICE_FLAG & 7) == 1));
-	//int POR_CARD_BOOT = ((R_BOOT_DEVICE_FLAG & 7) == 0);
+	int POR_CARD_BOOT = ((R_BOOT_DEVICE_FLAG & 7) == 0);
 	int dev=0;
 	if(POR_NAND_BOOT)	dev=SECURE_STORAGE_NAND_TYPE;
 	if(POR_SPI_BOOT)	dev=SECURE_STORAGE_SPI_TYPE;
@@ -61,7 +57,7 @@ static int auto_find_device(void)
 	int POR_NAND_BOOT = (((R_BOOT_DEVICE_FLAG & 7) == 7) || ((R_BOOT_DEVICE_FLAG & 7) == 6));
 	int POR_SPI_BOOT = (((R_BOOT_DEVICE_FLAG & 7) == 5) || ((R_BOOT_DEVICE_FLAG & 7) == 4));
 	int POR_EMMC_BOOT = ((R_BOOT_DEVICE_FLAG & 7) == 3);
-	//int POR_CARD_BOOT = ((R_BOOT_DEVICE_FLAG & 7) == 0);
+	int POR_CARD_BOOT = ((R_BOOT_DEVICE_FLAG & 7) == 0);
 	int dev=0;
 	if(POR_NAND_BOOT)	dev=SECURE_STORAGE_NAND_TYPE;
 	if(POR_SPI_BOOT)	dev=SECURE_STORAGE_SPI_TYPE;
@@ -155,7 +151,6 @@ int securestore_key_init( char *seed,int len)
 	cmd_arg.datalen = AESKEY_SIZE;
 	cmd_arg.data_phy_addr = (unsigned int)&aeskey_data[0];
 	cmd_arg.retval_phy_addr = (unsigned int)&retval;
-	extern int32_t meson_trustzone_storage(struct storage_hal_api_arg* arg);
 	err = meson_trustzone_storage(&cmd_arg);
 	if(err){
 		printf("%s:%d,meson_trustzone_storage init fail\n",__func__,__LINE__);
@@ -193,34 +188,6 @@ int securestore_key_query(char *keyname, unsigned int *query_return)
 #else
 	return  __securestore_key_query(keyname, query_return);
 #endif
-}
-
-/*
-*    securestore_key_verify - query whether key was burned.
-*    @keyname : key name will be queried.
-*    @query_result: query return value,  0: key exist and hash right; -1: hash error, -2:key not exist; others: reserved.
-*    @hashval : hash value
-*    @hashlen : hash value len(byte unit)
-*    return: 0: successful; others: failed. 
-*/
-int securestore_key_verify(char *keyname, unsigned int *query_return,char *hashval,int hashlen)
-{
-	int err=0;
-#ifdef SECUREOS_INTERFACE
-	struct storage_hal_api_arg cmd_arg;
-	//unsigned int retval;
-	cmd_arg.cmd = STORAGE_HAL_API_VERIFY;
-	cmd_arg.namelen = strlen(keyname);
-	cmd_arg.name_phy_addr = (unsigned int)keyname;
-	cmd_arg.datalen = hashlen;
-	cmd_arg.data_phy_addr = (unsigned int)hashval;//(unsigned int)&aeskey_data[0];
-	cmd_arg.retval_phy_addr = (unsigned int)query_return;
-	err = meson_trustzone_storage(&cmd_arg);
-	if(err){
-		printf("%s:%d,meson_trustzone_storage query fail\n",__func__,__LINE__);
-	}
-#endif
-	return err;
 }
 
 /*
@@ -318,6 +285,5 @@ int securestore_key_uninit(void)
 #else
 	return __securestore_key_uninit();
 #endif
-	return 0;
 }
 

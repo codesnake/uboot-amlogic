@@ -6,10 +6,6 @@
 #include <asm/arch/dsp_state.h>
 #include "dsp_firmware.dat"
 
-extern void *memcpy(void *dst, const void *src, size_t count);
-extern void  flush_cache (unsigned long start_addr, unsigned long size);
-extern int printf(const char *fmt, ...);
-
 #define S_1K					(1024)
 #define S_1M					(S_1K*S_1K)
 //#define S_1M					(64*S_1K)
@@ -47,7 +43,7 @@ extern int printf(const char *fmt, ...);
 
 static int dsp_start=0;
 
-int start_dsp(void)
+int start_dsp()
 {
 	unsigned long clk;
 
@@ -126,7 +122,7 @@ int start_dsp(void)
 	return 0;
 }
 
-int stop_dsp(void)
+int stop_dsp()
 {
 	if(!dsp_start)
 		return 0;

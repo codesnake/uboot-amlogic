@@ -77,13 +77,13 @@ static void lcd_ports_ctrl_mipi(Bool_t status)
     if (status) {
         switch (lcd_Conf->lcd_control.mipi_config->lane_num) {
             case 1:
-                WRITE_LCD_CBUS_REG_BITS(HHI_DIF_CSI_PHY_CNTL3, 0x14, 11, 5);
+                WRITE_LCD_CBUS_REG_BITS(HHI_DIF_CSI_PHY_CNTL3, 0x11, 11, 5);
                 break;
             case 2:
-                WRITE_LCD_CBUS_REG_BITS(HHI_DIF_CSI_PHY_CNTL3, 0x1c, 11, 5);
+                WRITE_LCD_CBUS_REG_BITS(HHI_DIF_CSI_PHY_CNTL3, 0x19, 11, 5);
                 break;
             case 3:
-                WRITE_LCD_CBUS_REG_BITS(HHI_DIF_CSI_PHY_CNTL3, 0x1e, 11, 5);
+                WRITE_LCD_CBUS_REG_BITS(HHI_DIF_CSI_PHY_CNTL3, 0x1d, 11, 5);
                 break;
             case 4:
                 WRITE_LCD_CBUS_REG_BITS(HHI_DIF_CSI_PHY_CNTL3, 0x1f, 11, 5);
@@ -996,7 +996,7 @@ static void print_lcd_clk_info(void)
     printf("vid2 pll clk      %uMHz\n"
            "lvds fifo clk     %uMHz\n"
            "cts encl clk      %uMHz\n\n",
-           (unsigned int)clk_util_clk_msr(12), (unsigned int)clk_util_clk_msr(24), (unsigned int)clk_util_clk_msr(9));
+           clk_util_clk_msr(62), clk_util_clk_msr(24), clk_util_clk_msr(9));
 }
 
 static void lcd_module_enable(void)

@@ -152,7 +152,7 @@ static inline int str2longlong(char *p, unsigned long long *num)
 static int
 arg_off_size(int argc, char *argv[], nand_info_t *nand, loff_t *off, loff_t *size)
 {
-	//int idx = nand_curr_device;
+	int idx = nand_curr_device;
 /*#if defined(CONFIG_CMD_MTDPARTS)
 	struct mtd_device *dev;
 	struct part_info *part;
@@ -200,9 +200,9 @@ arg_off_size(int argc, char *argv[], nand_info_t *nand, loff_t *off, loff_t *siz
 		*size = nand->size - *off;
 	}
 
-//#if defined(CONFIG_CMD_MTDPARTS)
-//out:
-//#endif
+#if defined(CONFIG_CMD_MTDPARTS)
+out:
+#endif
 	//printf("device %d ", idx);
 	if (*size == nand->size)
 		puts("whole chip\n");
@@ -270,7 +270,7 @@ static void nand_print_info(int idx)
 #endif
 }
 
-int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 {
 	int i, dev, ret = 0;
 	ulong addr;
@@ -285,9 +285,9 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 	const char *quiet_str = getenv("quiet");
 
 #if ((defined CONFIG_AML_NAND_KEY) || (defined MX_REVD) || (defined CONFIG_SECURE_NAND))
-	//int chip_num , tmp_chip_num, error;
+	int chip_num , tmp_chip_num, error;
 	nand = nand_info[nand_curr_device];
-	//struct mtd_info *mtd =nand;
+	struct mtd_info *mtd =nand;
 	struct aml_nand_chip *aml_chip = mtd_to_nand_chip(nand);
 #endif
 
@@ -508,7 +508,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 			{
 				goto usage;
 			}
-                    if ((arg_off_size(argc - o, (char **)(argv + o), nand, &off, &size) != 0))
+                    if ((arg_off_size(argc - o, argv + o, nand, &off, &size) != 0))
                     {
                         return  1;
                     }
@@ -606,7 +606,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 				off = 0;
 				size = get_mtd_size(argv[2]);
 			} else {
-				if (arg_off_size(argc - 4, (char **)(argv + 4), nand, &off, &size) != 0)
+				if (arg_off_size(argc - 4, argv + 4, nand, &off, &size) != 0)
 					return 1;
 			}
 		}
@@ -614,7 +614,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 			addr = (ulong)simple_strtoul(argv[2], NULL, 16);
 			read = strncmp(cmd, "read", 4) == 0; /* 1 = read, 0 = write */
 			printf("\nNAND %s: ", read ? "read" : "write");
-			if (arg_off_size(argc - 3, (char **)(argv + 3), nand, &off, &size) != 0)
+			if (arg_off_size(argc - 3, argv + 3, nand, &off, &size) != 0)
 				return 1;
 		}
 
@@ -703,7 +703,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 		addr = (ulong)simple_strtoul(argv[2], NULL, 16);
 		printf("\nNAND %s: ", read ? "rom_read" : "rom_write");
 		nand_curr_device = 0;
-		if (arg_off_size(argc - 3, (char **)(argv + 3), nand, &off, &size) != 0)
+		if (arg_off_size(argc - 3, argv + 3, nand, &off, &size) != 0)
 			return 1;
 
 		nand = nand_info[nand_curr_device];
@@ -712,7 +712,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 		s = strchr(cmd, '.');
 		if (!s ||!strcmp(s, ".e") || !strcmp(s, ".i")) {
 			if (read){
-				ret = romboot_nand_read(nand, off, (size_t *)&size,
+				ret = romboot_nand_read(nand, off, &size,
 							 (u_char *)addr);
 			}
 			else
@@ -738,7 +738,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 
 		src = (ulong)simple_strtoul(argv[2], NULL, 16);
 		dst= (ulong)simple_strtoul(argv[3], NULL, 16);
-		if (arg_off_size(argc - 4, (char **)(argv + 4), nand, &off, &size) != 0)
+		if (arg_off_size(argc - 4, argv + 4, nand, &off, &size) != 0)
 			return 1;
 		ret = nand_write_skip_bad(nand, off, &size,
 				(u_char *)src, 0);
@@ -853,7 +853,7 @@ int do_nand(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
         }
         b_all = b_all? 1: 0;
         
-        ret = nand_raw_read_nand_dev(nand,b_offset,(loff_t *)&b_count,(u_char *)addr ,b_all,1);
+        ret = nand_raw_read_nand_dev(nand,b_offset,&b_count,(u_char *)addr ,b_all,1);
         return ret == 0 ? 0 : 1;
     }
 #ifdef CONFIG_PARAMETER_PAGE
@@ -1014,7 +1014,7 @@ static int nand_load_image(cmd_tbl_t *cmdtp, nand_info_t *nand,
 	return 0;
 }
 
-int do_nandboot(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+int do_nandboot(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 {
 	char *boot_device = NULL;
 	int idx;

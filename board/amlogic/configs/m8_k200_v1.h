@@ -38,7 +38,7 @@
 #define CONFIG_AML_NAND_KEY
 #endif
 
-#define  CONFIG_AML_GATE_INIT	1
+//#define  CONFIG_AML_GATE_INIT	1
 #define CONFIG_NEXT_NAND
 //#define CONFIG_SECURE_NAND  1
 //support "boot,bootd"
@@ -60,7 +60,6 @@
 #define CONFIG_AML_V2_USBTOOL 1
 #endif//#ifdef CONFIG_NEXT_NAND
 
-#define CONFIG_CMD_CPU_TEMP
 #if CONFIG_AML_V2_USBTOOL
 #define CONFIG_SHA1
 #define CONFIG_AUTO_START_SD_BURNING     1//1 then auto detect whether or not jump into sdc_burning when boot from external mmc card 
@@ -143,7 +142,6 @@
 #endif	//#ifdef CONFIG_AML_I2C
 
 #define CONFIG_CMD_AML
-#define CONFIG_CMD_CPU_TEMP
 /*
  * PMU definitions, all PMU devices must be include involved
  * in CONFIG_PLATFORM_HAS_PMU
@@ -243,6 +241,7 @@
 	"console=ttyS0,115200n8\0" \
 	"bootm_low=0x00000000\0" \
 	"bootm_size=0x80000000\0" \
+	"mmcargs=setenv bootargs console=${console} " \
 	"boardname=m8_board\0" \
 	"chipname=8726m8\0" \
 	"get_dt=checkhw\0" \
@@ -251,7 +250,7 @@
 	"cvbsmode=576cvbs\0" \
 	"outputmode=1080p\0" \
 	"vdac_config=0x10\0" \
-	"initargs=init=/init console=ttyS0,115200n8 no_console_suspend ramoops.mem_address=0x04e00000 ramoops.mem_size=0x100000 ramoops.record_size=0x8000 ramoops.console_size=0x4000\0" \
+	"initargs=init=/init console=ttyS0,115200n8 no_console_suspend\0" \
 	"preloaddtb=imgread dtb boot ${loadaddr}\0" \
 	"video_dev=tvout\0" \
 	"display_width=1920\0" \
@@ -285,7 +284,7 @@
 	"preboot="\
         "if itest ${upgrade_step} == 3; then run prepare; run storeargs; run update; fi; "\
         "if itest ${upgrade_step} == 1; then  "\
-            "defenv_reserve_env; setenv upgrade_step 2; saveenv;"\
+            "defenv; setenv upgrade_step 2; saveenv;"\
         "fi; "\
         "run prepare;"\
         "run storeargs;"\
@@ -352,6 +351,9 @@
         "if mmcinfo; then "\
             "if fatload mmc 0 ${loadaddr} recovery.img; then bootm;fi;"\
         "fi; "\
+        "if usb start 0; then "\
+                "if fatload usb 0 ${loadaddr} recovery.img; then bootm; fi;"\
+        "fi;"\
 	      "if imgread kernel recovery ${loadaddr}; then "\
 	        "bootm; "\
 				"else "\
@@ -416,10 +418,6 @@
 
 #endif
 
-
-//wifi wake up
-#define CONFIG_WIFI_WAKEUP 1
-#define CONFIG_NET_WIFI
 
 //----------------------------------------------------------------------
 //Please set the M8 CPU clock(unit: MHz)
@@ -523,7 +521,7 @@
 #define CONFIG_CMD_RANDOM
 /* secure storage support both spi and emmc */
 #define CONFIG_SECURE_MMC
-//#define CONFIG_SPI_NOR_SECURE_STORAGE
+#define CONFIG_SPI_NOR_SECURE_STORAGE
 #endif // CONFIG_SECURE_STORAGE_BURNED
 
 #endif //CONFIG_MESON_TRUSTZONE

@@ -640,7 +640,7 @@ int aml_i2c_init(void)
 	struct aml_i2c *i2c = &g_aml_i2c_data;
 
     if (__i2c_init_flag) {
-        return 1;
+        return ;    
     }
 
 	if(plat == NULL)

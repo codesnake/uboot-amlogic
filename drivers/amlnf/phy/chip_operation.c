@@ -1746,15 +1746,15 @@ static int test_block(struct amlnand_chip *aml_chip)
 	//int  ret = 0, len,t=0;
 	int  ret = 0, t=0;
 
-	unsigned char *dat_buf =NULL;
-    blk_addr = ops_para->page_addr;
-	dat_buf  = aml_nand_malloc(flash->pagesize);
-	if(!dat_buf){
-		aml_nand_msg("test_block: malloc failed");
-		ret =  -1;
-		goto exit;
-	}
-	memset(dat_buf, 0xa5, flash->pagesize);
+	//unsigned char *dat_buf =NULL;
+	blk_addr = ops_para->page_addr;
+//	dat_buf  = aml_nand_malloc(flash->pagesize);
+//	if(!dat_buf){
+//		aml_nand_msg("test_block: malloc failed");
+//		ret =  -1;
+//		goto exit;
+//	}
+//	memset(dat_buf, 0xa5, flash->pagesize);
 	
 
 	phys_erase_shift = ffs(flash->blocksize) - 1;
@@ -1769,45 +1769,45 @@ static int test_block(struct amlnand_chip *aml_chip)
 //	nand_get_chip(aml_chip);
 //#endif	
     //erase
-    aml_nand_msg("erase addr = %ld",(long int)(ops_para->page_addr));
-
-	ret = erase_block(aml_chip); 	
-	if(ret < 0){
-		aml_nand_msg("nand blk erase failed");
-		ret =  -1;
-		goto exit;
-	}
-    aml_nand_msg("nand blk %ld erase OK",(long int)blk_addr);
-    #if 1
+	  //aml_nand_msg("erase addr = %ld",ops_para->page_addr);
+	
+//		ret = erase_block(aml_chip); 	
+//		if(ret < 0){
+//			aml_nand_msg("nand blk erase failed");
+//			ret =  -1;
+//			goto exit;
+//		}
+	  //aml_nand_msg("nand blk %ld erase OK",blk_addr);
+#if 1
     //read
-    memset((unsigned char *)ops_para, 0x0, sizeof(struct chip_ops_para));
-    ops_para->page_addr = blk_addr;
-	for(t = 0; t < pages_read; t++){
-		memset(aml_chip->user_page_buf, 0x0, flash->pagesize);
-        ops_para->page_addr += t;
-		ops_para->data_buf = aml_chip->user_page_buf;
-		ops_para->oob_buf = aml_chip->user_oob_buf;
-		ops_para->ooblen = sizeof(oob_buf);
-
-		ret = read_page(aml_chip);
-		if(ret < 0){
-			aml_nand_msg("nand read %ld failed",(long int)blk_addr);
-			ret =  -1;
-			goto exit;
-		}
-		//aml_nand_dbg("aml_chip->user_page_buf: ");
-		//show_data_buf(aml_chip->user_page_buf);
-		//aml_nand_dbg("dat_buf: ");
-		//show_data_buf(dat_buf);
-	}
-    aml_nand_msg("nand blk read OK");
+//    memset((unsigned char *)ops_para, 0x0, sizeof(struct chip_ops_para));
+//    ops_para->page_addr = blk_addr;
+//	for(t = 0; t < pages_read; t++){
+//		memset(aml_chip->user_page_buf, 0x0, flash->pagesize);
+//        ops_para->page_addr += t;
+//		ops_para->data_buf = aml_chip->user_page_buf;
+//		ops_para->oob_buf = aml_chip->user_oob_buf;
+//		ops_para->ooblen = sizeof(oob_buf);
+//
+//		ret = read_page(aml_chip);
+//		if(ret < 0){
+//			aml_nand_msg("nand read %ld failed",blk_addr);
+//			ret =  -1;
+//			goto exit;
+//		}
+//		//aml_nand_dbg("aml_chip->user_page_buf: ");
+//		//show_data_buf(aml_chip->user_page_buf);
+//		//aml_nand_dbg("dat_buf: ");
+//		//show_data_buf(dat_buf);
+//	}
+//    aml_nand_msg("nand blk read OK");
     
     //write
     memset((unsigned char *)ops_para, 0x0, sizeof(struct chip_ops_para));
     ops_para->page_addr = blk_addr;
+		memset( aml_chip->user_page_buf, 0xa5, flash->pagesize);
     for(t = 0; t < pages_read; t++){
-        memset( aml_chip->user_page_buf, 0xa5, flash->pagesize);
-        ops_para->page_addr += t;
+        ops_para->page_addr += 1;
         ops_para->data_buf = aml_chip->user_page_buf;
         ops_para->oob_buf = aml_chip->user_oob_buf;
         ops_para->ooblen = sizeof(oob_buf);
@@ -1819,56 +1819,56 @@ static int test_block(struct amlnand_chip *aml_chip)
             goto exit;
         }
     }
-    aml_nand_msg("nand blk %d write OK",blk_addr);
+    //aml_nand_msg("nand blk %d write OK",blk_addr);
     //read
-	memset((unsigned char *)ops_para, 0x0, sizeof(struct chip_ops_para));
+		memset((unsigned char *)ops_para, 0x0, sizeof(struct chip_ops_para));
     ops_para->page_addr = blk_addr;
-	for(t = 0; t < pages_read; t++){
-		memset(aml_chip->user_page_buf, 0x0, flash->pagesize);
-        ops_para->page_addr += t;
-		ops_para->data_buf = aml_chip->user_page_buf;
-		ops_para->oob_buf = aml_chip->user_oob_buf;
-		ops_para->ooblen = sizeof(oob_buf);
-
-		ret = read_page(aml_chip);
+		//memset(aml_chip->user_page_buf, 0x0, flash->pagesize);
+     //aml_nand_msg("test block read!!!!!!!0x%x", ops_para->page_addr);
+		for(t = 0; t < pages_read; t++){
+	        ops_para->page_addr += 1;
+			ops_para->data_buf = aml_chip->user_page_buf;
+			ops_para->oob_buf = aml_chip->user_oob_buf;
+			ops_para->ooblen = sizeof(oob_buf);
+			ret = read_page(aml_chip);
+			if((ret < 0)|| (ops_para->ecc_err) ){
+				aml_nand_msg("nand read failed");
+				ret =  -1;
+				//goto exit;
+				break;
+			}
+			//aml_nand_dbg("aml_chip->user_page_buf: ");
+			//show_data_buf(aml_chip->user_page_buf);
+			//aml_nand_dbg("dat_buf: ");
+			//show_data_buf(dat_buf);
+		}
+   // aml_nand_msg("nand blk %d read OK",blk_addr);
+    //erase
+		ops_para->page_addr = blk_addr;
+		//erase_block(aml_chip);
+		ret = erase_block(aml_chip); 	
 		if(ret < 0){
-			aml_nand_msg("nand read failed");
+			aml_nand_msg("nand blk erase failed");
 			ret =  -1;
 			goto exit;
 		}
-		//aml_nand_dbg("aml_chip->user_page_buf: ");
-		//show_data_buf(aml_chip->user_page_buf);
-		//aml_nand_dbg("dat_buf: ");
-		//show_data_buf(dat_buf);
-	}
-    aml_nand_msg("nand blk %d read OK",blk_addr);
-    //erase
-    ops_para->page_addr = blk_addr;
-	ret = erase_block(aml_chip); 	
-	if(ret < 0){
-		aml_nand_msg("nand blk erase failed");
-		ret =  -1;
-		goto exit;
-	}
-    aml_nand_msg("nand blk %d erase OK",blk_addr);
-    #endif
+#endif
 exit:
-//#ifdef AML_NAND_UBOOT
-//        nand_release_chip();
-//#else
-//        nand_release_chip(aml_chip);
-//#endif
+		if(ops_para->ecc_err){
+			ret = -1;
+		}
+	
+//    if(dat_buf){
+//        aml_nand_free(dat_buf);
+//        dat_buf=NULL;
+//    }
 
-        if(dat_buf){
-            aml_nand_free(dat_buf);
-            dat_buf=NULL;
-        }
+    if(!ret){
+        //aml_nand_msg("blk test OK");
+    }
     
-        if(!ret){
-            aml_nand_msg("blk test OK");
-        }
-        
-        return ret;
+    ops_para->page_addr = blk_addr;//!!!!!!!!
+    return ret;
 }
 
 /************************************************************

@@ -31,7 +31,7 @@
  *
  */
 #define container_of(ptr, type, member) ({			\
-	const typeof( ((type *)0)->member ) *__mptr = (const typeof( ((type *)0)->member ) *)(ptr);	\
+	const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
 	(type *)( (char *)__mptr - offsetof(type,member) );})
 
 #define NAND_CMD                                ((0xc1108600-IO_CBUS_BASE)>>2)
@@ -284,7 +284,7 @@
 #define NAND_INFO_DATA_1INFO(a)   ((a)&0xff)
 
 
-//#define NAND_DEFAULT_OPTIONS			(NAND_TIMING_MODE5 | NAND_ECC_BCH8_512_MODE)
+#define NAND_DEFAULT_OPTIONS			(NAND_TIMING_MODE5 | NAND_ECC_BCH8_512_MODE)
 
 
 #define AML_NORMAL						0

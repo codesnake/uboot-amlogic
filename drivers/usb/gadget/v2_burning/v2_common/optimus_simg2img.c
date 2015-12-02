@@ -202,54 +202,8 @@ int optimus_simg_to_media(char* simgPktHead, const u32 pktLen, u32* unParsedData
             break;
 
         case CHUNK_TYPE_FILL:
-            {
-                    const unsigned fillVal = *(unsigned*)(pChunk + 1);
-                    unsigned LeftDataLen   = chunkDataLen;
-                    unsigned temp_flashAddrStart = flashAddrStart;
-                    unsigned* pFillValBuf = (unsigned*)OPTIMUS_SPARSE_IMG_FILL_VAL_BUF;
-                    const unsigned FillBufSz = OPTIMUS_SPARSE_IMG_FILL_BUF_SZ;
-                    static unsigned _filledBufValidLen = 0;
-                    const unsigned thisChunkFilledLen = min(chunkDataLen, FillBufSz);
-
-                    spdbg("CHUNK_TYPE_FILL,fillVal=0x%8x, chunkDataLen=0x%8x, thisChunkFilledLen=0x%x\n", 
-                                    fillVal, chunkDataLen, thisChunkFilledLen);
-                    if(CHUNK_HEAD_SIZE + 4 != pChunk->total_sz){
-                            sperr("error FILL chunk\n");
-                            return -__LINE__;
-                    }
-
-                    if(!_filledBufValidLen){
-                            DWN_MSG("CHUNK_TYPE_FILL\n");
-                    }
-                    if(fillVal != *pFillValBuf && _filledBufValidLen){
-                            _filledBufValidLen = 0;
-                    }
-                    if(_filledBufValidLen < thisChunkFilledLen){
-                            int i = _filledBufValidLen>>2;
-                            unsigned* temBuf = pFillValBuf + i;
-
-                            while(i++ < (thisChunkFilledLen>>2))*temBuf++ = fillVal;
-                            _filledBufValidLen = thisChunkFilledLen;
-                    }
-
-                    do{
-                            unsigned actualWrLen = 0;
-
-                            thisWriteLen = min(LeftDataLen, thisChunkFilledLen);
-
-                            actualWrLen = optimus_cb_simg_write_media(temp_flashAddrStart, thisWriteLen, (char*)pFillValBuf);
-                            if(actualWrLen != thisWriteLen){
-                                    sperr("FILL_CHUNK:Want write 0x%x Bytes, but 0x%x\n", thisWriteLen, actualWrLen);
-                                    break;
-                            }
-
-                            temp_flashAddrStart += thisWriteLen >> 9;
-                            LeftDataLen -= thisWriteLen;
-                    }while(LeftDataLen);
-
-                    thisWriteLen = 4;///////////
-            }
-            break;
+            sperr("CHUNK_TYPE_FILL unsupported yet!\n");
+            return -__LINE__;
         case CHUNK_TYPE_CRC32:
             sperr("CHUNK_TYPE_CRC32 unsupported yet!\n");
             return -__LINE__;
@@ -338,18 +292,6 @@ int optimus_sparse_get_chunk_data(u8** head, u32* headSz, u32* dataSz, u64* data
                 }
             }
             break;
-
-        case CHUNK_TYPE_FILL:
-            {
-                spdbg("CHUNK_TYPE_FILL\n");
-                if(CHUNK_HEAD_SIZE + 4 != pChunk->total_sz){
-                    sperr("bogus DONT CARE chunk\n");
-                    return OPT_DOWN_FAIL;
-                }
-                *dataSz = 4;///////
-            }
-            break;
-
 
         default:
             sperr("unknown chunk ID 0x%x, parsed %d, total %d\n", pChunk->chunk_type, _spPacketStates.leftChunkNum, _spPacketStates.backChunkNum);

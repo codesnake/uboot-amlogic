@@ -75,8 +75,5 @@ struct spi_flash *spi_flash_probe_gigadevice(struct spi_slave *spi, u8 *idcode);
 #ifdef CONFIG_SPI_FLASH_PMDEVICE
 struct spi_flash *spi_flash_probe_pmdevice(struct spi_slave *spi, u8 *idcode);
 #endif
-#ifdef CONFIG_SPI_FLASH_ESMT
-struct spi_flash *spi_flash_probe_esmt(struct spi_slave *spi, u8 *idcode);
-#endif
 
 #endif //__SPI_FLASH_AMLOGIC_H__

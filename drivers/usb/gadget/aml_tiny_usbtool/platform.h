@@ -137,12 +137,12 @@ typedef __u64    __be64;
 // void dwc_modify_reg32( volatile uint32_t *_reg, const uint32_t _clear_mask, const uint32_t _set_mask) 
 #define dwc_modify_reg32(x, c, s) 	(*(volatile uint32_t *)(x + DWC_REG_BASE))=( ((dwc_read_reg32(x)) & (~c)) | (s))
 
-//#define __constant_cpu_to_le16(x) (x)
-//#define __constant_cpu_to_le32(x) (x)
-//#define cpu_to_le16(x)      (x)
-//#define  cpu_to_le32(x)     (x)
-//#define le16_to_cpu(x)      (x)
-//#define le32_to_cpu(x)      (x)
+#define __constant_cpu_to_le16(x) (x)
+#define __constant_cpu_to_le32(x) (x)
+#define cpu_to_le16(x)      (x)
+#define  cpu_to_le32(x)     (x)
+#define le16_to_cpu(x)      (x)
+#define le32_to_cpu(x)      (x)
 #define get_unaligned_16(ptr)				(((__u8 *)ptr)[0] | (((__u8 *)ptr)[1]<<8))
 #define get_unaligned_32(ptr)				(((__u8 *)ptr)[0] | (((__u8 *)ptr)[1]<<8) | (((__u8 *)ptr)[2]<<16) | (((__u8 *)ptr)[3]<<24))
 #define get_unaligned(ptr)				(((__u8 *)ptr)[0] | (((__u8 *)ptr)[1]<<8) | (((__u8 *)ptr)[2]<<16) | (((__u8 *)ptr)[3]<<24))
@@ -186,13 +186,13 @@ typedef __u64    __be64;
 
 
 static void set_usb_phy_config(int cfg);
-void usb_parameter_init(int time_out);
+void usb_parameter_init();
 int chip_utimer_set(int val);
 int chip_watchdog(void);
 #define udelay __udelay
 #define wait_ms(a) udelay(a*1000);
-int update_utime(void);
-int get_utime(void);
+int update_utime();
+int get_utime();
 //int chip_watchdog(void);
 //#define usb_memcpy(dst,src,len) rom_memcpy((unsigned)src,(unsigned)dst,(unsigned)len)
 //#define usb_memcpy_32bits(dst,src,len) rom_memcpy((unsigned)src,(unsigned)dst,(unsigned)len)

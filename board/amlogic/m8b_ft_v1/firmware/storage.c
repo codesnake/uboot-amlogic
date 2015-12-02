@@ -20,14 +20,12 @@ struct store_config  store_configs ={
 		.nand_configs = {
 			.enable_slc = 0,
 			.order_ce = 0,
-			.reserved[0] = 0,
-			.reserved[1] = 0,
+			.reserved = 0,
 		},
 		.mmc_configs = {
 			.type = (PORT_A_CARD_TYPE | (PORT_B_CARD_TYPE << 4) | (PORT_C_CARD_TYPE << 8)),
 			.port = 0,
-			.reserved[0] = 0,
-			.reserved[1] = 0,
+			.reserved = 0,
 		},
 };
 

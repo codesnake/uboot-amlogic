@@ -266,7 +266,7 @@ static int aml_emmc_key_check(aml_keybox_provider_t *provider)
 {
 	u8 keypart_cnt;
 	u64 part_size;
-	//u32 checksum;
+	u32 checksum;
 #if defined(EMMC_KEY_KERNEL)
 	struct memory_card *emmccard = (struct memory_card *)provider->priv;
 #elif defined(EMMC_KEY_UBOOT)
@@ -274,7 +274,7 @@ static int aml_emmc_key_check(aml_keybox_provider_t *provider)
 #endif
 	struct aml_emmckey_info_t *emmckey_info = emmccard->aml_emmckey_info;
 	struct emmckey_valid_node_t *emmckey_valid_node,*temp_valid_node;
-	//struct emmckey_data_t *emmckey_data;
+	struct emmckey_data_t *emmckey_data;
 	emmckey_info->key_part_count = emmckey_info->keyarea_phy_size / EMMC_KEYAREA_SIZE;
 	if(emmckey_info->key_part_count > EMMC_KEYAREA_COUNT){
 		emmckey_info->key_part_count = EMMC_KEYAREA_COUNT;
@@ -510,7 +510,7 @@ static aml_keybox_provider_t emmc_provider={
 
 int emmc_key_init( void *keypara)
 {
-	//int i;
+	int i;
 	u64  addr=0;
 	u32  size=0,blk_len=0;
 	u64  lba_start=0,lba_end=0;

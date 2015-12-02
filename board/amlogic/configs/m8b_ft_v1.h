@@ -53,7 +53,6 @@ remark:
 #endif// #if CONFIG_AML_V2_USBTOOL
 
 //Enable storage devices
-#define CONFIG_CMD_CPU_TEMP
 #define CONFIG_CMD_SF    1
 #if defined(CONFIG_CMD_SF)
 	#define SPI_WRITE_PROTECT  1

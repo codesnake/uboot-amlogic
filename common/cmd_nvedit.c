@@ -52,8 +52,6 @@
 #include <net.h>
 #endif
 
-extern void set_storage_device_flag(void);
-
 DECLARE_GLOBAL_DATA_PTR;
 
 #if !defined(CONFIG_ENV_IS_IN_EEPROM)	&& \
@@ -965,40 +963,76 @@ int do_loadenv (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	return 0;
 }
 
-// added by scy for reserve env
-static char* temp_for_compile[] = {"test1","test2","test3",NULL};
-extern char * env_args_reserve[80] __attribute__((weak, alias("temp_for_compile")));
-int get_envlist_size(const char* envlist[]);
-int	do_defenv_without (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]);
-void set_env_for_reserve(void) 
-{ 
-	int size_of_env_args = 0; 
-	size_of_env_args = get_envlist_size((const char **)env_args_reserve);
-	do_defenv_without (0,0,size_of_env_args, env_args_reserve);
-}
-
-int get_envlist_size(const char* envlist[])
+// add
+char * args[]=
 {
-	int i = 0;
-	int size = 0;
-	while(envlist[i]!=0)
-		i++;
-	size = i;
-	return size;
+"480poutputx",
+"480poutputx",
+"480poutputy",
+"480poutputwidth",
+"480poutputheight",
+"480ioutputx",
+"480ioutputy",
+"480ioutputwidth",
+"480ioutputheight",
+"576poutputx",
+"576poutputy",
+"576poutputwidth",
+"576poutputheight",
+"576ioutputx",
+"576ioutputy",
+"576ioutputwidth",
+"576ioutputheight",
+"720poutputx",
+"720poutputy",
+"720poutputwidth",
+"720poutputheight",
+"1080poutputx",
+"1080poutputy",
+"1080poutputwidth",
+"1080poutputheight",
+"1080ioutputx",
+"1080ioutputy",
+"1080ioutputwidth",
+"1080ioutputheight",
+"4k2k24hz_x",
+"4k2k24hz_y",
+"4k2k24hz_width",
+"4k2k24hz_height",
+"4k2k25hz_x",
+"4k2k25hz_y",
+"4k2k25hz_width",
+"4k2k25hz_height",
+"4k2k30hz_x",
+"4k2k30hz_y",
+"4k2k30hz_width",
+"4k2k30hz_height",
+"4k2ksmpte_x",
+"4k2ksmpte_y",
+"4k2ksmpte_width",
+"4k2ksmpte_height",
+"digitaudiooutput",
+"defaulttvfrequency",
+"has.accelerometer",
+"cecconfig",
+"cvbsmode",
+"hdmimode",
+"outputmode",
+"disp.fromleft"
+};
+
+void set_env_without_def() 
+{ 
+
+	int size_args = sizeof(args)/sizeof(char*);
+
+	do_defenv_without (0,0,size_args,args);
 }
 
-int do_reserve_env (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{	
-	set_env_for_reserve();
-#ifdef  CONFIG_STORE_COMPATIBLE
-	run_command("put  store",0);
-#endif
-	return 0;
-}
 
 int do_defenv (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {	
-	set_default_env(NULL);
+	set_env_without_def();
 #ifdef  CONFIG_STORE_COMPATIBLE
 	run_command("put  store",0);
 #endif
@@ -1018,12 +1052,7 @@ U_BOOT_CMD(
 	"\n    - set u-boot default environment\n"
 );
 
-// added by scy
-U_BOOT_CMD(
-	defenv_reserve_env, CONFIG_SYS_MAXARGS, 1,	do_reserve_env,
-	"reserve env",
-	"\n    - reserve u-boot environment when upgrade\n"
-);
+
 
 /***********************************
 *
@@ -1083,7 +1112,7 @@ U_BOOT_CMD(
 void replace(char* org, char* find, char* rep)
 {	
 	char *p1, *p2;		
-	while((p1 = strstr(org, find))){		
+	while(p1 = strstr(org, find)){		
 	p2 = p1 + strlen(find);		
 	memmove(p1 + strlen(rep), p2, strlen(p2) + 1);		
 	memcpy(p1, rep, strlen(rep));	

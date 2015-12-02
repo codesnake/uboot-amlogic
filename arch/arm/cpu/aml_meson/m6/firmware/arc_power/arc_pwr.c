@@ -7,9 +7,8 @@
 #include <asm/arch/ddr.h>
 #include <asm/arch/memtest.h>
 #include <asm/arch/pctl.h>
-#ifndef CONFIG_MESON_TRUSTZONE
 #include "boot_code.dat"
-#endif
+
 //#define CONFIG_ARC_SARDAC_ENABLE
 #ifdef CONFIG_ARC_SARDAC_ENABLE
 #include "sardac_arc.c"
@@ -38,7 +37,7 @@ void store_restore_plls(int flag);
 
 #define TICK_OF_ONE_SECOND 32000
 
-#define dbg_out(s,v) f_serial_puts((const char *)(s));serial_put_hex(v,32);f_serial_puts((const char *)("\n"));wait_uart_empty();
+#define dbg_out(s,v) f_serial_puts(s);serial_put_hex(v,32);f_serial_puts("\n");wait_uart_empty();
 
 #if (defined(CONFIG_AW_AXP20) || defined(CONFIG_ACT8942QJ233_PMU) || defined(CONFIG_AML_PMU))
 #define PLATFORM_HAS_PMU
@@ -60,11 +59,6 @@ extern inline void power_on_at_32k_1();
 extern inline void power_on_at_24M();
 extern void shut_down();
 extern void init_I2C();
-extern void printf_arc(const char *str);
-#endif
-#ifdef CONFIG_AML_PMU
-extern unsigned char get_charge_end_det();
-extern int aml_pmu_get_voltage(void);
 #endif
 extern void uart_reset();
 extern void init_ddr_pll(void);
@@ -122,17 +116,10 @@ void copy_reboot_code()
 {
 	int i;
 	int code_size;
-#ifdef CONFIG_MESON_TRUSTZONE
-	volatile unsigned char* pcode = *(int *)(0x0008);//appf_arc_code_memory[2]
-	volatile unsigned char * arm_base = (volatile unsigned char *)0x0000;
-
-	code_size = *(int *)(0x000c);//appf_arc_code_memory[3]
-#else
 	volatile unsigned char* pcode = (volatile unsigned char*)arm_reboot;
   volatile unsigned char * arm_base = (volatile unsigned char *)0x0000;
 
 	code_size = sizeof(arm_reboot);
-#endif
 	//copy new code for ARM restart
 	for(i = 0; i < code_size; i++)
 	{
@@ -301,21 +288,13 @@ void test_ddr(int i)
 #define pwr_ddr_off 
 void enter_power_down()
 {
-	//int i;
+	int i;
 	unsigned int uboot_cmd_flag=readl(P_AO_RTI_STATUS_REG2);//u-boot suspend cmd flag
 	unsigned char vcin_state = 0;
-#ifdef PLATFORM_HAS_PMU
 	unsigned char charging_state;
-#endif
-#if defined(CONFIG_AML_PMU) || defined(CONFIG_AW_AXP20)
     int delay_cnt = 0;
-#endif
-#ifdef CONFIG_AML_PMU
     int voltage   = 0;
-#endif
-#ifdef CONFIG_AW_AXP20  
     int axp_ocv = 0;
-#endif
 
 
 	//	disp_pctl();
@@ -404,7 +383,6 @@ void enter_power_down()
    	f_serial_puts("Set up pwr key\n");
  	wait_uart_empty();
 #ifdef CONFIG_AW_AXP20       
- 	extern int axp_get_ocv(void);
     axp_ocv = axp_get_ocv();
     f_serial_puts("axp_ocv=");
     wait_uart_empty();

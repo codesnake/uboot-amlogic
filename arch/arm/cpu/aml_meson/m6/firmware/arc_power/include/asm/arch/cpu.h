@@ -66,7 +66,7 @@
 
 #define CONFIG_SYS_MALLOC_LEN   (4<<20)
 
-//#define CONFIG_ENV_SIZE         (16 * 1024)
+#define CONFIG_ENV_SIZE         (16 * 1024)
 
 #define CONFIG_SYS_MAXARGS      16
 
@@ -82,7 +82,7 @@
 
 
 
-//#define CONFIG_L2_OFF
+#define CONFIG_L2_OFF
 
 /** Timer relative Configuration **/
 
@@ -112,7 +112,7 @@
 
 #endif
 
-//#warning todo implement nand driver later
+#warning todo implement nand driver later
 
 #define CONFIG_SYS_MAX_NAND_DEVICE  1  //make uboot happy
 

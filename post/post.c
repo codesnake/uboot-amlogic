@@ -491,7 +491,7 @@ unsigned long post_time_ms (unsigned long base)
 #ifdef CONFIG_PPC
 	return (unsigned long)(get_ticks () / (get_tbclk () / CONFIG_SYS_HZ)) - base;
 #else
-//#warning "Not implemented yet"
+#warning "Not implemented yet"
 	return 0; /* Not implemented yet */
 #endif
 }

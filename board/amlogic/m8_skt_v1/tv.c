@@ -110,21 +110,21 @@ static void tv_power_off(void)
     //power_off_lcd();
 }
 
-static void tv_enable(void)
+static int tv_enable(void)
 {
 	debug("%s\n", __FUNCTION__);
 
-	tv_info.vd_base = (void*)simple_strtoul(getenv("fb_addr"), NULL, 0);
-	tv_info.vl_col = simple_strtoul(getenv("display_width"), NULL, 0);
-	tv_info.vl_row = simple_strtoul(getenv("display_height"), NULL, 0);
+	tv_info.vd_base = simple_strtoul(getenv("fb_addr"), NULL, NULL);
+	tv_info.vl_col = simple_strtoul(getenv("display_width"), NULL, NULL);
+	tv_info.vl_row = simple_strtoul(getenv("display_height"), NULL, NULL);
 	tv_info.vl_bpix = simple_strtoul(getenv("display_bpp"), NULL, 10);
-	tv_info.vd_color_fg = simple_strtoul(getenv("display_color_fg"), NULL, 0);
-	tv_info.vd_color_bg = simple_strtoul(getenv("display_color_bg"), NULL, 0);
+	tv_info.vd_color_fg = simple_strtoul(getenv("display_color_fg"), NULL, NULL);
+	tv_info.vd_color_bg = simple_strtoul(getenv("display_color_bg"), NULL, NULL);
 	
 //\\temp
 //	tv_sync_duration(&lcd_config);
 	
-    //return 0;
+    return 0;
 }
 
 void tv_disable(void)

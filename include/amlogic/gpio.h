@@ -9,8 +9,8 @@ struct gpio_chip {
 	int			(*get)(struct gpio_chip *chip ,unsigned offset);
 	int			(*direction_output)(struct gpio_chip *chip ,unsigned offset, int value);
 	void			(*set)(struct gpio_chip *chip ,unsigned offset, int value);
-	int			(*set_pullup)(unsigned offset, int value,unsigned int pullen);
-	int			(*set_highz)(unsigned offset);
+	void			(*set_pullup)(unsigned offset, int value,unsigned int pullen);
+	void			(*set_highz)(unsigned offset);
 	int                  (*name_to_pin)(const char *name);
 };
 struct amlogic_gpio_desc{

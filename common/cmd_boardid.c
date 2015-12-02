@@ -29,10 +29,6 @@
 #include <amlogic/efuse.h>
 
 #define BOARDID_SIZE  1024               //max BOARDID size
- 
-extern bool is_nand_exist (void); // is nand exist
-extern bool is_emmc_exist (void); // is eMMC/TSD exist
-extern ssize_t uboot_key_read(char *keyname, char *keydata);
 
 static char boardid_prefetch[BOARDID_SIZE] = { 0x00 };
 
@@ -70,7 +66,7 @@ int do_boardid_prefetch(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv
 	run_command("secukey emmc",0);
 #endif
 
-#if defined(CONFIG_STORE_COMPATIBLE) && defined(CONFIG_SECURITYKEY)
+#ifdef CONFIG_STORE_COMPATIBLE && defined(CONFIG_SECURITYKEY)
     if (is_nand_exist()) {
         run_command("secukey nand",0);
     } else if (is_emmc_exist()) {
@@ -88,7 +84,7 @@ int do_boardid_prefetch(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv
 		printf("boardid keys read from emmc success!\n");
 #endif
 
-#if defined(CONFIG_STORE_COMPATIBLE) && defined(CONFIG_SECURITYKEY)
+#ifdef CONFIG_STORE_COMPATIBLE && defined(CONFIG_SECURITYKEY)
     if (is_nand_exist()) {
 		printf("boardid keys read from nand success!\n");
     } else if (is_emmc_exist()) {
@@ -116,7 +112,7 @@ int do_boardid_prefetch(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv
 			printf("emmc key read boardid fail,boardid valid\n");
 #endif
 
-#if defined(CONFIG_STORE_COMPATIBLE) && defined(CONFIG_SECURITYKEY)
+#ifdef CONFIG_STORE_COMPATIBLE && defined(CONFIG_SECURITYKEY)
             if (is_nand_exist()) {
                 printf("nand key read boardid fail,boardid valid\n");
             } else if (is_emmc_exist()) {
@@ -145,7 +141,7 @@ int do_boardid_prefetch(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv
 			} 
 		}else {
 			efuseinfo_item_t info;
-			int efuse_ret=-1;
+			int efuse_ret;
 			char *argv[3]={"efuse","read","boardid"};
 			printf("boardid keys not in nand,read from efuse\n");
 			if((!strncmp(argv[1],"read",sizeof("read"))) &&  (!strncmp(argv[2],"boardid",sizeof("boardid")))){

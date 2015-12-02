@@ -8,9 +8,6 @@ Linux gpio.C
 #include <asm/arch/io.h>
 #include <asm/arch/gpio.h>
 #include <amlogic/gpio.h>
-#include <asm/cpu_id.h>
-extern void *malloc (size_t len);
-extern void free(void*);
 
 int gpio_debug=0;
 
@@ -578,7 +575,7 @@ struct amlogic_gpio_desc amlogic_pins[]=
 };
 int gpio_amlogic_requst(struct gpio_chip *chip ,unsigned offset)
 {
-	//int ret;
+	int ret;
 	unsigned int i,reg,bit;
 	unsigned int *gpio_reg=&gpio_to_pin[offset][0];
 		for(i=0;i<sizeof(gpio_to_pin[offset])/sizeof(gpio_to_pin[offset][0]);i++){
@@ -591,7 +588,6 @@ int gpio_amlogic_requst(struct gpio_chip *chip ,unsigned offset)
 					printf("clear pinmux reg%d[%d]=%d\n",reg,bit,aml_get_reg32_bits(p_pin_mux_reg_addr[reg],bit,1));
 			}
 		}
-	return 0;
 }
 /* amlogic request gpio interface*/
 
@@ -622,15 +618,9 @@ int gpio_amlogic_direction_output(struct gpio_chip *chip ,unsigned offset, int v
 		aml_clr_reg32_mask(P_PREG_PAD_GPIO0_O,1<<29);
 		aml_set_reg32_mask(P_AO_SECURE_REG0,1<<0);
 		if(value)
-			if(IS_MESON_M8M2_CPU)
-				aml_set_reg32_mask(P_PAD_PULL_UP_REG2,1<<0);
-			else
-				aml_set_reg32_mask(P_PREG_PAD_GPIO0_O,1<<31);//out put high
+			aml_set_reg32_mask(P_PREG_PAD_GPIO0_O,1<<31);//out put high
 		else
-			if(IS_MESON_M8M2_CPU)
-				aml_clr_reg32_mask(P_PAD_PULL_UP_REG2,1<<0);
-			else
-				aml_clr_reg32_mask(P_PREG_PAD_GPIO0_O,1<<31);//out put low
+			aml_clr_reg32_mask(P_PREG_PAD_GPIO0_O,1<<31);//out put low
 		aml_clr_reg32_mask(P_PREG_PAD_GPIO0_O,1<<30);//out put enable
 		return 0;
 	}
@@ -684,7 +674,7 @@ int gpio_amlogic_name_to_num(const char *name)
 	if(!strcmp(name,"GPIO_TEST_N"))
 		return GPIO_TEST_N;
 	len=strlen(name);
-	p=(char *)malloc(len+1);
+	p=malloc(len+1);
 	start=p;
 	if(!p)
 	{
@@ -724,7 +714,7 @@ int gpio_amlogic_name_to_num(const char *name)
 }
 
 
-static int m8_set_pullup(unsigned pin, int val,unsigned int pullen)
+static int m8_set_pullup(unsigned int pin,unsigned int val,unsigned int pullen)
 {
 	unsigned int reg=0,bit=0,bit_en=0,ret;
 	ret=m8_pin_to_pullup(pin,&reg,&bit,&bit_en);

@@ -549,7 +549,7 @@ int board_init(void)
 #ifdef	BOARD_LATE_INIT
 int board_late_init(void)
 {
-	//unsigned char val;
+	unsigned char val;
 #ifdef CONFIG_AML_I2C  
 	board_i2c_init();
 #endif /*CONFIG_AML_I2C*/

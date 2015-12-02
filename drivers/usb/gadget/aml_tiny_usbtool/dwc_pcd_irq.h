@@ -9,8 +9,8 @@
 #ifndef __DWC_PCD_IRQ_H__
 #define __DWC_PCD_IRQ_H__
 
-int dwc_pcd_irq(void);
-int dwc_otg_irq(void);
+int dwc_pcd_irq();
+int dwc_otg_irq();
 
 /**
  * States of EP0.
@@ -24,5 +24,5 @@ typedef enum ep0_state {
 	EP0_STALL,
 } ep0state_e;
 
-extern int dwc_common_irq(void);
+extern int dwc_common_irq();
 #endif

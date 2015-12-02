@@ -5,7 +5,6 @@
 #include <malloc.h>
 #include <amlogic/gpio.h>
 extern int gpio_debug;
-extern void amlogic_set_highz(unsigned int pin);
 int do_gpio(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	int pin,val;

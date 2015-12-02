@@ -27,10 +27,6 @@
 //#include <stdlib.h>
 //#include <string.h>
 
-extern void *malloc (size_t len);
-extern void free(void*);
-extern void* realloc (void* ptr, size_t size);
-
 struct rand_handle {
 	uint8_t		 i;
 	uint8_t		 j;
@@ -39,8 +35,8 @@ struct rand_handle {
 	int		 tmplen;
 };
 
-//static unsigned char g_Seed[32] ={0};
-//static unsigned long g_ulSendlen = 0;
+static unsigned char g_Seed[32] ={0};
+static unsigned long g_ulSendlen = 0;
 ////////////////////////////////////////////////
 static inline void
 rand_init(rand_t *rand)
@@ -94,7 +90,7 @@ rand_open(void)
 	gettimeofday(tv, NULL);
 #endif
 #endif
-	if ((r = (rand_t *)malloc(sizeof(*r))) != NULL) {
+	if ((r = malloc(sizeof(*r))) != NULL) {
 		rand_init(r);
 		rand_addrandom(r, seed, 128);
 		rand_addrandom(r, seed + 128, 128);
@@ -139,13 +135,12 @@ rand_set(rand_t *r, const void *buf, size_t len)
 	return (0);
 }
 
-#if 0
-static int rand_add(rand_t *r, const void *buf, size_t len)
+static int
+rand_add(rand_t *r, const void *buf, size_t len)
 {
 	rand_addrandom(r, (u_char *)buf, len);
 	return (0);
 }
-#endif
 
 static uint8_t
 rand_uint8(rand_t *r)
@@ -175,7 +170,6 @@ rand_uint32(rand_t *r)
 	return (val);
 }
 
-#if 0
 static int
 rand_shuffle(rand_t *r, void *base, size_t nmemb, size_t size)
 {
@@ -208,8 +202,6 @@ rand_shuffle(rand_t *r, void *base, size_t nmemb, size_t size)
 	}
 	return (0);
 }
-#endif
-
 static rand_t * rand_close(rand_t *r)
 {
 	if (r != NULL) {
@@ -220,7 +212,6 @@ static rand_t * rand_close(rand_t *r)
 	return (NULL);
 }
 
-#if 0
 static unsigned int Rand_SetSend(unsigned char *pSend, unsigned long ulSendlen)
 {
 	if(ulSendlen > 32 )
@@ -249,7 +240,6 @@ static unsigned int Rand_GenRand(unsigned char *pRand, unsigned long ulRandLen)
 	memcpy(g_Seed,pRand,g_ulSendlen);
 	return 0;
 }
-#endif
 
 int random_generate(unsigned int seed_ext,unsigned char *buf,unsigned len)
 {

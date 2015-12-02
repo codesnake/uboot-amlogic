@@ -216,9 +216,7 @@ LIBS += drivers/mmc/libmmc.o
 ifneq ($(CONFIG_NEXT_NAND),y)
 
 LIBS += drivers/mtd/libmtd.o
-#ifndef CONFIG_M3
 LIBS += drivers/mtd/nand/libnand.o
-#endif
 ifeq ($(CONFIG_JERRY_NAND_TEST),y)
 LIBS += drivers/mtd/aml_nand/libamlnand.o
 endif
@@ -658,7 +656,7 @@ $(obj)u-boot.dis:	$(obj)u-boot
 GEN_UBOOT = \
 		UNDEF_SYM=`$(OBJDUMP) -x $(LIBBOARD) $(LIBS) | \
 		sed  -n -e 's/.*\($(SYM_PREFIX)__u_boot_cmd_.*\)/-u\1/p'|sort|uniq`;\
-		cd $(LNDIR) && $(LD) --no-enum-size-warning $(LDFLAGS) $(LDFLAGS_$(@F)) $$UNDEF_SYM $(__OBJS) \
+		cd $(LNDIR) && $(LD) $(LDFLAGS) $(LDFLAGS_$(@F)) $$UNDEF_SYM $(__OBJS) \
 			--start-group $(__LIBS)  	--end-group $(PLATFORM_LIBS) \
 			-Map $(obj)u-boot.map -o u-boot
 $(obj)u-boot:	depend \

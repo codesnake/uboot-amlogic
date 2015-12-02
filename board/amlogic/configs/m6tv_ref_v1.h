@@ -209,7 +209,7 @@
 #define CONFIG_VIDEO_AML
 #define CONFIG_VIDEO_AMLLCD
 #define CONFIG_CMD_BMP
-#define LCD_BPP LCD_COLOR24
+#define LCD_BPP LCD_COLOR32
 #define LCD_TEST_PATTERN
 
 /*config tv cold power on*/

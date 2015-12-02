@@ -19,6 +19,8 @@ int cfg_ddr_mode = CFG_DDR_MODE;
 
 void set_ddr_clock(struct ddr_set * timing_reg)
 {
+	int n_pll_try_times = 0;
+ 
 	#if defined(CONFIG_VLSI_EMULATOR)
 	Wr_cbus(AM_ANALOG_TOP_REG1, Rd_cbus(AM_ANALOG_TOP_REG1)|1);
 	#endif //
@@ -61,7 +63,6 @@ void set_ddr_clock(struct ddr_set * timing_reg)
 		#endif
 
 		#if !defined(CONFIG_VLSI_EMULATOR)
-		int n_pll_try_times = 0;
 		PLL_LOCK_CHECK(n_pll_try_times,3);
 		#endif // #if !defined(CONFIG_VLSI_EMULATOR)
 

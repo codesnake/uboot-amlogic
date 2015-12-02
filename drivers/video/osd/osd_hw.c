@@ -73,10 +73,8 @@ static const struct vframe_operations_s osd_vf_provider =
     .put  = NULL,
 };
 
-#ifdef CONFIG_AM_VIDEO
 static struct vframe_provider_s osd_vf_prov;
 static unsigned char osd_vf_prov_init = 0;
-#endif
 
 static inline void  osd_update_3d_mode(int enable_osd1,int enable_osd2)
 {

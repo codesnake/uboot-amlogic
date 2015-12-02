@@ -12,18 +12,20 @@
 #include <asm/arch/ao_reg.h>
 #include <arc_pwr.h>
 
-extern void wait_uart_empty();
-extern void udelay__(int i);
-#ifdef CONFIG_RN5T618
-void rn5t618_set_gpio(int gpio, int output);
-#endif
+
 
 #define CONFIG_IR_REMOTE_WAKEUP 1//for M8 MBox
+#ifndef CONFIG_CEC_WAKEUP
+#define CONFIG_CEC_WAKEUP       1//for CEC function
+#endif
 
 #ifdef CONFIG_IR_REMOTE_WAKEUP
 #include "irremote2arc.c"
 #endif
 
+#ifdef CONFIG_CEC_WAKEUP
+#include <cec_tx_reg.h>
+#endif
 /*
  * i2c clock speed define for 32K and 24M mode
  */
@@ -41,7 +43,7 @@ void rn5t618_set_gpio(int gpio, int output);
 /*
  * use globle virable to fast i2c speed
  */
-volatile static unsigned char exit_reason = 0;
+static unsigned char exit_reason = 0;
 
 #ifdef CONFIG_RN5T618
 #define I2C_RN5T618_ADDR   (0x32 << 1)
@@ -50,7 +52,7 @@ volatile static unsigned char exit_reason = 0;
 #define i2c_pmu_read_w(reg)             (unsigned short)i2c_pmu_read_12(reg, 2)
 #endif
 
-volatile static unsigned char vbus_status;
+static unsigned char vbus_status;
 
 static int gpio_sel0;
 static int gpio_mask;
@@ -177,8 +179,8 @@ unsigned short i2c_pmu_read_12(unsigned int reg, int size)
 extern void delay_ms(int ms);
 void init_I2C()
 {
-	unsigned v,reg;
-	//struct aml_i2c_reg_ctrl* ctrl;
+	unsigned v,speed,reg;
+	struct aml_i2c_reg_ctrl* ctrl;
 
 		//save gpio intr setting
 	gpio_sel0 = readl(0xc8100084);
@@ -288,7 +290,7 @@ int get_charging_state()
 void rn5t618_shut_down()
 {
     unsigned char reg_coulomb[4];
-    unsigned char reg_save[4]={0};
+    unsigned char reg_save[4];
     unsigned char flag;
     int save_coulomb, curr_coulomb;
 
@@ -566,7 +568,7 @@ void rn5t618_power_on_at_24M()                                          // need 
 void rn5t618_power_off_at_32K_1()
 {
     unsigned int reg;                               // change i2c speed to 1KHz under 32KHz cpu clock
-    //unsigned int sleep_flag = readl(P_AO_RTI_STATUS_REG2);
+    unsigned int sleep_flag = readl(P_AO_RTI_STATUS_REG2);
 
 	reg  = readl(P_AO_I2C_M_0_CONTROL_REG);
 	reg &= 0xCFC00FFF;
@@ -643,6 +645,15 @@ unsigned int rn5t618_detect_key(unsigned int flags)
 	writel(readl(0xc8100080) | (1<<8),0xc8100080);
 	writel(1<<8,0xc810008c); //clear intr
 */
+#ifdef CONFIG_CEC_WAKEUP
+    udelay__(10000);
+    if(hdmi_cec_func_config & 0x1){
+        cec_power_on();
+        cec_msg.log_addr = 4;
+        remote_cec_hw_reset();
+        cec_node_init();
+    }
+#endif
 	prev_status = get_charging_state();
     do {
         /*
@@ -708,6 +719,14 @@ unsigned int rn5t618_detect_key(unsigned int flags)
 			exit_reason = 6;
 			break;
 		}
+#endif
+#ifdef CONFIG_CEC_WAKEUP
+        if(hdmi_cec_func_config & 0x1){
+          cec_handler();	
+          if(cec_msg.cec_power == 0x1){  //cec power key
+                break;
+            }
+        }
 #endif
 
 	    if((readl(P_AO_RTC_ADDR1) >> 12) & 0x1) {

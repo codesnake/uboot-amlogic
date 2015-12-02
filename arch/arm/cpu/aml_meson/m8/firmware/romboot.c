@@ -69,33 +69,17 @@ SPL_STATIC_FUNC void fw_print_info(unsigned por_cfg,unsigned stage)
 	        		case POR_1ST_SPI:
 	        			serial_puts("1st SPI\n");
 	        		break;
-                    //case POR_1ST_SPI_RESERVED:
-                    case POR_1ST_tSD_SDIO_A:
-                        if(IS_MESON_M8M2_CPU)
-                            serial_puts("1st tSD/fSD on SDIO A\n");
-                        else
-                            serial_puts("1st SPI RESERVED\n");
+	        		case POR_1ST_SPI_RESERVED:
+	        			serial_puts("1st SPI RESERVED\n");
 	        		break;
-                    //case POR_1ST_SDIO_C:
-                    case POR_1ST_eMMC_SDIO_C:
-                        if(IS_MESON_M8M2_CPU)
-                            serial_puts("1st eMMC on SDIO C\n");
-                        else
-                            serial_puts("1st SDIO C\n");
+	        		case POR_1ST_SDIO_C:
+	        			serial_puts("1st SDIO C\n");
 	        		break;
-                    //case POR_1ST_SDIO_B:
-                    case POR_1ST_eMMC_SDIO_A:
-                        if(IS_MESON_M8M2_CPU)
-                            serial_puts("1st eMMC on SDIO A\n");
-                        else
-                            serial_puts("1st SDIO B\n");
+	        		case POR_1ST_SDIO_B:
+	        			serial_puts("1st SDIO B\n");
 	        		break;
-                    //case POR_1ST_SDIO_A:
-                    case POR_1ST_tSD_SDIO_C:
-                        if(IS_MESON_M8M2_CPU)
-                            serial_puts("1st tSD/fSD on SDIO C\n");
-                        else
-                            serial_puts("1st SDIO A\n");
+	        		case POR_1ST_SDIO_A:
+	        			serial_puts("1ST SDIO A\n");
 	        		break;       				
 	        }
       }
@@ -129,9 +113,7 @@ SPL_STATIC_FUNC void fw_print_info(unsigned por_cfg,unsigned stage)
 STATIC_PREFIX int fw_load_intl(unsigned por_cfg,unsigned target,unsigned size)
 {
     int rc=0;
-#if defined(CONFIG_UCL) && !defined(CONFIG_IMPROVE_UCL_DEC) && !defined(CONFIG_VLSI_EMULATOR)
 	unsigned len;
-#endif
     unsigned temp_addr;
 
 #ifdef CONFIG_MESON_TRUSTZONE
@@ -152,7 +134,7 @@ STATIC_PREFIX int fw_load_intl(unsigned por_cfg,unsigned target,unsigned size)
 
 	if((((unsigned int)fw_load_intl >> 24) & 0xFF) != ((AHB_SRAM_BASE>>24)&0xFF))
 	{	
-		memcpy((void*)temp_addr,(void*)target,size); //here need fine tune!!
+		memcpy(temp_addr,target,size); //here need fine tune!!
 #if defined(CONFIG_AML_SECU_BOOT_V2)
 		serial_puts("Aml log : M8-TPL-SEC-DEC-1\n");
 		goto m8_tpl_dec;	
@@ -162,53 +144,16 @@ STATIC_PREFIX int fw_load_intl(unsigned por_cfg,unsigned target,unsigned size)
 	}
 
     unsigned * mem;    
-
-    unsigned int boot_device = 0;
-#define BOOT_DEVICE_NAND    5
-#define BOOT_DEVICE_SPI     4
-#define BOOT_DEVICE_SDIO3   3
-#define BOOT_DEVICE_SDIO2   2
-#define BOOT_DEVICE_SDIO1   1
-    if(IS_MESON_M8M2_CPU){
-        switch(POR_GET_1ST_CFG(por_cfg)){
-            case POR_1ST_NAND:
-                boot_device = BOOT_DEVICE_NAND; break;
-            case POR_1ST_SPI:
-                boot_device = BOOT_DEVICE_SPI; break;
-            case POR_1ST_eMMC_SDIO_C:
-            case POR_1ST_tSD_SDIO_C:
-                boot_device = BOOT_DEVICE_SDIO3; break;
-            case POR_1ST_eMMC_SDIO_A:
-            case POR_1ST_tSD_SDIO_A:
-                boot_device = BOOT_DEVICE_SDIO1; break;
-            default:
-                break;
-        }
-    }
-    else{
-        switch(POR_GET_1ST_CFG(por_cfg)){
-            case POR_1ST_NAND:
-                boot_device = BOOT_DEVICE_NAND; break;
-            case POR_1ST_SPI:
-            case POR_1ST_SPI_RESERVED:
-                boot_device = BOOT_DEVICE_SPI; break;
-            case POR_1ST_SDIO_C:
-                boot_device = BOOT_DEVICE_SDIO3; break;
-            case POR_1ST_SDIO_B:
-                boot_device = BOOT_DEVICE_SDIO2; break;
-            case POR_1ST_SDIO_A:
-                boot_device = BOOT_DEVICE_SDIO1; break;
-            default:
-                break;
-        }
-    }
-
-    switch(boot_device)
+    
+    //switch(POR_1ST_SPI)
+    switch(POR_GET_1ST_CFG(por_cfg))
     {
-        case BOOT_DEVICE_NAND:
+        case POR_1ST_NAND:
+        //case POR_1ST_NAND_RB:        	
             rc=nf_read(temp_addr,size);            
             break;
-        case BOOT_DEVICE_SPI:
+        case POR_1ST_SPI :
+        case POR_1ST_SPI_RESERVED :
             mem=(unsigned *)(NOR_START_ADDR+READ_SIZE);
             spi_init();
 #if CONFIG_UCL==0
@@ -225,7 +170,7 @@ STATIC_PREFIX int fw_load_intl(unsigned por_cfg,unsigned target,unsigned size)
             spi_secure_storage_get(NOR_START_ADDR,0,0);
 #endif
             break;
-        case BOOT_DEVICE_SDIO3:
+        case POR_1ST_SDIO_C:
         	serial_puts("Boot From SDIO C\n");
         	rc=sdio_read(temp_addr,size,POR_2ND_SDIO_C<<2);
 #ifdef CONFIG_MESON_TRUSTZONE
@@ -233,9 +178,9 @@ STATIC_PREFIX int fw_load_intl(unsigned por_cfg,unsigned target,unsigned size)
             sdio_secure_storage_get();
 #endif
         	break;
-        case BOOT_DEVICE_SDIO2:
+        case POR_1ST_SDIO_B:
         	rc=sdio_read(temp_addr,size,POR_2ND_SDIO_B<<2);break;
-        case BOOT_DEVICE_SDIO1:
+        case POR_1ST_SDIO_A:
            rc=sdio_read(temp_addr,size,POR_2ND_SDIO_A<<2);break;
            break;
         default:
@@ -292,11 +237,8 @@ STATIC_PREFIX int fw_init_extl(unsigned por_cfg)
 }
 STATIC_PREFIX int fw_load_extl(unsigned por_cfg,unsigned target,unsigned size)
 {
-    int rc = 0;
     unsigned temp_addr;
-#if defined(CONFIG_UCL) && !defined(CONFIG_IMPROVE_UCL_DEC) && !defined(CONFIG_VLSI_EMULATOR)
 	unsigned len;
-#endif
 
 #ifdef CONFIG_MESON_TRUSTZONE
 	unsigned secure_addr;
@@ -312,7 +254,7 @@ STATIC_PREFIX int fw_load_extl(unsigned por_cfg,unsigned target,unsigned size)
 
 	if((((unsigned int)fw_load_extl >> 24) & 0xFF) != ((AHB_SRAM_BASE>>24)&0xFF))
 	{	
-		memcpy((void*)temp_addr,(void*)target,size); //here need fine tune!!
+		memcpy(temp_addr,target,size); //here need fine tune!!
 #if defined(CONFIG_AML_SECU_BOOT_V2)
 		serial_puts("Aml log : M8-TPL-SEC-DEC-2\n");
 		goto m8_tpl_dec;	
@@ -321,9 +263,7 @@ STATIC_PREFIX int fw_load_extl(unsigned por_cfg,unsigned target,unsigned size)
 		goto m8_tpl_ucl_dec;
 	}
 
-    rc=sdio_read(temp_addr,size,por_cfg);  
-	if(rc)
-		return rc;
+    int rc=sdio_read(temp_addr,size,por_cfg);   
 
 #if defined(CONFIG_AML_SECU_BOOT_V2)
 m8_tpl_dec:

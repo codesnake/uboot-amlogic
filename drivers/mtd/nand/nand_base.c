@@ -2559,7 +2559,6 @@ static int nand_block_markbad(struct mtd_info *mtd, loff_t ofs)
 	return chip->block_markbad(mtd, ofs);
 }
 
-#if 0
 /**
  * nand_suspend - [MTD Interface] Suspend the NAND flash
  * @mtd:	MTD device structure
@@ -2585,7 +2584,6 @@ static void nand_resume(struct mtd_info *mtd)
 		printk(KERN_ERR "nand_resume() called for a chip which is not "
 		       "in suspended state\n");
 }
-#endif
 
 /*
  * Set default functions
@@ -2685,7 +2683,7 @@ static struct nand_flash_dev *nand_get_flash_type(struct mtd_info *mtd,
 	/* Lookup the flash id */
 	for (i = 0; nand_flash_ids[i].name != NULL; i++) {
 		if (dev_id == nand_flash_ids[i].id) {
-			type =  (struct nand_flash_dev *)&nand_flash_ids[i];
+			type =  &nand_flash_ids[i];
 			break;
 		}
 	}

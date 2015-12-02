@@ -73,7 +73,7 @@ void dsp_int_in0_irq(int arg);
 int  dsp_isa_irq(unsigned long arg)
 {
 	unsigned int status=read_arc2_irq_status();
-	//unsigned long intnum;
+	unsigned long intnum;
 	//intnum = status & VIU2_VSYNC_INT;
 	//intnum = status & VIU1_VSYNC_INT;
 	if(status)

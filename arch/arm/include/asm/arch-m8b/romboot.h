@@ -56,7 +56,7 @@
 #define POR_2ND_NEVER_CHECKED 0
 
 //** ECC mode 7, dma 528 bytes(data+parity),Short mode , no scramble
-//#define DEFAULT_ECC_MODE ((1<<23)|(1<<22)|(2<<20)|(1<<19)|(1<<17)|(7<<14)|(1<<13)|(48<<6)|1)
+#define DEFAULT_ECC_MODE ((1<<23)|(1<<22)|(2<<20)|(1<<19)|(1<<17)|(7<<14)|(1<<13)|(48<<6)|1)
 
 #define C_ROM_BOOT_DEBUG_LOG (volatile unsigned long *)(GL_DATA_ADR + 0xe0)
 //#define DEBUG_EFUSE

@@ -479,7 +479,8 @@ void aml_test_1s_clock(unsigned long* osc_clk_count1, unsigned long* osc_clk_cou
 	*osc_clk_count2 = RD_RTC(RTC_ADDR2);    		
 	WR_RTC(RTC_ADDR3, RD_RTC(RTC_ADDR3) & ~(1 << 17));  // disable count always    	   	
 }
-unsigned aml_get_gpo_dig(void)
+
+unsigned aml_get_gpo_dig()
 {
 	return (RD_RTC(RTC_ADDR1) & 0x8);
 }

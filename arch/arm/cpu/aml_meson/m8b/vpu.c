@@ -7,20 +7,12 @@
 #include <asm/arch/io.h> 
 #include <asm/arch/clock.h>
 
-#define VPU_VERION	"v03"
-
-extern void udelay(unsigned long usec);
-extern int printf(const char *fmt, ...);
-#ifdef CONFIG_OF_LIBFDT
-extern int fdt_path_offset(const void *fdt, const char *path);
-extern const char *fdt_strerror(int errval);
-extern const void *fdt_getprop(const void *fdt, int nodeoffset, const char *name, int *lenp);
-extern int fdt_check_header(const void *fdt);
-#endif
+#define VPU_VERION	"v02"
 
 typedef struct {
-	unsigned int clk_level_dft;
-	unsigned int clk_level_max;
+	unsigned int h_res;
+	unsigned int v_res;
+	unsigned int refresh_rate;
 	unsigned int clk_level;
 }VPU_Conf_t;
 
@@ -50,8 +42,9 @@ static unsigned int vpu_clk_setting[][3] = {
 };
 
 static VPU_Conf_t vpu_config = {
-	.clk_level_dft = CLK_LEVEL_DFT,
-	.clk_level_max = CLK_LEVEL_MAX,
+	.h_res = 2048,
+	.v_res = 1536,
+	.refresh_rate = 60,	//Hz
 	.clk_level = CLK_LEVEL_DFT,
 };
 
@@ -63,8 +56,8 @@ static unsigned int get_vpu_clk_level(unsigned int video_clk)
 	
 	video_bw = video_clk + 2000000;
 
-	for (i=0; i<vpu_config.clk_level_max; i++) {
-		if (video_bw <= vpu_clk_setting[i][0])
+	for (i=0; i<CLK_LEVEL_MAX; i++) {
+		if (video_bw <= vpu_clk_setting[i][0])			
 			break;
 	}
 	clk_level = i;
@@ -113,14 +106,14 @@ static int set_vpu_clk(unsigned int vclk)
 		clk_level = vclk;
 	}
 
-	if (clk_level >= vpu_config.clk_level_max) {
+	if (clk_level >= CLK_LEVEL_MAX) {
 		ret = 1;
-		clk_level = vpu_config.clk_level_dft;
+		clk_level = CLK_LEVEL_DFT;
 		printf("vpu clk out of supported range, set to default\n");
 	}
 	
-	vpu_config.clk_level = clk_level;
 	writel(((1 << 8) | (vpu_clk_setting[clk_level][1] << 9) | (vpu_clk_setting[clk_level][2] << 0)), P_HHI_VPU_CLK_CNTL);
+	vpu_config.clk_level = clk_level;
 	printf("set vpu clk: %uHz, readback: %uHz(0x%x)\n", vpu_clk_setting[clk_level][0], get_vpu_clk(), (readl(P_HHI_VPU_CLK_CNTL)));
 
 	return ret;
@@ -152,10 +145,6 @@ static void vpu_driver_init(void)
     setbits_le32(P_RESET2_MASK, ((0x1 << 2) | (0x1<<3) | (0x1<<11) | (0x1<<15)));
 
     clrbits_le32(P_AO_RTI_GEN_PWR_SLEEP0, (0x1<<9)); // [9] VPU_HDMI
-
-    //add for power consumption tuning by VLSI team advice
-    writel(0x00000000, P_HHI_VID_CLK_CNTL2); //clear all cts_clk_gate
-    //writel(((readl(P_VPU_VPU_PWM_V0) & ~(0x3 << 29)) | (0x1 << 29)), P_VPU_VPU_PWM_V0); //disable vpu_pwm_src
 }
 
 static void vpu_driver_disable(void)
@@ -171,7 +160,7 @@ static void vpu_driver_disable(void)
     writel(0xffffffff, P_HHI_VPU_MEM_PD_REG1);
 
     // Power down VPU domain
-    setbits_le32(P_AO_RTI_GEN_PWR_SLEEP0, (0x1 << 8)); //PDN
+    clrbits_le32(P_AO_RTI_GEN_PWR_SLEEP0, (0x1 << 8)); //PDN
     clrbits_le32(P_HHI_VPU_CLK_CNTL, (1 << 8));
 }
 
@@ -189,9 +178,9 @@ static int get_vpu_config(void)
 			return ret;
 		}
 		
-		propdata = (char *)fdt_getprop(dt_addr, nodeoffset, (const char *)("clk_level"), NULL);
+		propdata = fdt_getprop(dt_addr, nodeoffset, "clk_level", NULL);
 		if(propdata == NULL){
-			vpu_config.clk_level = vpu_config.clk_level_dft;
+			vpu_config.clk_level = CLK_LEVEL_DFT;
 			printf("don't find to match clk_level in dts, use default setting.\n");
 		}
 		else {
@@ -201,7 +190,7 @@ static int get_vpu_config(void)
 #endif
 	}
 	else {
-		vpu_config.clk_level = vpu_config.clk_level_dft;
+		vpu_config.clk_level = CLK_LEVEL_DFT;
 		printf("vpu clk_level = %u\n", vpu_config.clk_level);
 	}
 	return ret;
@@ -209,15 +198,16 @@ static int get_vpu_config(void)
 
 int vpu_probe(void)
 {
+	int ret;
+
 	dts_ready = 0;
 #ifdef CONFIG_OF_LIBFDT
 #ifdef CONFIG_DT_PRELOAD
 #ifdef CONFIG_DTB_LOAD_ADDR
-	dt_addr = (char *)CONFIG_DTB_LOAD_ADDR;
+	dt_addr = CONFIG_DTB_LOAD_ADDR;
 #else
-	dt_addr = (char *)0x0f000000;
+	dt_addr = 0x0f000000;
 #endif
-	int ret;
 	ret = fdt_check_header(dt_addr);
 	if(ret < 0) {
 		printf("check dts: %s, load default vpu parameters\n", fdt_strerror(ret));
@@ -228,8 +218,6 @@ int vpu_probe(void)
 #endif
 #endif
 	
-	vpu_config.clk_level_dft = CLK_LEVEL_DFT;
-	vpu_config.clk_level_max = CLK_LEVEL_MAX;
 	get_vpu_config();
 	vpu_driver_init();
 

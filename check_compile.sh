@@ -10,13 +10,6 @@
 #./check_compile.sh cus        -check customer board configs (ref: customer/board/boards.cfg)
 #./check_compile.sh all        -check both amlogic and customer boards
 
-#Support user defined filter.
-#  eg:
-#    ./check_compile.sh m8b  //compile all m8baby config in board/amlogic
-#    ./check_compile.sh m8_  //compile all m8 config in board/amlogic
-#    ./check_compile.sh skt  //compile all socket config in board/amlogic
-#    ./check_compile.sh m6   //compile all m6x(m6,m6l,m6s,m6tv.etc..) config in board/amlogic
-#    ./check_compile.sh m6_  //compile all m6 config in board/amlogic
 
 declare -a cfg_file=[]
 declare filter="$1"

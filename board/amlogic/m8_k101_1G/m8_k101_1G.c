@@ -501,7 +501,7 @@ static void board_i2c_init(void)
 #endif
 }
 
-void wifi_power_init(void)
+void wifi_power_init()
 {
 	printf("mcli -- wifi_power_init in uboot --\n");
 	clrbits_le32(P_AO_GPIO_O_EN_N,1<<22);
@@ -609,7 +609,7 @@ static int do_msr(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 	//printf("\n");
 	for(;((nIndex < 64) && nCounter);nCounter--,nIndex++)
-		printf("MSR clock[%d] = %dMHz\n",nIndex,(int)clk_util_clk_msr(nIndex));
+		printf("MSR clock[%d] = %dMHz\n",nIndex,clk_util_clk_msr(nIndex));
 
 	return 0;
 	

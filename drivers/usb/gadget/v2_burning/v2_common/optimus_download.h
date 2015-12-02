@@ -67,32 +67,16 @@ unsigned v2_key_burn(const char* keyName, const u8* keyVal, const unsigned keyVa
 //      Back buf                          Transfer buf
 //TODO: move memory mapping to comman shared header file
 //FIXME:Make sure [0x818<<20, 0x839<<20] not used by others
-//[Buffer 0] DRAM_START, DRAM_START+2M, This range can't be accessed
-//[Buffer 1] Buffer to Back up partition image data that not write back to flash, 
 #define OPTIMUS_SPARSE_IMG_LEFT_DATA_ADDR_LOW   (DDR_MEM_ADDR_START + (2U<<20))//Don't access First 1M address 
 #define OPTIMUS_SPARSE_IMG_LEFT_DATA_MAX_SZ    (0X2<<20) //back up address for sparse image, 2M
 
-//[Buffer 2] This 64M buffer is used to cache image data received from USB download,
-//            This Buffer size  should be 64M, other size has pending bugs when sparse image is very large.
+//this buffer can't be 0x800u<<20 as sparse move data to the left
 #define OPTIMUS_DOWNLOAD_TRANSFER_BUF_ADDR      (OPTIMUS_SPARSE_IMG_LEFT_DATA_ADDR_LOW + OPTIMUS_SPARSE_IMG_LEFT_DATA_MAX_SZ)
 #define OPTIMUS_DOWNLOAD_TRANSFER_BUF_TOTALSZ   (0X40<<20)//64M
-
+#define OPTIMUS_DOWNLOAD_SPARSE_INFO_FOR_VERIFY (OPTIMUS_DOWNLOAD_TRANSFER_BUF_ADDR + OPTIMUS_DOWNLOAD_TRANSFER_BUF_TOTALSZ)//for Back up sparse chunk headers 
 #define OPTIMUS_DOWNLOAD_SLOT_SZ                (64<<10)    //64K
 #define OPTIMUS_DOWNLOAD_SLOT_SZ_SHIFT_BITS     (16)    //64K
 #define OPTIMUS_DOWNLOAD_SLOT_NUM               (OPTIMUS_DOWNLOAD_TRANSFER_BUF_TOTALSZ/OPTIMUS_DOWNLOAD_SLOT_SZ)
-
-//[Buffer 3] This buffer is used to Back up sparse chunk headers for verifying sparse image
-#define OPTIMUS_DOWNLOAD_SPARSE_INFO_FOR_VERIFY (OPTIMUS_DOWNLOAD_TRANSFER_BUF_ADDR + OPTIMUS_DOWNLOAD_TRANSFER_BUF_TOTALSZ)
-#define OPTIMUS_DOWNLOAD_SPS_VERIFY_BACK_INFO_SZ (0x2U<<20)
-
-//[Buffer 4] This buffer is used for filling filled-value CHUNK_TYPE_FILL type sparse chunk,
-#define OPTIMUS_SPARSE_IMG_FILL_VAL_BUF         (OPTIMUS_DOWNLOAD_SPARSE_INFO_FOR_VERIFY + OPTIMUS_DOWNLOAD_SPS_VERIFY_BACK_INFO_SZ)
-#define OPTIMUS_SPARSE_IMG_FILL_BUF_SZ          OPTIMUS_DOWNLOAD_SLOT_SZ
-
-//[Buffer 5] This buffer is used to cache logo resources for upgrading
-////buffer to display logo, 10M used now
-#define OPTIMUS_DOWNLOAD_DISPLAY_BUF            (OPTIMUS_SPARSE_IMG_FILL_VAL_BUF + OPTIMUS_DOWNLOAD_SLOT_SZ)
-#define OPTIMUS_DOWNLOAD_BUF_FREE_USE           (OPTIMUS_DOWNLOAD_DISPLAY_BUF + (10U<<20))//free buffer not used by downloading, 2 + 64 + 2 + 10 
 
 #define OPTIMUS_VFAT_IMG_WRITE_BACK_SZ          (OPTIMUS_DOWNLOAD_SLOT_SZ*1)//update complete alogrithm if change it
 #define OPTIMUS_SIMG_WRITE_BACK_SZ              OPTIMUS_DOWNLOAD_TRANSFER_BUF_TOTALSZ
@@ -105,6 +89,9 @@ unsigned v2_key_burn(const char* keyName, const u8* keyVal, const unsigned keyVa
 //As key size < 64K, So buffer [OPTIMUS_SPARSE_IMG_LEFT_DATA_ADDR_LOW, OPTIMUS_DOWNLOAD_TRANSFER_BUF_ADDR) not used when download key
 #define OPTIMUS_KEY_DECRYPT_BUF                 OPTIMUS_SPARSE_IMG_LEFT_DATA_ADDR_LOW//buffer for decrypt the key
 #define OPTIMUS_KEY_DECRYPT_BUF_SZ              OPTIMUS_DOWNLOAD_SLOT_SZ              
+
+#define OPTIMUS_DOWNLOAD_DISPLAY_BUF            (OPTIMUS_DOWNLOAD_SPARSE_INFO_FOR_VERIFY + (2U<<20))//buffer to display logo, 10M used now
+#define OPTIMUS_DOWNLOAD_BUF_FREE_USE           (OPTIMUS_DOWNLOAD_DISPLAY_BUF + (10U<<20))//free buffer not used by downloading, 2 + 64 + 2 + 10 
 
 #define COMPILE_TIME_ASSERT(expr)       typedef char assert_type[(expr) ? 1 : -1]
 

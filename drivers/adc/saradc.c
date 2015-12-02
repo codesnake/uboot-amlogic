@@ -240,18 +240,6 @@ enum {
 static u8 g_chan_mux[AML_ADC_SARADC_CHAN_NUM] = {0,1,2,3,4,5,6,7};
 
 extern int printf(const char *fmt, ...);
-#define set_bits	WRITE_CBUS_REG_BITS
-#define enable_bandgap()    set_bits(SAR_ADC_DELTA_10, 1, 10, 1)
-#define disable_bandgap()   set_bits(SAR_ADC_DELTA_10, 0, 10, 1)
-#define set_trimming(x)     set_bits(SAR_ADC_DELTA_10, x, 11, 4)
-#define enable_temp__()     set_bits(SAR_ADC_DELTA_10, 1, 15, 1)
-#define disable_temp__()    set_bits(SAR_ADC_DELTA_10, 0, 15, 1)
-#define enable_temp()       set_bits(SAR_ADC_DELTA_10, 1, 26, 1)
-#define disable_temp()      set_bits(SAR_ADC_DELTA_10, 0, 26, 1)
-#define select_temp()       set_bits(SAR_ADC_DELTA_10, 1, 27, 1)
-#define unselect_temp()     set_bits(SAR_ADC_DELTA_10, 0, 27, 1)
-#define set_trimming1(x)    set_bits(HHI_DPLL_TOP_0, x, 9, 1)
-
 
 void saradc_enable(void)
 {
@@ -308,10 +296,7 @@ void saradc_enable(void)
 	printf("ADCREG ch10 sw =%x\n",READ_CBUS_REG(SAR_ADC_CHAN_10_SW));
 	printf("ADCREG detect&idle=%x\n",READ_CBUS_REG(SAR_ADC_DETECT_IDLE_SW));
 #endif //AML_ADC_SAMPLE_DEBUG
-	select_temp();
-	enable_temp();
-	enable_temp__();
-	udelay(1000);
+
 }
 
 int get_adc_sample(int chan)
@@ -373,30 +358,3 @@ int saradc_disable(void)
 	
 	return 0;
 }
-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
-int get_tsc(int temp)
-{
-    int Vmeasure,TS_C;
-    Vmeasure = temp-392;	//ADC_code should be used in decimal here
-    printf("Vmeasure=%d\n",Vmeasure);
-    TS_C = ((Vmeasure*18*5)/1023)+8;	//Please note this expression is only valid for old-version of M8.((Vmeasure-0.75)/0.05+8) for version-B
-    printf("TS_C=%d\n",TS_C);
-
-    if(TS_C>15)
-        TS_C=15;
-    else if(TS_C<0)
-        TS_C=0;
-    printf("TS_C=%d\n",TS_C);
-    return TS_C;
-}
-unsigned int get_cpu_temp(int tsc,int flag)
-{
-    if (flag)
-        set_trimming(tsc & 0x0f);
-    else
-        set_trimming(8);
-    if(!IS_MESON_M8_CPU)
-        set_trimming1(tsc>>4);
-    return  get_adc_sample(6);
-}
-#endif

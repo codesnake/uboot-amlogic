@@ -50,7 +50,6 @@
 #define CONFIG_UNIFY_KEY_MANAGE 1       //Support burning key with usb tool
 
 //Enable storage devices
-#define CONFIG_CMD_CPU_TEMP
 #define CONFIG_CMD_NAND  1
 #define CONFIG_VIDEO_AML 1
 #define CONFIG_CMD_BMP 1
@@ -70,7 +69,7 @@
 //#define CONFIG_IR_REMOTE 1
 #define CONFIG_L2_OFF	 1
 
-//#define CONFIG_CMD_NET   1
+#define CONFIG_CMD_NET   1
 #if defined(CONFIG_CMD_NET)
 	#define CONFIG_AML_ETHERNET 1
 	#define RMII_PHY_INTERFACE    1
@@ -122,7 +121,7 @@
  */
 #define CONFIG_POWER_SPL                            // init power for all domians, must have
 #define CONFIG_VCCK_VOLTAGE             1050        // CPU core voltage when boot, must have
-#define CONFIG_VDDAO_VOLTAGE            1050        // VDDAO voltage when boot, must have
+#define CONFIG_VDDAO_VOLTAGE            1100        // VDDAO voltage when boot, must have
 #define CONFIG_DDR_VOLTAGE              1500        // DDR voltage when boot, must have
 
 #define CONFIG_IOREF_1V8                1800        // IOREV_1.8v voltage when boot, option
@@ -198,11 +197,12 @@
 	"console=ttyS0,115200n8\0" \
 	"bootm_low=0x00000000\0" \
 	"bootm_size=0x80000000\0" \
+	"mmcargs=setenv bootargs console=${console} " \
 	"boardname=m8_board\0" \
 	"chipname=8726m8\0" \
 	"upgrade_step=0\0" \
 	"initrd_high=60000000\0" \
-	"bootargs=init=/init console=ttyS0,115200n8 no_console_suspend ramoops.mem_address=0x04e00000 ramoops.mem_size=0x100000 ramoops.record_size=0x8000 ramoops.console_size=0x4000 logo=osd1,loaded,panel,debug\0" \
+	"bootargs=init=/init console=ttyS0,115200n8 no_console_suspend logo=osd1,loaded,panel,debug\0" \
 	"preloaddtb=imgread dtb boot ${loadaddr}\0" \
 	"video_dev=panel\0" \
 	"display_width=768\0" \
@@ -238,15 +238,16 @@
                 "run upgrade_check;"\
 		"get_rebootmode; clear_rebootmode; magic_checkstatus 1; echo reboot_mode=${reboot_mode} magic=${magic_key_status};" \
 		"usbbc; run batlow_or_not; setenv sleep_count 0; "\
-                "run switch_bootmode;" \
-         "\0"\
+                "run switch_bootmode" \
+                "\0"\
    	"upgrade_check="\
                 "if itest ${upgrade_step} == 3; then run update; fi; "\
                 "if itest ${upgrade_step} == 1; then defenv; setenv upgrade_step 2; saveenv; fi; "\
                 "\0"\
         "prepare="\
-                "video open; video dev bl_on;"\
-                "imgread pic logo poweron ${loadaddr_misc};"\
+                "video open; video clear; video dev bl_on;"\
+                "imgread res logo ${loadaddr_misc};"\
+                "unpackimg ${loadaddr_misc};"\
                 "\0"\
         "switch_bootmode="\
 		"if test ${reboot_mode} = normal; then "\
@@ -256,7 +257,7 @@
 		"else if test ${reboot_mode} = update; then "\
 			"run update; "\
 		"else if test ${reboot_mode} = usb_burning; then "\
-			"run prepare; run usb_burning; "\
+			"run usb_burning; "\
 		"else if test ${magic_key_status} = update; then "\
 			"run update; "\
 		"else if test ${magic_key_status} = poweron; then "\
@@ -282,8 +283,6 @@
 		"fi; fi;" \
                  "\0"\
         "charging="\
-                "imgread res logo ${loadaddr_misc};"\
-                "unpackimg ${loadaddr_misc};"\
 		"video clear;"\
 		"while itest 1 == 1; do "\
 			"get_batcap; "\
@@ -314,12 +313,11 @@
 		"else "\
 			"get_batcap; "\
 			"if itest ${battery_cap} < ${batlow_threshold}; "\
-				"then run batlow_warning; video dev disable; poweroff; "\
+				"then run prepare; run batlow_warning; video dev disable; poweroff; "\
 			"fi; "\
 		"fi;" \
                  "\0"\
         "batlow_warning="\
-                "imgread pic logo batterylow ${loadaddr_misc};"\
 		"bmp display ${batterylow_offset}; msleep 500; bmp display ${batterylow_offset}; msleep 500; "\
 		"bmp display ${batterylow_offset}; msleep 500; bmp display ${batterylow_offset}; msleep 500; "\
 		"bmp display ${batterylow_offset}; msleep 1000;"\
@@ -334,9 +332,7 @@
                 "\0"\
         "update="\
    		"echo update...; "\
-		"run prepare;"\
-                "imgread pic logo upgrade_logo ${loadaddr_misc};"\
-		"bmp display ${upgrade_logo_offset}; "\
+		"run prepare; bmp display ${upgrade_logo_offset}; "\
                 "run usb_burning; "\
                 "if mmcinfo; then "\
 			"if fatexist mmc 0 ${sdcburncfg}; then "\

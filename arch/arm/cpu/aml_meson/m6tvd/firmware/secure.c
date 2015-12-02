@@ -43,8 +43,6 @@ typedef  int  (*t_func_r1)( int a);
 typedef  int  (*t_func_r2)( int a, int b);
 typedef  int  (*t_func_r3)( int a, int b, int c);
 
-extern int printf(const char *fmt, ...);
-
 static int aml_m6tvd_sec_boot_check(unsigned char *pSRC,unsigned char *pkey1,int nkey1Len,unsigned char *pkey2,int nkey2Len)
 {	
 
@@ -118,25 +116,25 @@ static int aml_m6tvd_sec_boot_check(unsigned char *pSRC,unsigned char *pkey1,int
 	t_func_r3 fp_10 = (t_func_r3)g_action[nStep][10];//int memcmp(1,2,3)
 	t_func_r1 fp_11 = (t_func_r1)g_action[nStep][11];//int mpi_msb(1)
 
-	fp_00((int)&cb1_ctx,0,0);
+	fp_00(&cb1_ctx,0,0);
 	if(pkey1 && pkey2)
 	{	
-		if(fp_01((int)cb1_ctx.szBuf1,(int)pkey1,nkey1Len) ||	fp_01((int)cb1_ctx.szBuf2,(int)pkey2,nkey2Len))
+		if(fp_01(cb1_ctx.szBuf1,pkey1,nkey1Len) ||	fp_01(cb1_ctx.szBuf2,pkey2,nkey2Len))
 			goto exit;
-		cb1_ctx.len = ( fp_11((int)cb1_ctx.szBuf1 ) + 7 ) >> 3;			
+		cb1_ctx.len = ( fp_11( cb1_ctx.szBuf1 ) + 7 ) >> 3;			
 	}
 	else
 	{
 		unsigned int nState  = 0;
-		fp_02((int)&nState,0,4);		
-		fp_03((int)&cb1_ctx,(nState & (1<<23)) ? 1 : 0);
+		fp_02(&nState,0,4);		
+		fp_03(&cb1_ctx,(nState & (1<<23)) ? 1 : 0);
 		cb1_ctx.len = (nState & (1<<23)) ? 256 : 128;
 	}
 	
-	fp_09((int)&chk_blk,(int)pSRC,sizeof(chk_blk));
+	fp_09((unsigned char*)&chk_blk,(unsigned char*)pSRC,sizeof(chk_blk));
 
 	for(i = 0;i< sizeof(chk_blk);i+=cb1_ctx.len)
-		if(fp_04((int)&cb1_ctx, (int)(pBuf+i), (int)(pBuf+i)))
+		if(fp_04(&cb1_ctx, pBuf+i, pBuf+i ))
 			goto exit;
 
 	if(AMLOGIC_CHKBLK_ID != chk_blk.unAMLID ||
@@ -152,17 +150,17 @@ static int aml_m6tvd_sec_boot_check(unsigned char *pSRC,unsigned char *pkey1,int
 		goto exit;
 
 	if(chk_blk.nLength2)
-		fp_09((int)pSRC,(int)(pSRC+chk_blk.nLength1),
+		fp_09((void*)pSRC,(void*)(pSRC+chk_blk.nLength1),
 			chk_blk.nLength2);
 
-	fp_09((int)szkey,(int)chk_blk.szkey2,sizeof(szkey));
-	fp_05((int)&cb2_ctx,(int)szkey );
-	fp_06((int)&szkey[32]);
+	fp_09((void*)szkey,(void*)chk_blk.szkey2,sizeof(szkey));
+	fp_05( &cb2_ctx, szkey );
+	fp_06(&szkey[32]);
 	for (i=0; i<(chk_blk.nLength4)/16; i++)
-		fp_07 ((int)&cb2_ctx, (int)&szkey[32], (int)&ct32[i*4], (int)&ct32[i*4] );
+		fp_07 ( &cb2_ctx, &szkey[32], &ct32[i*4], &ct32[i*4] );
 	
-	fp_08((int)pSRC,chk_blk.nLength3, (int)szkey, 0 );	
-	if(fp_10((int)szkey,(int)chk_blk.szkey1,32))
+	fp_08( pSRC,chk_blk.nLength3, szkey, 0 );	
+	if(fp_10(szkey,chk_blk.szkey1,32))
 		goto exit;
 
 	nRet = 0;

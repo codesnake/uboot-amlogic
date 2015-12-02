@@ -16,69 +16,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-const char * env_args_reserve[]=
-{
-"480poutputx",
-"480poutputx",
-"480poutputy",
-"480poutputwidth",
-"480poutputheight",
-"480ioutputx",
-"480ioutputy",
-"480ioutputwidth",
-"480ioutputheight",
-"576poutputx",
-"576poutputy",
-"576poutputwidth",
-"576poutputheight",
-"576ioutputx",
-"576ioutputy",
-"576ioutputwidth",
-"576ioutputheight",
-"720poutputx",
-"720poutputy",
-"720poutputwidth",
-"720poutputheight",
-"1080poutputx",
-"1080poutputy",
-"1080poutputwidth",
-"1080poutputheight",
-"1080ioutputx",
-"1080ioutputy",
-"1080ioutputwidth",
-"1080ioutputheight",
-"4k2k24hz_x",
-"4k2k24hz_y",
-"4k2k24hz_width",
-"4k2k24hz_height",
-"4k2k25hz_x",
-"4k2k25hz_y",
-"4k2k25hz_width",
-"4k2k25hz_height",
-"4k2k30hz_x",
-"4k2k30hz_y",
-"4k2k30hz_width",
-"4k2k30hz_height",
-"4k2ksmpte_x",
-"4k2ksmpte_y",
-"4k2ksmpte_width",
-"4k2ksmpte_height",
-"digitaudiooutput",
-"defaulttvfrequency",
-"has.accelerometer",
-"cecconfig",
-"cvbsmode",
-"hdmimode",
-"outputmode",
-"auto_update_enable",
-"disp.fromleft",
-NULL
-};
-
-struct gpio_chip;
-extern int gpio_amlogic_requst(struct gpio_chip *chip,unsigned offset);
-extern int gpio_amlogic_direction_output(struct gpio_chip *chip,unsigned offset, int value);
-
 #if defined(CONFIG_CMD_NET)
 /*************************************************
   * Amlogic Ethernet controller operation
@@ -673,7 +610,7 @@ static int do_msr(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 	//printf("\n");
 	for(;((nIndex < 64) && nCounter);nCounter--,nIndex++)
-		printf("MSR clock[%d] = %dMHz\n",nIndex,(int)clk_util_clk_msr(nIndex));
+		printf("MSR clock[%d] = %dMHz\n",nIndex,clk_util_clk_msr(nIndex));
 
 	return 0;
 	

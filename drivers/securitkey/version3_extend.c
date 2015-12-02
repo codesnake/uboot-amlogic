@@ -440,9 +440,8 @@ static int32_t key_item_clean(void)
 		tmp_node++;
 	}
 #endif
-	return 0;
 }
-extern int register_aes_algorithm(int storage_version);
+
 
 static int32_t key_item_parse(struct v3_key_storage_head *head)
 {

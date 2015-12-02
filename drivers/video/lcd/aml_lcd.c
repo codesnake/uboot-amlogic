@@ -351,8 +351,6 @@ int lcd_drawchars (ushort x, ushort y, uchar *str, int count)
 				}
 				bits <<= 1;
 			}
-#elif(LCD_BPP == LCD_COLOR32)
-			d=NULL;
 #endif	
 
 		}

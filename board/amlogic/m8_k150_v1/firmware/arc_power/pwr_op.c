@@ -62,12 +62,10 @@ static unsigned char exit_reason = 0;
 
 #endif  /* CONFIG_AML1216 */
 
+static unsigned char vbus_status;
 
 static int gpio_sel0;
 static int gpio_mask;
-
-extern void wait_uart_empty();
-extern void udelay__(int i);
 
 void printf_arc(const char *str)
 {
@@ -124,6 +122,7 @@ int hard_i2c_wait_complete(void)
 unsigned short hard_i2c_read1616(unsigned char SlaveAddr, unsigned short RegAddr)
 {
     unsigned short data;
+    unsigned int ctrl;
 
     // Set the I2C Address
     (*I2C_SLAVE_ADDR) = ((*I2C_SLAVE_ADDR) & ~0xff) | SlaveAddr;
@@ -240,7 +239,8 @@ int find_idx(int start, int target, int step, int size)
 extern void delay_ms(int ms);
 void init_I2C()
 {
-	unsigned v,reg;
+	unsigned v,speed,reg;
+	struct aml_i2c_reg_ctrl* ctrl;
 
 		//save gpio intr setting
 	gpio_sel0 = readl(0xc8100084);
@@ -372,7 +372,7 @@ int aml1216_set_gpio(int gpio, int val)
     unsigned int data;
 
     if (gpio > 4 || gpio <= 0) {
-        return -1;
+        return;    
     }
 
     data = (1 << (gpio + 11));
@@ -381,7 +381,7 @@ int aml1216_set_gpio(int gpio, int val)
     } else {
         i2c_pmu_write_w(PWR_UP_SW_ENABLE_ADDR, data);    
     }
-    udelay__(100);
+    udelay(100);
     return 0;
 #endif
 }
@@ -413,11 +413,14 @@ int aml1216_set_vddEE_voltage(int voltage)
 {
     int addr = 0x005d;
     int idx_to, idx_cur;
+    unsigned current;
     unsigned char val;
  
     val = i2c_pmu_read_b(addr);
     idx_cur = ((val & 0xfc) >> 2);
     idx_to = find_idx_by_vddEE_voltage(voltage, VDDEE_voltage_table);
+
+    current = idx_to*5; 
 
 #if 1                                                           // for debug
     printf_arc("\nVDDEE current set from 0x");
@@ -433,8 +436,7 @@ int aml1216_set_vddEE_voltage(int voltage)
     val |= (idx_to << 2);
 
     i2c_pmu_write_b(addr, val);
-    udelay__(5 * 100);
-    return 0;
+    __udelay(5 * 100);
 }
 
 int aml1216_get_battery_voltage()
@@ -466,7 +468,7 @@ void aml_pmu_power_ctrl(int on, int bit_mask)
 {
     unsigned short addr = on ? PWR_UP_SW_ENABLE_ADDR : PWR_DN_SW_ENABLE_ADDR;
     i2c_pmu_write_w(addr, (unsigned short)bit_mask);
-    udelay__(100);
+    udelay(100);
 }
 
 #define power_off_ao18()            aml_pmu_power_ctrl(0, 1 << AML1216_POWER_LDO3_BIT)
@@ -496,7 +498,7 @@ int aml1216_get_vsys_voltage(void)
 
     i2c_pmu_write_b(0x00AA, 0xC3);                            // select VBUS channel
     i2c_pmu_write_b(0x009A, 0x28);
-    udelay__(100);
+    udelay(100);
     val = i2c_pmu_read_w(0x00B1);
     result = ((val & 0x1f00) + (val & 0xff));
     if (result & 0x1000) {                                  // complement code
@@ -608,9 +610,10 @@ void aml1216_power_on_at_24M()
     }   
 }
 
-void aml1216_power_off_at_32K_1(void)
+void aml1216_power_off_at_32K_1()
 {
     unsigned int reg;                               // change i2c speed to 1KHz under 32KHz cpu clock
+    unsigned int sleep_flag = readl(P_AO_RTI_STATUS_REG2);
 
     reg  = readl(P_AO_I2C_M_0_CONTROL_REG);
     reg &= 0xFFC00FFF;
@@ -626,7 +629,7 @@ void aml1216_power_off_at_32K_1(void)
     power_off_vcc33();                                  // close DCDC3, VCC3.3v
 }
 
-void aml1216_power_on_at_32K_1(void)
+void aml1216_power_on_at_32K_1()
 {
     unsigned int    reg;
 
@@ -640,18 +643,18 @@ void aml1216_power_on_at_32K_1(void)
     udelay__(10);
 }
 
-void aml1216_power_off_at_32K_2(void)
+aml1216_power_off_at_32K_2()
 {
        // TODO: add code here
 }
 
-void aml1216_power_on_at_32K_2(void)
+void aml1216_power_on_at_32K_2()
 {
        // TODO: add code here
 }
 
 
-void aml1216_shut_down(void)
+void aml1216_shut_down()
 {
     i2c_pmu_write_b(0x0019, 0x10);                              // cut usb output 
     i2c_pmu_write_w(0x0084, 0x0001);                            // close boost

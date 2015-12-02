@@ -166,7 +166,7 @@ static int do_image_read_dtb(cmd_tbl_t *cmdtp, int flag, int argc, char * const 
             return __LINE__;
         }
 		else{
-            strcpy((char *)_imgLoadedPart, partName);
+            strcpy(_imgLoadedPart, partName);
 			g_nIMGReadFlag = 1;
         }
 #endif//#ifdef CONFIG_AML_SECU_BOOT_V2
@@ -184,7 +184,7 @@ static int do_image_read_dtb(cmd_tbl_t *cmdtp, int flag, int argc, char * const 
         }
     }
 
-    dtbLoadAddr = (unsigned char*)get_multi_dt_entry((unsigned int)dtbLoadAddr);
+    dtbLoadAddr = get_multi_dt_entry(dtbLoadAddr);
     if(fdt_check_header(dtbLoadAddr)){
         errorP("dtb head check failed\n");
         return __LINE__;
@@ -309,7 +309,7 @@ static int do_image_read_kernel(cmd_tbl_t *cmdtp, int flag, int argc, char * con
         }
 
         //2, check whether it load the same kernel
-        if(strcmp(partName, (const char *)_imgLoadedPart)){
+        if(strcmp(partName, _imgLoadedPart)){
             g_nIMGReadFlag = 0;
             break;//break here as user now load not the same kernel as 'imgread dtb'
         }
@@ -503,7 +503,7 @@ static int do_image_read_pic(cmd_tbl_t *cmdtp, int flag, int argc, char * const 
     unsigned char* loadaddr = 0;
     int rc = 0;
     const AmlResImgHead_t* pResImgHead = NULL;
-    //unsigned totalSz    = 0;
+    unsigned totalSz    = 0;
     uint64_t flashReadOff = 0;
     const unsigned PreloadSz = PIC_PRELOAD_SZ;//preload 8k, 124-1 pic header, If you need pack more than 123 items,  fix this
     unsigned itemIndex = 0;
@@ -558,10 +558,10 @@ static int do_image_read_pic(cmd_tbl_t *cmdtp, int flag, int argc, char * const 
             {
                     char env_name[IH_NMLEN*2];
                     char env_data[IH_NMLEN*2];
-                    unsigned picLoadAddr = (unsigned)loadaddr + (unsigned)pItem->start;
+                    unsigned picLoadAddr = loadaddr + pItem->start;
 
                     //emmc read can't support offset not align 512
-                    rc = store_read_ops((unsigned char*)partName, (unsigned char *)((picLoadAddr>>9)<<9), 
+                    rc = store_read_ops((unsigned char*)partName, (char*)((picLoadAddr>>9)<<9), 
                                     ((pItem->start>>9)<<9), pItem->size + (picLoadAddr & 0x1ff));
                     if(rc){
                             errorP("Fail to read pic at offset 0x%x\n", pItem->start);

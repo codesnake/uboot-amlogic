@@ -8,9 +8,6 @@ Linux gpio.C
 #include <asm/arch/gpio.h>
 #include <amlogic/gpio.h>
 
-extern void *malloc (size_t len);
-extern void free(void*);
-
 struct gpio_addr
 {
 	unsigned long mode_addr;
@@ -631,10 +628,10 @@ struct amlogic_gpio_desc amlogic_pins[]=
 
 int gpio_amlogic_requst(struct gpio_chip *chip,unsigned offset)
 {
-	//int ret;
+	int ret;
 	unsigned int i,reg,bit;
 	unsigned int *gpio_reg=&gpio_to_pin[offset][0];
-	//unsigned long flags;
+	unsigned long flags;
 		for(i=0;i<sizeof(gpio_to_pin[offset])/sizeof(gpio_to_pin[offset][0]);i++){
 			if(gpio_reg[i]!=NONE)
 			{
@@ -646,7 +643,6 @@ int gpio_amlogic_requst(struct gpio_chip *chip,unsigned offset)
 					printf("clear pinmux reg%d[%d]=%d\n",reg,bit,aml_get_reg32_bits(p_pin_mux_reg_addr[reg],bit,1));
 			}
 		}
-	return 0;
 }
 /* amlogic request gpio interface*/
 
@@ -655,7 +651,7 @@ int gpio_amlogic_requst(struct gpio_chip *chip,unsigned offset)
 int gpio_amlogic_direction_input(struct gpio_chip *chip,unsigned offset)
 {
 	unsigned int reg,bit;
-	//unsigned long flags;
+	unsigned long flags;
 	
 	reg=GPIO_REG(amlogic_pins[offset].out_en_reg_bit);
 	bit=GPIO_BIT(amlogic_pins[offset].out_en_reg_bit);
@@ -669,7 +665,7 @@ int gpio_amlogic_direction_input(struct gpio_chip *chip,unsigned offset)
 int gpio_amlogic_get(struct gpio_chip *chip,unsigned offset)
 {
 	unsigned int reg,bit,ret;
-	//unsigned long flags;
+	unsigned long flags;
 	
 	reg=GPIO_REG(amlogic_pins[offset].input_value_reg_bit);
 	bit=GPIO_BIT(amlogic_pins[offset].input_value_reg_bit);
@@ -681,7 +677,7 @@ int gpio_amlogic_get(struct gpio_chip *chip,unsigned offset)
 int gpio_amlogic_direction_output(struct gpio_chip *chip,unsigned offset, int value)
 {
 	unsigned int reg,bit;
-	//unsigned long flags;
+	unsigned long flags;
 	
 	if(value){
 		reg=GPIO_REG(amlogic_pins[offset].out_value_reg_bit);
@@ -703,10 +699,10 @@ int gpio_amlogic_direction_output(struct gpio_chip *chip,unsigned offset, int va
 	}
 	return 0;
 }
-void gpio_amlogic_set(struct gpio_chip *chip,unsigned offset, int value)
+void	gpio_amlogic_set(struct gpio_chip *chip,unsigned offset, int value)
 {
 	unsigned int reg,bit;
-	//unsigned long flags;
+	unsigned long flags;
 	
 	reg=GPIO_REG(amlogic_pins[offset].out_value_reg_bit);
 	bit=GPIO_BIT(amlogic_pins[offset].out_value_reg_bit);
@@ -826,7 +822,7 @@ static int amlogic_pin_to_pullup(unsigned int pin ,unsigned int *reg,unsigned in
 		return -1;
 	return 0;
 }
-static int m6_set_pullup(unsigned int pin,int val,unsigned int pullupen)
+static int m6_set_pullup(unsigned int pin,unsigned int val,unsigned int pullupen)
 {
 	unsigned int reg=0,bit=0,ret;
 	ret=amlogic_pin_to_pullup(pin,&reg,&bit);

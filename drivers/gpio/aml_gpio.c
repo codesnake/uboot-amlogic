@@ -31,11 +31,8 @@ int amlogic_get_value(unsigned int pin)
 		if(amlogic_gpio_chip.get)
 			return amlogic_gpio_chip.get(NULL,pin);
 	}
-	else{
+	else
 		printf("%d out of range\n",pin);
-		return -1;
-	}
-	return 0;
 }
 
 void amlogic_set_value(unsigned int pin,int value)

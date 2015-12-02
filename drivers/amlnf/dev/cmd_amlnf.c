@@ -259,8 +259,7 @@ int do_amlnfphy(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 	 amlnf_get_chip_size(&chipsize);
 
 	if(strcmp(cmd, "env") == 0){
-		aml_nand_dbg("env relocate");
-		env_relocate ();
+		aml_nand_dbg("env relocate");		env_relocate ();
 		return 0;
 	}
 	if(strcmp(cmd, "disprotect") == 0){

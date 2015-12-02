@@ -215,7 +215,7 @@ static void aml_m6_sec_boot_check_2RSA_key(const unsigned char *pSRC)
 		memcpy_aml(pBlk->szCHK,szCHK_temp,124);
 		
 		//int m6_aes_decrypt(unsigned char *ct,int ctlen,unsigned char *key,int keylen);
-		m6_aes_decrypt(index,(unsigned char *)pSRC,(int)(pBlk->secure.nAESLength),szAESkey,sizeof(szAESkey));
+		m6_aes_decrypt(index,pSRC,pBlk->secure.nAESLength,szAESkey,sizeof(szAESkey));
 		unsigned char szHashKey[32];
 		memset_aml(szHashKey,0,sizeof(szHashKey));
 

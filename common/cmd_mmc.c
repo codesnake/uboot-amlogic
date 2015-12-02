@@ -114,7 +114,7 @@ int do_mmcinfo (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
 	struct mmc *mmc;
 	int dev_num;
-	//int ret = 1;
+	int ret = 1;
 
 	if (argc < 2)
 		dev_num = 0;
@@ -328,7 +328,7 @@ U_BOOT_CMD(
 
 
 
-int do_mmcdump(cmd_tbl_t * cmdtp,int flag,int argc,char * const argv [ ])
+static void do_mmcdump(cmd_tbl_t * cmdtp,int flag,int argc,char * const argv [ ])
 {
 	unsigned int i =0;
 	char    buf[200] = {};
@@ -339,7 +339,7 @@ int do_mmcdump(cmd_tbl_t * cmdtp,int flag,int argc,char * const argv [ ])
 	}
 
 
-	u64 Capacity = 2909798400LL;
+	u64 Capacity = 2909798400;
 	unsigned int BlockLen = 512;
 	unsigned int MaxBlock  = Capacity/BlockLen;
 	unsigned int PRB = 0x8000;//PerReadBlock
@@ -416,7 +416,8 @@ int do_mmcdump(cmd_tbl_t * cmdtp,int flag,int argc,char * const argv [ ])
 		printf("percent:%d",100);
 
 	}
-	return 0;
+
+
 }
 
 U_BOOT_CMD(

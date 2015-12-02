@@ -12,9 +12,6 @@
 #define EFUSE_SECURE_BOOT_SET 6
 #define EFUSE_INFO 7
 
-extern ssize_t efuse_read(char *buf, size_t count, loff_t *ppos );
-extern ssize_t efuse_write(const char *buf, size_t count, loff_t *ppos );
-
 int __aml_sec_boot_check_efuse(unsigned char *pSRC)
 {	
 	return -1;
@@ -202,31 +199,30 @@ int cmd_efuse(int argc, char * const argv[], char *buf)
 
 		int nChkVal,nChkAddr;
 		nChkVal = nChkAddr = 0;
-		efuse_read((char *)&nChkVal,sizeof(nChkVal),(loff_t*)&nChkAddr);
+		efuse_read(&nChkVal,sizeof(nChkVal),(loff_t*)&nChkAddr);
 		if(((nChkVal >> 7) & 1) && ((nChkVal >> 6) & 1))
 		{
 			printf("aml log : boot key can not write twice!\n");
 			return -1;
 		}		
 	#ifdef CONFIG_MESON_TRUSTZONE
-		extern uint32_t meson_trustzone_efuse_check(unsigned char *addr);
-		if (meson_trustzone_efuse_check((unsigned char *)nAddr)) {
+		if (meson_trustzone_efuse_check(nAddr)) {
 			printf("aml log : efuse pattern check fail!\n");
 			return -1;
 		}
-		if(meson_trustzone_efuse_writepattern((const char *)nAddr, EFUSE_BYTES)){
+		if(meson_trustzone_efuse_writepattern(nAddr, EFUSE_BYTES)){
 			printf("aml log : efuse pattern write fail!\n");
 			return -1;
 		}
 	#else
-		if(aml_sec_boot_check_efuse((unsigned char *)nAddr))
+		if(aml_sec_boot_check_efuse(nAddr))
         {
 			printf("aml log : efuse pattern check fail!\n");
             return -1;
         }
 		else
 		{	unsigned int pos = 0;
-			efuse_write((const char *)nAddr, EFUSE_BYTES, (loff_t*)&pos);
+			efuse_write(nAddr, EFUSE_BYTES, (loff_t*)&pos);
 		}
 	#endif
 	}

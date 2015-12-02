@@ -18,7 +18,7 @@
 #endif /*CONFIG_AML_I2C*/
 #include <asm/arch/gpio.h>
 #include <asm/arch/reboot.h>
-//#define reboot_mode *((volatile unsigned long*)0xc8100004)
+#define reboot_mode *((volatile unsigned long*)0xc8100004)
 DECLARE_GLOBAL_DATA_PTR;
 
 

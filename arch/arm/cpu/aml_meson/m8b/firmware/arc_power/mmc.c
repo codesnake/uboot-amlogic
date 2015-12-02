@@ -43,8 +43,6 @@
 #define DELAY_10000 10000
 #endif
 
-extern void __udelay(unsigned long usec);
-
 #ifdef hx_serial_puts
   #undef hx_serial_puts
   #undef hx_serial_put_hex

@@ -1310,7 +1310,6 @@ static void init_lvds_phy(Lcd_Config_t *pConf)
 static inline void _init_display_driver(Lcd_Config_t *pConf)
 {
 	int lcd_type;
-#ifdef PRINT_DEBUG_INFO
 	const char* lcd_type_table[]={
 		"NULL",
 		"TTL",
@@ -1318,7 +1317,6 @@ static inline void _init_display_driver(Lcd_Config_t *pConf)
 		"miniLVDS",
 		"invalid",
 	};
-#endif
 
 	lcd_type = pDev->conf.lcd_basic.lcd_type;
 	PRINT_INFO("\nInit LCD type: %s.\n", lcd_type_table[lcd_type]);

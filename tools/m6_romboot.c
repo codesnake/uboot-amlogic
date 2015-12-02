@@ -41,7 +41,7 @@ int m6_write(FILE * fp_spl,FILE * fp_in ,FILE * fp_out)
 	int nINLen = ftell(fp_in);
 	nINLen = (nINLen + 0xF ) & (~0xF);
 	fseek(fp_in,0,SEEK_SET);
-	unsigned int * pAUINF = (unsigned int *)(buf+(AML_UBOOT_SINFO_OFFSET>>1));
+	unsigned int * pAUINF = (int *)(buf+(AML_UBOOT_SINFO_OFFSET>>1));
 	*pAUINF++ = READ_SIZE;  //32KB or 64KB
 	*pAUINF   = nINLen+READ_SIZE;
 	#undef AML_UBOOT_SINFO_OFFSET //for env clean up

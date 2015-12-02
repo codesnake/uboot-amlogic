@@ -8,7 +8,7 @@
 #include <linux/err.h>
 #include <partition_table.h>
 
-unsigned char *cmd_name = (unsigned char *)("store");
+unsigned char *cmd_name = "store";
 
 /***
 upgrade_read_ops:
@@ -152,7 +152,7 @@ int store_erase_ops(unsigned char *par_name, uint64_t off, uint64_t size, unsign
 			return -1;
 		}
 		
-		sprintf(str, "%s  scrub  0x%llx ",cmd_name, (long long unsigned int)0);
+		sprintf(str, "%s  scrub  0x%llx ",cmd_name, 0);
 		store_dbg("command:	%s", str);
 		ret = run_command(str, 0);
 		if(ret != 0){
@@ -169,7 +169,7 @@ bootloader:
 ***/
 int store_boot_read(unsigned char * buf, uint64_t off, uint64_t size)
 {
-	//unsigned char *name;
+	unsigned char *name;
 	uint64_t addr;
 	char	str[128];
 	int ret =0;
@@ -196,7 +196,7 @@ int store_boot_read(unsigned char * buf, uint64_t off, uint64_t size)
 
 int store_boot_write(unsigned char * buf,uint64_t off, uint64_t size)
 {
-	//unsigned char *name;
+	unsigned char *name;
 	uint64_t addr;
 	char	str[128];
 	int ret =0;
@@ -223,8 +223,8 @@ int store_boot_write(unsigned char * buf,uint64_t off, uint64_t size)
 
 int store_init(unsigned  flag)
 {
-	//unsigned char *name;
-	//unsigned long addr;
+	unsigned char *name;
+	unsigned long addr;
 	char	str[128];
 	int ret =0;
 	store_dbg("flag : %d",flag);
@@ -242,8 +242,8 @@ int store_init(unsigned  flag)
 
 int store_exit(void)
 {
-	//unsigned char *name;
-	//unsigned long addr;
+	unsigned char *name;
+	unsigned long addr;
 	char	str[128];
 	int ret =0;
 	

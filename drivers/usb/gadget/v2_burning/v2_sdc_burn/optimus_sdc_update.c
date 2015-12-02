@@ -4,10 +4,10 @@
  *              this update based on the burner is latest: (uboot for burnner can run from peripherals such as sdmmc/usb)
  *
  * \version     1.0.0
- * \date        2014-9-15
+ * \date        2013-6-20
  * \author      Sam.Wu <yihui.wu@amlogic.com>
- *				Chunyu.Song <chunyu.song@amlogic.com>
- * Copyright (c) 2014 Amlogic. All Rights Reserved.
+ *
+ * Copyright (c) 2013 Amlogic. All Rights Reserved.
  *
  */
 #include "optimus_sdc_burn_i.h"
@@ -148,15 +148,9 @@ int sdc_burn_verify(const char* verifyFile)
     int rcode = 0;
     char* argv[8];
     char  verifyCmd[64] = "";
-    char cmdBuf[64];
-    char *usb_update = getenv("usb_update");
+    char cmdBuf[64] = "fatload mmc 0 ";
 
-    if(!strcmp(usb_update,"1")){
-          sprintf(cmdBuf, "%s 0x%p %s",  "fatload usb 0 ", verifyCmd, verifyFile);
-    }
-    else{
-          sprintf(cmdBuf, "%s 0x%p %s",  "fatload mmc 0 ", verifyCmd, verifyFile);
-    }
+    sprintf(cmdBuf, "%s 0x%p %s", cmdBuf, verifyCmd, verifyFile);
     SDC_DBG("To run cmd [%s]\n", cmdBuf);
     rcode = run_command(cmdBuf, 0);
     if(rcode < 0){
@@ -177,6 +171,7 @@ int sdc_burn_verify(const char* verifyFile)
         SDC_ERR("Fail to verify\n");
         return __LINE__;
     }
+
     return 0;
 }
 
@@ -266,8 +261,7 @@ int do_sdc_update(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     const char* imgItemPath = argv[2];
     const char* fileFmt     = argc > 3 ? argv[3] : NULL;
     const char* verifyFile  = argc > 4 ? argv[4] : NULL;
-	
-	setenv("usb_update",0);
+    
 #if BURN_DBG
     printf("argc %d, %s, %s\n", argc, argv[0], argv[1]);
     if(argc < 3)

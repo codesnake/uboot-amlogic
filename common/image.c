@@ -1219,7 +1219,7 @@ int get_relocate_addr(char **of_flat_tree, __u32 rd_len, __u32 ft_len)
 		printf(" dts: not find  node %s.\n",fdt_strerror(nodeoffset));
 		return -1;
 	}
-	str = (char *)fdt_getprop(fdt_blob, nodeoffset, "aml_reserved_end", NULL);
+	str = fdt_getprop(fdt_blob, nodeoffset, "aml_reserved_end", NULL);
 	if(str == NULL){
 		printf("faild to get aml_reserved_end address\n");
 		printf("the default relocate ramdisk and fdt address-relocate_addr: 0x%x\n",relocate_addr);

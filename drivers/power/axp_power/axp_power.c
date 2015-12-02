@@ -77,7 +77,7 @@ int axp_read(int reg, uint8_t *val)
             .addr = AXP_I2C_ADDR,
             .flags = 0,
             .len = 1,
-            .buf = (__u8 *)&reg,
+            .buf = &reg,
         },
         {
             .addr = AXP_I2C_ADDR,
@@ -104,7 +104,7 @@ int axp_reads(int reg, int len, uint8_t *val)
             .addr = AXP_I2C_ADDR,
             .flags = 0,
             .len = 1,
-            .buf = (__u8 *)&reg,
+            .buf = &reg,
         },
         {
             .addr = AXP_I2C_ADDR,
@@ -171,7 +171,7 @@ int axp_update(int reg, uint8_t val, uint8_t mask)
 out:
 	return ret;
 }
-extern void mdelay(unsigned long usec);
+
 void axp_power_off(void)
 {
 	printf("[axp] send power-off command!\n");
@@ -196,8 +196,8 @@ int find_idx(int start, int target, int step, int length)
 
 void axp20_dcdc_voltage(int dcdc, int target) 
 {
-    int idx_to=0, idx_cur;
-    int addr=0, val, mask=0;
+    int idx_to, idx_cur;
+    int addr, val, mask;
     if (dcdc == 2) {
         idx_to = find_idx(700, target, 25, 64);
         addr   = 0x23; 
@@ -207,7 +207,7 @@ void axp20_dcdc_voltage(int dcdc, int target)
         addr   = 0x27; 
         mask   = 0x7f;
     }
-    axp_read(addr, (uint8_t *)&val);
+    axp_read(addr, &val);
     idx_cur = val & mask;
     
 #if 0                                                           // for debug
@@ -249,7 +249,7 @@ int set_dcdc2(u32 val)
 		printf("axp_write(): Failed!\n");
 		return -1;
 	}
-	if(axp_read(POWER20_DC2OUT_VOL, (uint8_t *)&reg_val))
+	if(axp_read(POWER20_DC2OUT_VOL, &reg_val))
 	{
 		printf("axp_read(): Failed!\n");
 		return -1;
@@ -273,7 +273,7 @@ int set_dcdc3(u32 val)
 		printf("axp_write(): Failed!\n");
 		return -1;
 	}
-	if(axp_read(POWER20_DC3OUT_VOL, (uint8_t *)&reg_val))
+	if(axp_read(POWER20_DC3OUT_VOL, &reg_val))
 	{
 		printf("axp_read(): Failed!\n");
 		return -1;
@@ -290,11 +290,7 @@ int ldo4_voltage_table[] = { 1250, 1300, 1400, 1500, 1600, 1700,
 int check_axp_regulator_for_m6_board(void)
 {
 	int ret = 0;
-	uint8_t reg_data;
-
-#if defined(CONFIG_LDO2_VOLTAGE) || defined(CONFIG_LDO4_VOLTAGE) || defined(CONFIG_LDO3_VOLTAGE)
-	uint8_t val;
-#endif
+	uint8_t reg_data, val;
 
 #ifdef CONFIG_CONST_PWM_FOR_DCDC
 	//check work mode for DCDC2 & DCDC3
@@ -340,7 +336,7 @@ int check_axp_regulator_for_m6_board(void)
 	axp_read(POWER20_LDO24OUT_VOL, &reg_data);
 	if(((reg_data>>4)&0xf)  != val)
 	{
-		val = (reg_data & 0xf0) | (val<<4);
+		val = reg_data & 0xf0 | (val<<4);
 		axp_write(POWER20_LDO24OUT_VOL, val);	//set LDO2(VDDIO_AO) to 3.000V
 		printf("Set  LDO2(VDDIO_AO) to %dmV(0x%x). But the register is 0x%x before\n", CONFIG_LDO2_VOLTAGE, val, reg_data);
 		mdelay(10);

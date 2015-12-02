@@ -23,17 +23,14 @@ int aml1218_battery_calibrate(void);
 #define AML1218_ADDR     0x35
 
 #define DBG(format, args...) printf("[AML1218]"format,##args)
+static int aml1218_curr_dir = 0;
 static int aml1218_battery_test = 0;
 static int charger_sign_bit = 0;
 
 static int pmu_init_chgvol = 0;
 static int pmu_init_chg_enabled = 0;
 static int battery_rdc = 0;
-extern int aml_i2c_xfer_slow(struct i2c_msg *msgs, int num);
-extern void mdelay(int n);
-int aml1218_get_pmu_version(void);
 int aml1218_set_charge_enable(int enable);
-int aml1218_set_full_charge_voltage(int voltage);
 int aml1218_write(int add, uint8_t val)
 {
     int ret;
@@ -178,6 +175,7 @@ int aml1218_get_battery_voltage(void)
     uint8_t val[2];
     int result = 0;
     int tmp;
+    int i;
     
     aml1218_reads(0x00AF, val, 2);        
     tmp = (((val[1] & 0x1f) << 8) + val[0]);
@@ -258,7 +256,7 @@ int aml1218_get_charge_status(int print)
      * work around for charge status register can't update problem
      */
     aml1218_read(0x00E0, &val);
-    aml1218_reads(0x00DE, (uint8_t *)&reg_all, 4);
+    aml1218_reads(0x00DE, &reg_all, 4);
     if (print) {
         printf("--charge status:0x%08x", reg_all);     
     }
@@ -336,7 +334,7 @@ static int aml1218_get_coulomber(void)
 int aml1218_get_battery_current(void)
 {
     uint8_t  buf[2] = {};
-    uint32_t tmp;
+    uint32_t tmp, i;
     int      result = 0;
 
     aml1218_reads(0x00AB, buf, 2);
@@ -352,6 +350,7 @@ int aml1218_get_battery_current(void)
 
 int aml1218_set_gpio(int pin, int val)
 {
+    int ret;
     uint32_t data;
 
     if (pin <= 0 || pin > 3 || val > 1 || val < 0) {
@@ -385,7 +384,7 @@ int aml1218_get_gpio(int pin, int *val)
     uint8_t data;
 
     if (pin <= 0 || pin > 4 || !val) {
-        printf("ERROR, invalid input value, pin = %d, val= %p\n", pin, val);
+        printf("ERROR, invalid input value, pin = %d, val= %d\n", pin, val);
         return -1;
     }
     ret = aml1218_read(0x00C4, &data);
@@ -403,7 +402,7 @@ int aml1218_get_gpio(int pin, int *val)
 }
 
 int  pmu__version = -1;
-int aml1218_get_pmu_version(void)
+int aml1218_get_pmu_version()
 {
     uint8_t val = 0; 
 
@@ -416,7 +415,6 @@ int aml1218_get_pmu_version(void)
     return pmu__version;
 }
 
-#if 0
 static int aml1218_cal_ocv(void)
 {
     int para_flag;
@@ -458,7 +456,6 @@ static int aml1218_cal_ocv(void)
     }   
     return ocv;
 }
-#endif
 
 #ifdef CONFIG_USB_DWC_OTG_HCD
 static int curr_usb_mode = 0;
@@ -474,7 +471,11 @@ int aml1218_usb_bc_process(int mode)
 
 int aml1218_set_charge_enable(int enable)
 {
+    uint8_t val = 0; 
+    uint8_t val_t = 0;
     int pmu_version = 0;
+    int charge_status = 0;
+    int ocv = 0;
     int vsys, vbat;
 
     vsys = aml1218_get_vsys_voltage();
@@ -809,10 +810,10 @@ int find_idx(int start, int target, int step, int size)
 int aml1218_set_dcdc_voltage(int dcdc, uint32_t voltage)
 {
     int addr;
-    int addr1 = 0;
+    int addr1;
     int idx_to_12;
     int idx_to_3;
-    int ret = -1;
+    int ret;
     int range = 64;
     int step  = 20000;
     int tmp1,tmp2;
@@ -834,7 +835,7 @@ int aml1218_set_dcdc_voltage(int dcdc, uint32_t voltage)
            break;
 
        case 3:
-           step  = 50000; 
+           step == 50000; 
            range = 43; 
            addr1 = 0x4f;
            break;
@@ -860,7 +861,7 @@ int aml1218_set_dcdc_voltage(int dcdc, uint32_t voltage)
     tmp4 = tmp4 << 5;
 
     if (idx_to_12 >= 0) {
-        if (dcdc == 3)
+        if (dcdc = 3)
         {
               aml1218_set_bits(addr, (uint8_t)tmp3, 0x1c); //set bit[4:2]
               aml1218_set_bits(addr, (uint8_t)tmp4, 0x60);//set bit[6:5]       
@@ -909,7 +910,7 @@ int aml1218_read16(uint32_t add, uint16_t *val)
             .addr  = AML1218_ADDR,
             .flags = I2C_M_RD,
             .len   = 2, 
-            .buf   = (uint8_t *)val,
+            .buf   = val,
         }
     };
     ret = aml_i2c_xfer_slow(msg, 2);
@@ -929,7 +930,8 @@ void aml1218_set_long_press(int ms)
     tmp = ms/100 -1; 
     val &= ~0x7f;
     val |= tmp;                                        // set power key long press to 10s
-    aml1218_set_bits(0x0090, val, 0x7f);
+    return aml1218_set_bits(0x0090, val, 0x7f);
+
 }
 
 void check_boot_up_source(void)
@@ -974,6 +976,8 @@ void check_boot_up_source(void)
         i++;
         val_total >>= 1;
     }
+    return 0;
+    
 }
 
 int aml1218_check_fault(void)
@@ -1243,7 +1247,7 @@ struct aml_pmu_driver* aml_pmu_get_driver(void)
     uint8_t val;
 
     if (aml1218_read(0x00, &val)) {
-        printf("%s, pmu check fail:%x\n", __func__, val);
+        printf("%s, pmu check fail\n", __func__, val);
         return NULL;
     }
 
@@ -1252,7 +1256,7 @@ struct aml_pmu_driver* aml_pmu_get_driver(void)
 
 static int do_pmu_reg16(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
-    int rw = 0;
+    int rw = 0, i;
     int addr;
     unsigned short val;
 
@@ -1360,7 +1364,7 @@ static uint32_t aml1218_get_chg_status(void)
 {
     uint32_t val;
 
-    aml1218_reads(0x00DE, (uint8_t *)&val, 4);
+    aml1218_reads(0x00DE, &val, 4);
     return val;
 }
 
@@ -1377,7 +1381,7 @@ int aml1218_calculate_rdc(void)
     int32_t i_lo, i_hi;
     int32_t v_lo, v_hi;
     int32_t rdc_cal = 0;
-    int32_t avg = 0;
+    int32_t avg;
     static int32_t rdc_avg = 0;
     static int32_t rdc_cnt = 0;
 
@@ -1492,7 +1496,7 @@ int aml1218_update_calibrate(int charge)
     return rdc_c;
 }
 
-struct energy_array {
+static struct energy_array {
     int     ocv;                            // mV
     int     coulomb;                        // mAh read 
     int     coulomb_p;                      // mAh @ 3700mV
@@ -1665,15 +1669,15 @@ extern struct panel_operations panel_oper;
 int aml1218_battery_calibrate(void)
 {
  #if 1 
-    uint64_t energy_c = 0;
-    uint64_t energy_p = 0;
+    int64_t energy_c = 0;
+    int64_t energy_p = 0;
     int     prev_coulomb = 0;
     int     prev_ocv  = 0;
     int     prev_ibat = 0;
     int     key;
     int     ibat_cnt = 0;
     int     i;
-    int64_t energy_top;
+    int64_t energy_top, energy_visible;
     int     base, offset, range_charge, percent, range_discharge;
     char    buf[200] = {};
     int     size;
@@ -1787,20 +1791,15 @@ int aml1218_battery_calibrate(void)
     energy_top = energy_c;
     terminal_print(0, 10, "============= RESULT FOR CHARGE ================\n");
     terminal_print(0, 11, "i,    ocv,     energy,     c,   c_e,   off,    %%\n");
-    /*
     offset = battery_energy_charge[15].coulomb_p - battery_energy_charge[2].coulomb_p;
     i = (battery_energy_charge[3].coulomb_p - battery_energy_charge[2].coulomb_p) * 100;
     if ((i / offset) >= 3) {
-        //ocv_0 = 2;
-        ocv_0 = 3; 
+        ocv_0 = 2; 
         terminal_print(0, 35, "We set zero reference ocv to 3414mV\n");
     } else {
         ocv_0 = 3;    
         terminal_print(0, 35, "We set zero reference ocv to 3555mV\n");
-    }*/
-    ocv_0 = 3;  
-    terminal_print(0, 35, "We set zero reference ocv to 3555mV\n");
-
+    }
     base = battery_energy_charge[ocv_0].coulomb_p;
     range_charge = battery_energy_charge[15].coulomb_p - base;
     for (i = 0; i < 16; i++) {
@@ -1891,7 +1890,7 @@ int aml1218_battery_calibrate(void)
         prev_ocv = ocv;
         prev_ibat = ibat;
         udelay(1000000);
-        if (ocv < 3500) {
+        if (ocv < 3350) {
             ibat_cnt++;
             if (ibat_cnt > 10) {
                 terminal_print(0, 35, "ocv is too low, we stop discharging test now!\n");

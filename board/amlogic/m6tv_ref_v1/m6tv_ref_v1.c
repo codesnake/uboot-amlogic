@@ -18,7 +18,7 @@
 #endif /*CONFIG_AML_I2C*/
 #include <asm/arch/gpio.h>
 #include <asm/arch/reboot.h>
-//#define reboot_mode *((volatile unsigned long*)0xc8100004)
+#define reboot_mode *((volatile unsigned long*)0xc8100004)
 DECLARE_GLOBAL_DATA_PTR;
 
 
@@ -922,7 +922,6 @@ struct aml_nand_device aml_nand_mid_device = {
 //@board schematic: m3_skt_v1.pdf
 //@pinmax: AppNote-M3-CorePinMux.xlsx
 //GPIOA_26 used to set VCCX2_EN: 0 to enable power and 1 to disable power
-#if 0
 static void gpio_set_vbus_power(char is_power_on)
 {
 	if(is_power_on)
@@ -948,7 +947,6 @@ static void gpio_set_vbus_power(char is_power_on)
 		set_gpio_val(GPIOA_bank_bit0_27(26), GPIOA_bit_bit0_27(26), 1);		
 	}
 }
-#endif
 
 static int usb_charging_detect_call_back(char bc_mode)
 {

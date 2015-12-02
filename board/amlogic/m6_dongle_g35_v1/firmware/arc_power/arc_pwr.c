@@ -11,11 +11,6 @@
 #include "boot_code.dat"
 #include <asm/arch/cec_tx_reg.h>
 
-extern void wait_uart_empty(void);
-extern void power_down_ddr_phy(void);
-extern void uart_reset();
-extern void init_ddr_pll(void);
-extern void __udelay(int usec);
 
 #define CONFIG_IR_REMOTE_WAKEUP 1//for M6 MBox
 #define CONFIG_CEC_WAKEUP       0//for CEC function
@@ -47,7 +42,7 @@ void store_restore_plls(int flag);
 
 #define TICK_OF_ONE_SECOND 32000
 
-#define dbg_out(s,v) f_serial_puts((const char *)(s));serial_put_hex(v,32);f_serial_puts((const char *)("\n"));wait_uart_empty();
+#define dbg_out(s,v) f_serial_puts(s);serial_put_hex(v,32);f_serial_puts('\n');wait_uart_empty();
 
 static void timer_init()
 {
@@ -82,7 +77,6 @@ unsigned delay_tick(unsigned count)
             asm("mov r0,r0");
         }
     }
-    return 0;
 }
 
 void delay_ms(int ms)
@@ -220,7 +214,7 @@ static void power_on_vcc5v(void)
 #endif
 
 /***********************/
-#if 0
+
 static void enable_iso_ee()
 {
 	writel(readl(P_AO_RTI_PWR_CNTL_REG0)&(~(1<<4)),P_AO_RTI_PWR_CNTL_REG0);
@@ -229,12 +223,11 @@ static void disable_iso_ee()
 {
 	writel(readl(P_AO_RTI_PWR_CNTL_REG0)|(1<<4),P_AO_RTI_PWR_CNTL_REG0);
 }
-#endif
+
 static void cpu_off()
 {
 	writel(readl(P_HHI_SYS_CPU_CLK_CNTL)|(1<<19),P_HHI_SYS_CPU_CLK_CNTL);
 }
-#if 0
 static void switch_to_rtc()
 {
 	// writel(readl(P_AO_RTI_PWR_CNTL_REG0)|(1<<8),P_AO_RTI_PWR_CNTL_REG0);
@@ -245,7 +238,6 @@ static void switch_to_81()
 	 writel(readl(P_AO_RTI_PWR_CNTL_REG0)&(~(1<<8)),P_AO_RTI_PWR_CNTL_REG0);
    udelay(100);
 }
-
 static void enable_iso_ao()
 {
 	 writel(readl(P_AO_RTI_PWR_CNTL_REG0)&(~(0xF<<0)),P_AO_RTI_PWR_CNTL_REG0);
@@ -262,7 +254,6 @@ static void ee_on()
 {
 	 writel(readl(P_AO_RTI_PWR_CNTL_REG0)|(0x1<<9),P_AO_RTI_PWR_CNTL_REG0);
 }
-#endif
 void restart_arm()
 {
 	//------------------------------------------------------------------------
@@ -297,17 +288,17 @@ void restart_arm()
 #define pwr_ddr_off 
 void enter_power_down()
 {
-	//unsigned v;
-	//int i;
-	//unsigned addr;
-	//unsigned gate;
+	unsigned v;
+	int i;
+	unsigned addr;
+	unsigned gate;
 	unsigned power_key;
     //unsigned char cec_repeat = 0;
     //unsigned char power_key_num = 0x0;
     //unsigned long cec_key = 0;
     //unsigned long cec_status;
-    unsigned long test_status_0=0;
-    unsigned long test_status_1=0;
+    unsigned long test_status_0;
+    unsigned long test_status_1;
     //unsigned long test_reg_0;
     //unsigned long test_reg_1;
     //unsigned long poweronflag = 0;
@@ -853,7 +844,7 @@ int main(void)
 {
 	unsigned cmd;
 	char c;
-	//int i = 0,j;
+	int i = 0,j;
 	timer_init();
 #ifdef POWER_OFF_VDDIO	
 	f_serial_puts("sleep ... off\n");
@@ -965,7 +956,7 @@ unsigned pll_settings[2][4]={{0,0,0},{0,0,0}};
 #define CONFIG_SYS_PLL_SAVE
 void store_restore_plls(int flag)
 {
-    //int i;
+    int i;
     if(flag)
     {
 #ifdef CONFIG_SYS_PLL_SAVE 

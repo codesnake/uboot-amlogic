@@ -337,6 +337,15 @@ typedef enum {
 	BL_CTL_MAX = 5,
 } BL_Ctrl_Method_t;
 
+static const char* bl_ctrl_method_table[]={
+	"gpio",
+	"pwm_negative",
+	"pwm_positive",
+	"pwm_combo",
+	"extern",
+	"null",
+};
+
 typedef enum {
 	BL_PWM_A = 0,
 	BL_PWM_B,

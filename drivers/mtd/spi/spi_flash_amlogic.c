@@ -735,7 +735,6 @@ int spi_flash_read_amlogic(struct spi_flash *flash,u32 offset, size_t len, void 
 void spi_flash_free(struct spi_flash *flash)
 {
 #ifdef CONFIG_SPI_NOR_SECURE_STORAGE
-	extern void spi_securestorage_free(void);
 	spi_securestorage_free();
 #endif
 	spi_free_slave(flash->spi);
@@ -799,9 +798,6 @@ static const struct {
 #endif
 #ifdef CONFIG_SPI_FLASH_PMDEVICE
 	{ 0, 0x7f, spi_flash_probe_pmdevice, },
-#endif
-#ifdef CONFIG_SPI_FLASH_ESMT
-	{ 0, 0x8c, spi_flash_probe_esmt, },
 #endif
 #ifdef CONFIG_SPI_FRAM_RAMTRON
 	{ 6, 0xc2, spi_fram_probe_ramtron, },
@@ -867,7 +863,6 @@ struct spi_flash *spi_flash_probe(unsigned int bus, unsigned int cs,
 	}
 	
 #ifdef CONFIG_SPI_NOR_SECURE_STORAGE
-	extern int spi_securestorage_probe(void *keypara);
 	if(spi_securestorage_probe(flash)){
 		printf("spi secure storage probe fail\n");
 	}

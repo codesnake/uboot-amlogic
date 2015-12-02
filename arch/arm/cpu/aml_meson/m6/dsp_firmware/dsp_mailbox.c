@@ -82,7 +82,7 @@ void dsp_mail_box2_irq(void)
 }
 int dsp_mailbox_send(int overwrite,int num,int cmd,const char *data,int len)
 {
-	//unsigned long flags;
+	unsigned long flags;
 	int res=-1;
 #if 0
 	local_irq_save(flags);

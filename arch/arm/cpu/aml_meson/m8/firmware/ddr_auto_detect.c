@@ -41,9 +41,9 @@ void print_ddr_channel(void){
 	}
 	else{
 		channel_set = readl(P_MMC_DDR_CTRL);
-		if(0x3==((channel_set>>24)&0x3))/*ddr 0 only*/
+		if(0x3==(channel_set>>24)&0x3)/*ddr 0 only*/
 			serial_puts("DDR 0 only");
-		else if(0x1==((channel_set>>24)&0x3))/*ddr 1 only*/
+		else if(0x1==(channel_set>>24)&0x3)/*ddr 1 only*/
 			serial_puts("DDR 1 only");
 		else /*others, 2 channels*/
 			serial_puts("DDR 0 + DDR 1");
@@ -137,7 +137,6 @@ unsigned int get_ddr_channel_num(unsigned int dmc){
 			else
 				return CFG_DDR_ONE_CHANNEL_DDR1_ONLY;
 		}
-		return 0;
 	}
 	else
 		return (dmc>>24)&0x3;
@@ -168,8 +167,8 @@ unsigned int dtar_reset(struct ddr_set * timing_reg){
 	ddr1_row_bits = GET_DDR_ROW_BITS(ddr1_size, bus_width);
 	ddr1_row_size = GET_DDR_ROW_SIZE(ddr1_row_bits);
 	timing_reg->t_mmc_ddr_ctrl = set_dmc_row(timing_reg->t_mmc_ddr_ctrl, ddr0_row_size, ddr1_row_size);
-	unsigned int dtar_addr_0_offset=0, dtar_addr_1_offset=0, dtar_addr_0, dtar_addr_1;
-	unsigned int ddr_channel_switch=0;
+	unsigned int dtar_addr_0_offset, dtar_addr_1_offset, dtar_addr_0, dtar_addr_1;
+	unsigned int ddr_channel_switch;
 	switch(ddr_channel_num){
 		case CFG_DDR_TWO_CHANNEL_SWITCH_BIT_12:
 			ddr_channel_switch = 0x0;
@@ -266,7 +265,6 @@ unsigned int dtar_reset(struct ddr_set * timing_reg){
 	//disable pctl clk
 	writel(readl(P_DDR0_CLK_CTRL) & (~1), P_DDR0_CLK_CTRL);
 	writel(readl(P_DDR1_CLK_CTRL) & (~1), P_DDR1_CLK_CTRL);
-	return 0;
 }
 #endif
 

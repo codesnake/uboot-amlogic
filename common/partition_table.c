@@ -1,20 +1,13 @@
-#include <common.h>
+
 #include <asm/arch/storage.h>
 #include <partition_table.h>
-
-extern void *malloc (size_t len);
-extern void free(void*);
 
 #define ENV_NAME   "env"
 struct partitions * part_table = NULL;
 int device_boot_flag = -1;   // indicate spi nand emmc 
 int aml_card_type = 0;
 
-#ifdef CONFIG_MESON_TRUSTZONE
-extern uint32_t meson_trustzone_acs_addr(uint32_t addr);
-#endif
-
-void show_partition_table(void)
+void show_partition_table()
 {
 	int i=0;
 	struct partitions * par_table=NULL;
@@ -35,7 +28,7 @@ void show_partition_table(void)
 void init_partiton_table(uint64_t addr)
 {
 	int i=0,j=0;
-	struct partitions * par_table = (struct partitions *)(int)addr;
+	struct partitions * par_table = (struct partitions *)addr;
 	struct partitions * tmp_table =NULL;
 	struct partitions * soure_table =NULL;
 
@@ -71,8 +64,8 @@ char * get_acs_struct_addr (char *name)
 	_acs_tmp_addr = _acs_set_addr;
 
 	while(_acs_set_addr < (_acs_tmp_addr + ACS_SET_LEN)){
-		if(!memcmp((unsigned char *)(int)_acs_set_addr, name, 4)){
-            return (char*)(int)_acs_set_addr;
+		if(!memcmp((unsigned char *)_acs_set_addr, name, 4)){
+            return _acs_set_addr;
 		}
 		_acs_set_addr  = _acs_set_addr  + 16;
 	}
@@ -80,23 +73,23 @@ char * get_acs_struct_addr (char *name)
     return NULL;
 }
 
-int  get_partition_table(void)
+int  get_partition_table()
 {
 	int ret=0;
     struct store_config *sc;
 	uint64_t addr;
 
-	addr = (uint64_t)(int)get_acs_struct_addr(TABLE_MAGIC_NAME);
+	addr = (uint64_t)get_acs_struct_addr(TABLE_MAGIC_NAME);
 	if(addr){
 		addr = addr + 12;
 #ifdef CONFIG_MESON_TRUSTZONE
 		addr =  meson_trustzone_acs_addr(addr);
 #else
-		addr = *((volatile uint64_t *)(int)addr);
+		addr = *((volatile uint64_t *)addr);
 #endif
 		// printf("get_patition_table: addr =%llx:\n",addr);
         
-		part_table =(struct partitions *)malloc((MAX_PART_NUM * sizeof(struct partitions)));
+		part_table = malloc((MAX_PART_NUM * sizeof(struct partitions)));
 		if(part_table == NULL){
 			printf("partition_table malloc failed!\n");
 			ret = -1;
@@ -112,17 +105,17 @@ int  get_partition_table(void)
 		goto exit_err;
 	}
     
-	addr = (uint64_t)(int)get_acs_struct_addr(STORE_MAGIC_NAME);
+	addr = (uint64_t)get_acs_struct_addr(STORE_MAGIC_NAME);
 	if(addr) {
 		addr = addr + 12;
 #ifdef CONFIG_MESON_TRUSTZONE
 		addr =  meson_trustzone_acs_addr(addr);
 #else
-		addr = *((volatile uint64_t *)(int)addr);
+		addr = *((volatile uint64_t *)addr);
 #endif
 		// printf("get_patition_table: store config addr %llx:\n",addr);
         
-        sc = (struct store_config *)(int)addr;
+        sc = (struct store_config *)addr;
         aml_card_type = sc->mmc_configs.type;
         printf("aml_card_type=%#x\n", aml_card_type);
 	}else{
@@ -141,7 +134,7 @@ exit_err:
 	}
 	return ret;
 }
-/*
+
 int get_storage_device_flag(int init_ret)
 {
 	printf("get_boot_device_flag: init_ret %d\n",init_ret);
@@ -174,11 +167,10 @@ int get_storage_device_flag(int init_ret)
 		return 0;
 	}
 
-	return -1;
 }
-*/
 
-void set_storage_device_flag(void)
+
+void set_storage_device_flag()
 {
 	 char  value[4];
 	 char *s =NULL;
@@ -201,18 +193,6 @@ void set_storage_device_flag(void)
 		}
 	 }
 	return ;
-}
-
-int get_storage_device_flag(void)// return -1 error;
-{
-		char *s =NULL;
-		int tmp_num = -1;
-		s = getenv("store");
-		if (!s)
-		return -1; 
-		tmp_num = simple_strtoul(s,NULL,16);
-		printf("get_storage_device_flag: store %d\n",tmp_num);
-		return tmp_num;
 }
 
 bool is_nand_exist (void) // is nand exist

@@ -4,7 +4,7 @@
 #define CONFIG_MACH_MESON8_M201  // generate M8 M201 machid number
 
 #define CONFIG_POWER_SPL
-#define CONFIG_PWM_VDDEE_VOLTAGE            1050   //VDDEE voltage when boot, must have
+#define CONFIG_PWM_VDDEE_VOLTAGE            1100   //VDDEE voltage when boot, must have
 #define CONFIG_PWM_VDDEE_SUSPEND_VOLTAGE    860	 //VDDEE voltage when suspend, must have
 #define CONFIG_SECURITYKEY
 //#define TEST_UBOOT_BOOT_SPEND_TIME
@@ -47,7 +47,6 @@
 #define CONFIG_CMD_PWM  1
 
 //Enable storage devices
-#define CONFIG_CMD_CPU_TEMP
 #define CONFIG_CMD_NAND  1
 #define CONFIG_VIDEO_AML 1
 #define CONFIG_CMD_BMP 1
@@ -139,6 +138,7 @@
 	"console=ttyS0,115200n8\0" \
 	"bootm_low=0x00000000\0" \
 	"bootm_size=0x80000000\0" \
+	"mmcargs=setenv bootargs console=${console} " \
 	"boardname=m8_board\0" \
 	"chipname=8726m8\0" \
 	"initrd_high=60000000\0" \
@@ -146,7 +146,7 @@
 	"cvbsmode=576cvbs\0" \
 	"outputmode=1080p\0" \
 	"vdac_config=0x10\0" \
-	"initargs=init=/init console=ttyS0,115200n8 no_console_suspend  ramoops.mem_address=0x04e00000 ramoops.mem_size=0x100000 ramoops.record_size=0x8000 ramoops.console_size=0x4000\0" \
+	"initargs=init=/init console=ttyS0,115200n8 no_console_suspend \0" \
 	"video_dev=tvout\0" \
 	"display_width=1920\0" \
 	"display_height=1080\0" \
@@ -174,11 +174,12 @@
 	"upgrade_step=0\0" \
 	"firstboot=1\0" \
 	"store=0\0"\
+	"wipe_data=success\0"\
 	"preloaddtb=imgread dtb boot ${loadaddr}\0" \
 	"preboot="\
         "if itest ${upgrade_step} == 3; then run prepare; run storeargs; run update; fi; "\
         "if itest ${upgrade_step} == 1; then  "\
-            "defenv_reserve_env; setenv upgrade_step 2; saveenv;"\
+            "defenv; setenv upgrade_step 2; saveenv;"\
         "fi; "\
         "run prepare;"\
         "run storeargs;"\
@@ -221,9 +222,11 @@
         	"run update;"\
         "else if test ${reboot_mode} = usb_burning; then "\
         	"run usb_burning;"\
+		"else if test ${wipe_data} = failed; then "\
+			"echo wipe_data=${wipe_data}; run recovery;"\
         "else " \
         	"  "\
-        "fi;fi;fi\0" \
+        "fi;fi;fi;fi\0" \
     \
     "prepare="\
         "logo size ${outputmode}; video open; video clear; video dev open ${outputmode};"\
@@ -245,6 +248,9 @@
         "if mmcinfo; then "\
             "if fatload mmc 0 ${loadaddr} recovery.img; then bootm;fi;"\
         "fi; "\
+        "if usb start 0; then "\
+                "if fatload usb 0 ${loadaddr} recovery.img; then bootm; fi;"\
+        "fi;"\
 	      "if imgread kernel recovery ${loadaddr}; then "\
 	        "bootm; "\
 				"else "\

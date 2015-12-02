@@ -70,7 +70,7 @@
 #define NAND_BOOT_ERASE_PROTECT_CACHE         2
 #define NAND_BOOT_ERASE_ALL   				3
 #define NAND_BOOT_SCRUB_ALL				4
-
+#define NAND_SCAN_ID_INIT				5
 
 /****nand debug flag info******/
 #define NAND_WRITE_VERIFY			1

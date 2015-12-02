@@ -279,7 +279,7 @@ static struct ddr_set __ddr_setting={
 				(CFG_DDR_RRD << 22 )|       //tRRD       //7500ps
 				(CFG_DDR_RC  << 26)),
 		
-		[1] =  (((CFG_DDR_MRD - 4) << 0 ) |		//tMRD      //4 TCK     For DDR3 and LPDDR2, the value used for tMRD is 4 plus the value programmed in these bits, i.e. tMRDvalue for DDR3 (ranges from 4 to 7)
+		[1] =  ((CFG_DDR_MRD - 4 << 0 ) |		//tMRD      //4 TCK     For DDR3 and LPDDR2, the value used for tMRD is 4 plus the value programmed in these bits, i.e. tMRDvalue for DDR3 (ranges from 4 to 7)
 				((CFG_DDR_MOD - 12) << 2 ) | //tMOD      //0: 12 TCK
 				(CFG_DDR_FAW  << 5 )  |      //tFAW      //40000ps
 				(CFG_DDR_RFC  << 11)  |      //tRFC      //160000~70312500
@@ -505,7 +505,7 @@ STATIC_PREFIX_DATA char init_script[DEBUGROM_CMD_BUF_SIZE] __attribute__((sectio
 */
 STATIC_PREFIX_DATA unsigned char __secureargs_m8[] __attribute__((section(".setting"))) = {
 	"videostreambufconfig=0x0aa00000,0x0c9fffff,0x0,0x0,0x0,0x0,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff \
-	videoframebufconfig=0x3a800000,0x3fffffff,0x0,0x0,0x0,0x0,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff \0"};
+	videoframebufconfig=0x3a800000,0x3e7fffff,0x0,0x0,0x0,0x0,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff,0xffff \0"};
 
 STATIC_PREFIX_DATA unsigned char __secureargs_m8m2[] __attribute__((section(".setting"))) = {
 	"videostreambufconfig=0x0aa00000,0x0c9FFFFF,0x0,0xff \

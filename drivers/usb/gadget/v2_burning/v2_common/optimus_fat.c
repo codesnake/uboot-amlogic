@@ -42,28 +42,25 @@ extern int device_boot_flag;
 static int v2_ext_mmc_read(__u32 startblock, __u32 nBlk, __u8 * bufptr)
 {
     int ret = 0;
-    char* usb_update = getenv("usb_update");
-    if(strcmp(usb_update,"1"))
-    {
-        //Attention: So far the work flow of sdc_burn or sdc_update after store_init(0), so device_boot_flag is setup yet!
-        if((device_boot_flag == SPI_EMMC_FLAG) || (device_boot_flag == EMMC_BOOT_FLAG))
-        {
-           	static struct mmc *mmc = NULL;
 
-        	if(!mmc)
-        	{
-            	mmc = find_mmc_device(0);
-            	if(!mmc){
-                	FAT_ERROR("Fail to find mmc 0 device");
-                	return __LINE__;
-            	}
-        	}
-        	ret = mmc_init(mmc);
-        	if(ret){
-            	FAT_ERROR("Fail to init mmc 0 device");
-            	return __LINE__;
-        	}
-    	}
+    //Attention: So far the work flow of sdc_burn or sdc_update after store_init(0), so device_boot_flag is setup yet!
+    if((device_boot_flag == SPI_EMMC_FLAG) || (device_boot_flag == EMMC_BOOT_FLAG))
+    {
+        static struct mmc *mmc = NULL;
+
+        if(!mmc)
+        {
+            mmc = find_mmc_device(0);
+            if(!mmc){
+                FAT_ERROR("Fail to find mmc 0 device");
+                return __LINE__;
+            }
+        }
+        ret = mmc_init(mmc);
+        if(ret){
+            FAT_ERROR("Fail to init mmc 0 device");
+            return __LINE__;
+        }
     }
 
     ret = disk_read(startblock, nBlk, bufptr);
@@ -1180,25 +1177,16 @@ do_fat_fclose(int fd)
     put_fd(fd);
 }
 
-// added by scy
 //if image not exist, return 0
 s64 do_fat_get_fileSz(const char* imgItemPath)
 {
     char cmdBuf[256] = "";
     int rcode = 0;
     const char* envFileSz = NULL; 
-    const char* usb_update = getenv("usb_update");
 
-	if(!strcmp(usb_update,"1"))
-    {
-    	//fatexist usb host 0 imgItemPath
-    	sprintf(cmdBuf, "fatexist usb 0 %s", imgItemPath);
-    }
-    else
-    {
-	sprintf(cmdBuf, "fatexist mmc 0 %s", imgItemPath);
-    }
-	/*SDC_DBG("to run cmd [%s]\n", cmdBuf);*/
+    //fatexist mmc 0 imgItemPath
+    sprintf(cmdBuf, "fatexist mmc 0 %s", imgItemPath);
+    /*SDC_DBG("to run cmd [%s]\n", cmdBuf);*/
     rcode = run_command(cmdBuf, 0);
     if(rcode){
         printf("fail in cmd [%s], rcode %d\n", cmdBuf, rcode);

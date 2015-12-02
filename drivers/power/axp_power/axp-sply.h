@@ -39,7 +39,7 @@
 #define AXP18_CHARGE_VBUS					POWER18_IPS_SET
 
 
-//static 	struct input_dev * powerkeydev;
+static 	struct input_dev * powerkeydev;
 
 const unsigned int AXP18_NOTIFIER_ON	=	AXP18_IRQ_EXTOV |
 											AXP18_IRQ_EXTIN |

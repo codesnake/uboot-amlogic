@@ -15,7 +15,7 @@
 #include <linux/mtd/nand_ecc.h>
 
 #if 1
-//static unsigned default_environment_size = 0;
+static unsigned default_environment_size = 0;
 struct mtd_info *nand_secure_mtd = NULL;
 static int aml_nand_read_secure (struct mtd_info *mtd, loff_t offset, u_char * buf)
 {
@@ -178,7 +178,7 @@ exit:
 
  int aml_nand_save_secure(struct mtd_info *mtd, u_char *buf)
 {
-	struct env_free_node_t *secure_free_node=NULL, *secure_tmp_node;
+	struct env_free_node_t *secure_free_node, *secure_tmp_node;
 	struct aml_nand_chip *aml_chip = mtd_to_nand_chip(mtd);
 	struct erase_info  *nand_erase_info;
 	int error = 0, pages_per_blk, i = 1;
@@ -219,7 +219,7 @@ exit:
 				goto exit;
 			}
 
-			secure_tmp_node = (struct env_free_node_t *)(aml_chip->aml_nandsecure_info->secure_valid_node);
+			secure_tmp_node = aml_chip->aml_nandsecure_info->secure_valid_node;
 
 			secure_free_node = aml_chip->aml_nandsecure_info->secure_free_node;
 
@@ -296,7 +296,7 @@ static int aml_nand_secure_init(struct mtd_info *mtd)
 	struct nand_chip *chip = &aml_chip->chip;
 	struct secure_oobinfo_t *secure_oobinfo;
 	struct env_free_node_t *secure_free_node, *secure_tmp_node, *secure_prev_node;
-	int error = 0, err, start_blk, tmp_blk, secure_blk, i, pages_per_blk, max_env_blk, phys_erase_shift;
+	int error = 0, err, start_blk, tmp_blk, secure_blk, i, j, pages_per_blk, bad_blk_cnt = 0, max_env_blk, phys_erase_shift;
 	loff_t offset;
 	unsigned char *data_buf;
 	unsigned int remain_start_block,remain_tatol_block,remain_block,total_blk;
@@ -359,7 +359,6 @@ static int aml_nand_secure_init(struct mtd_info *mtd)
 	aml_chip->aml_nandsecure_info->end_block = total_blk;
 	printk("%s,%d : secure start blk %d \n",__func__,__LINE__,aml_chip->aml_nandsecure_info->start_block);	
 #else
-	int bad_blk_cnt = 0;
 	offset = mtd->size - mtd->erasesize;
 	remain_start_block = (int)(offset >> phys_erase_shift);
 	remain_block = 0;
@@ -562,11 +561,11 @@ exit:
 static int secure_info_check(struct mtd_info *mtd)
 {
 	struct aml_nand_chip *aml_chip = mtd_to_nand_chip(mtd);
-	//struct aml_nand_platform *plat = aml_chip->platform;
-	//struct platform_nand_chip *chip = &plat->platform_nand_data.chip;
+	struct aml_nand_platform *plat = aml_chip->platform;
+	struct platform_nand_chip *chip = &plat->platform_nand_data.chip;
 	secure_t *secure_ptr;
-	int error = 0;//, start_blk, total_blk, i, j, nr, phys_erase_shift, update_secure_flag = 0;
-	//loff_t offset;
+	int error = 0, start_blk, total_blk, i, j, nr, phys_erase_shift, update_secure_flag = 0;
+	loff_t offset;
 
 	error = aml_nand_secure_init(mtd);
 	if (error)
@@ -609,15 +608,15 @@ exit:
 
 int secure_device_init(struct mtd_info *mtd)
 {
-	//struct aml_nand_chip *aml_chip = mtd_to_nand_chip(mtd);
-	//struct aml_nand_platform *plat = aml_chip->platform;
-	//struct platform_nand_chip *chip = &plat->platform_nand_data.chip;
-	//struct aml_nand_bbt_info *nand_bbt_info;
-	//struct aml_nand_part_info *aml_nand_part;
-	//struct mtd_partition *parts;
-	//env_t *env_ptr;
-	int ret = 0;//, start_blk, total_blk, i, j, nr, phys_erase_shift;
-	//loff_t offset;
+	struct aml_nand_chip *aml_chip = mtd_to_nand_chip(mtd);
+	struct aml_nand_platform *plat = aml_chip->platform;
+	struct platform_nand_chip *chip = &plat->platform_nand_data.chip;
+	struct aml_nand_bbt_info *nand_bbt_info;
+	struct aml_nand_part_info *aml_nand_part;
+	struct mtd_partition *parts;
+	env_t *env_ptr;
+	int ret = 0, start_blk, total_blk, i, j, nr, phys_erase_shift;
+	loff_t offset;
 
     	nand_secure_mtd = mtd;
 	printk("secure_device_init : %d\n",__LINE__);
@@ -629,8 +628,8 @@ int secure_device_init(struct mtd_info *mtd)
 
 	return ret;
 
-//exit_erro:
-//	return ret;
+exit_erro:
+	return ret;
 
 }
 

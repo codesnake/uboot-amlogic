@@ -1,7 +1,7 @@
 #ifndef _CEC_TX_REG_H
 #define _CEC_TRX_REG_H
 
-//#define M6_PLL_RESET(pll)
+//#define M6_PLL_RESET(pll) \
 //	aml_write_reg32(pll,aml_read_reg32(pll) | (1<<29));
 
 //wait for pll lock

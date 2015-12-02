@@ -13,10 +13,7 @@ ifdef CONFIG_AML_SMP
 	./bin2code smp_code $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/smp.bin $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/smp.dat
 endif
 	$(MAKE) -f Makefile.$(targetComplier)
-
-ifndef CONFIG_M3
 	$(MAKE) -f Makefile.ddr_init
-endif
 
 ifdef CONFIG_AML_EXT_PGM
 	$(MAKE) -f Makefile.ft

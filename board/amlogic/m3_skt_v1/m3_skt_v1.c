@@ -35,7 +35,6 @@ static void setup_net_chip(void)
 	//disable all other pins which share the GPIOA_23
     CLEAR_CBUS_REG_MASK(PERIPHS_PIN_MUX_0,(1<<6)); //LCDin_B7 R0[6]
     CLEAR_CBUS_REG_MASK(PERIPHS_PIN_MUX_7,(1<<11));//ENC_11 R7[11]
-#if 0
 	//GPIOA_23 -> 0
     CLEAR_CBUS_REG_MASK(PREG_EGPIO_O,1<<23);    //RST -> 0
     //GPIOA_23 output enable
@@ -43,16 +42,7 @@ static void setup_net_chip(void)
     udelay(2000);
 	//GPIOA_23 -> 1
     SET_CBUS_REG_MASK(PREG_EGPIO_O,1<<23);      //RST -> 1
-    udelay(2000);
-#endif
-	/* reset phy with GPIOD_7 m3_f16 board used gpiod_7 */
-    CLEAR_CBUS_REG_MASK(PREG_GGPIO_O,1<<23);    //RST -> 0
-    //GPIOD_7 output enable
-    CLEAR_CBUS_REG_MASK(PREG_GGPIO_EN_N,1<<23);
-    udelay(20000);
-	//GPIOD_7 -> 1
-    SET_CBUS_REG_MASK(PREG_GGPIO_O,1<<23);      //RST -> 1
-    udelay(20000);
+    udelay(2000);	
 }
 
 int board_eth_init(bd_t *bis)
@@ -397,14 +387,14 @@ static void gpio_set_vbus_power(char is_power_on)
 {
 	if(is_power_on)
 	{
-		set_gpio_mode(GPIOD_bank_bit0_9(9), GPIOD_bit_bit0_9(9), GPIO_OUTPUT_MODE);
-		set_gpio_val(GPIOD_bank_bit0_9(9), GPIOD_bit_bit0_9(9), 1);
+		set_gpio_mode(GPIOA_bank_bit0_27(26), GPIOA_bit_bit0_27(26), GPIO_OUTPUT_MODE);
+		set_gpio_val(GPIOA_bank_bit0_27(26), GPIOA_bit_bit0_27(26), 0);
 		udelay(100000);
 	}
 	else
 	{
-		set_gpio_mode(GPIOD_bank_bit0_9(9), GPIOD_bit_bit0_9(9), GPIO_OUTPUT_MODE);
-		set_gpio_val(GPIOD_bank_bit0_9(9), GPIOD_bit_bit0_9(9), 0);
+		set_gpio_mode(GPIOA_bank_bit0_27(26), GPIOA_bit_bit0_27(26), GPIO_OUTPUT_MODE);
+		set_gpio_val(GPIOA_bank_bit0_27(26), GPIOA_bit_bit0_27(26), 1);
 	}
 }
 
@@ -413,20 +403,12 @@ static void gpio_set_vbus_power(char is_power_on)
 //USB_PHY_CLOCK_SEL_M3_XTAL_DIV2 @ 0 (12MHz)
 //USB_PHY_CLOCK_SEL_M3_DDR_PLL @ 27(336MHz); @Rev2663 M3 SKT board DDR is 336MHz
 //                                                            43 (528MHz); M3 SKT board DDR not stable for 528MHz
-struct amlogic_usb_config g_usb_config_m3_skt_a={
+struct amlogic_usb_config g_usb_config_m3_skt={
 	USB_PHY_CLOCK_SEL_M3_XTAL,
 	1, //PLL divider: (clock/12 -1)
-	CONFIG_M3_USBPORT_BASE_A,
+	CONFIG_M3_USBPORT_BASE,
 	USB_ID_MODE_SW_HOST,
 	gpio_set_vbus_power, //set_vbus_power
-};
-
-struct amlogic_usb_config g_usb_config_m3_skt_b={
-	USB_PHY_CLOCK_SEL_M3_XTAL,
-	1, //PLL divider: (clock/12 -1)
-	CONFIG_M3_USBPORT_BASE_B,
-	USB_ID_MODE_SW_HOST,
-	NULL,	//gpio_set_vbus_power, //set_vbus_power
 };
 #endif /*CONFIG_USB_DWC_OTG_HCD*/
 
@@ -445,50 +427,10 @@ int board_init(void)
 #endif /*CONFIG_AML_I2C*/
 
 #ifdef CONFIG_USB_DWC_OTG_HCD
-	board_usb_init(&g_usb_config_m3_skt_a,BOARD_USB_MODE_HOST);
-	board_usb_init(&g_usb_config_m3_skt_b,BOARD_USB_MODE_HOST);
+	board_usb_init(&g_usb_config_m3_skt);
 #endif /*CONFIG_USB_DWC_OTG_HCD*/
 	
 	return 0;
 }
 
-static int do_msr(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-	const char *cmd;
-
-	/* need at least two arguments */
-	if (argc > 2)
-		goto usage;
-
-	int nIndex = 0;
-	int nCounter = 64;
-	
-	if( 2 == argc)
-	{
-		cmd = argv[1];
-		char *endp;
-		nIndex = simple_strtoul(argv[1], &endp, 10);
-		if(nIndex < 0 || nIndex > 63)
-			goto usage;
-		nCounter = 1;
-	}	
-	
-	extern unsigned long    clk_util_clk_msr(unsigned long clk_mux);
-
-	//printf("\n");
-	for(;((nIndex < 46) && nCounter);nCounter--,nIndex++)
-		printf("MSR clock[%02d] = %03dMHz\n",nIndex,(int)clk_util_clk_msr(nIndex));
-
-	return 0;
-	
-usage:
-	return cmd_usage(cmdtp);
-}
-
-U_BOOT_CMD(
-	msr,	2, 	1,	do_msr,
-	"Meson msr sub-system",
-	" [0...63] - measure clock frequency\n"
-	"          - no clock index will measure all clock"
-);
 

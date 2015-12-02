@@ -54,7 +54,7 @@ void resume_remote_register(void)
 static int ir_remote_init_32k_mode(void)
 {
     unsigned int control_value,status,data_value;
-    //int i;
+    int i;
 
     int val = readl(P_AO_RTI_PIN_MUX_REG);
 		writel((val  | (1<<0)), P_AO_RTI_PIN_MUX_REG);
@@ -229,7 +229,7 @@ unsigned char remote_cec_ll_rx(void)
 {
 
     int i;
-    //unsigned char data = 0;
+    unsigned char data = 0;
     unsigned char ret = 0;  
     unsigned int n = 0;
     unsigned char msg[16];
@@ -284,7 +284,7 @@ void cec_buf_clear(void)
 }
 int remote_cec_ll_tx(unsigned char *msg, unsigned char len)
 {
-    int j;
+    int i,j;
     int ret = 0;
     unsigned int n = 0;
     unsigned char repeat = 3;
@@ -372,7 +372,7 @@ void cec_report_device_power_status(void)
 
 void cec_set_stream_path(void)
 {
-    //unsigned char msg[4];
+    unsigned char msg[4];
     
     unsigned char phy_addr_ab = (readl(P_AO_DEBUG_REG1) >> 8) & 0xff;
     unsigned char phy_addr_cd = readl(P_AO_DEBUG_REG1) & 0xff;
@@ -591,7 +591,7 @@ unsigned int cec_handler(void)
         if ((data_msg_stat & 0x3) == RX_DONE) {
             data_msg_num = cec_rd_reg(CEC0_BASE_ADDR + CEC_RX_NUM_MSG);
             if (data_msg_num == 1) {
-                //unsigned char rx_msg[MAX_MSG], rx_len;                
+                unsigned char rx_msg[MAX_MSG], rx_len;                
                 remote_cec_ll_rx();
                 cec_handle_message();
                 //remote_cec_ll_rx(rx_msg, &rx_len);

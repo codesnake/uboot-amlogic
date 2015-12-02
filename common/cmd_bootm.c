@@ -303,10 +303,9 @@ static int bootm_start(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 		images.rd_start = ((ulong)temp_android_hdr->kernel_size + 0x800 + (ulong)os_hdr 
 			+  ((ulong)temp_android_hdr->page_size - 1)) & (~((ulong)temp_android_hdr->page_size - 1));
 		images.rd_end = images.rd_start + (ulong)temp_android_hdr->ramdisk_size;
-		printf("    Ramdisk start addr = 0x%x, len = 0x%x\n",(unsigned int)images.rd_start,(unsigned int)(temp_android_hdr->ramdisk_size));
+		printf("    Ramdisk start addr = 0x%x, len = 0x%x\n",images.rd_start,temp_android_hdr->ramdisk_size );
 #if defined(CONFIG_OF_LIBFDT)
-		images.ft_len = (ulong)temp_android_hdr->second_size;
-		if(images.ft_len)
+		if(images.ft_len = (ulong)temp_android_hdr->second_size)
 		{
 			fdt_addr = (images.rd_end
 				+ ((ulong)temp_android_hdr->page_size - 1)) & (~((ulong)temp_android_hdr->page_size - 1));
@@ -315,7 +314,7 @@ static int bootm_start(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[]
 			images.ft_addr = (char *)fdt_addr;
 			images.ft_len = fdt_totalsize(fdt_addr);
 			printf("    Flat device tree start addr = 0x%x, len = 0x%x magic=0x%x\n",
-			(unsigned int)images.ft_addr,(unsigned int)images.ft_len,*(unsigned int*)images.ft_addr);
+			(int *)images.ft_addr,images.ft_len,*(unsigned int*)images.ft_addr);
 		}
 #endif
 		break;
@@ -896,7 +895,7 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	    printf("from main_loop start to kernel decompress finished time:%dus\n",boot_kernel_start-main_loop_start);
 	}
 #endif
-	//ulong	temp_img_addr;
+	ulong	temp_img_addr;
 
 	AML_LOG_TE("cmd_bootm");
 
@@ -1512,7 +1511,7 @@ void mem_size_arg_process(void)
 	(defined(CONFIG_SILENT_CONSOLE_LINUX_QUIET) || defined(CONFIG_DEPRECATED_SILENT_LINUX_CONSOLE))
 static void fixup_silent_linux ()
 {
-	char buf[1024], *start;
+	char buf[256], *start, *end;
 	char *cmdline = getenv ("bootargs");
 
 	/* Only fix cmdline when requested */
@@ -1522,7 +1521,6 @@ static void fixup_silent_linux ()
 	debug ("before silent fix-up: %s\n", cmdline);
 	if (cmdline) {
 #if defined(CONFIG_DEPRECATED_SILENT_LINUX_CONSOLE)
-		char *end;
 		if ((start = strstr (cmdline, "console=")) != NULL) {
 			end = strchr (start, ' ');
 			strncpy (buf, cmdline, (start - cmdline + 8));

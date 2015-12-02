@@ -43,7 +43,7 @@
 #endif
 #ifdef CONFIG_ENABLE_WATCHDOG
 #include <asm/arch/reg_addr.h>
-void reset_chip(void)
+void reset_chip()
 {
 			writel((1<<22) | (3<<24)|1000, P_WATCHDOG_TC);
 }

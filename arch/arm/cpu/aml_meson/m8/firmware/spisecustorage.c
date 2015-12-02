@@ -59,7 +59,7 @@ STATIC_PREFIX int spi_secure_storage_get(int nor_addr,int mem_addr,int size)
 	struct spi_securestorage_head_t part1_head,part2_head;
 	char part1_flag,part2_flag;
 	unsigned char magic[16];
-	unsigned char *pm = (unsigned char *)SPI_SECURESTORAGE_MAGIC;
+	unsigned char *pm = SPI_SECURESTORAGE_MAGIC;
 	mem_addr = SECURE_STORAGE_MEM_ADDR;
 	size = SECURE_STORAGE_MEM_SIZE;
 #if 0

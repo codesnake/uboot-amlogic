@@ -1,14 +1,9 @@
 //ddr pctl init code based on ucode from martin.jin, lpddr2 tuned by jiaxing.ye
 
-/*remove warnings*/
-static void ddr_udelay_nothing(unsigned long usec){
-	return;
-}
-
 #if 0
   #define ddr_udelay __udelay
 #else
-  #define ddr_udelay ddr_udelay_nothing
+  #define ddr_udelay
 #endif
 
 static void delay_us(unsigned long us)
@@ -18,29 +13,18 @@ static void delay_us(unsigned long us)
 	while((Rd_cbus(ISA_TIMERE) - nStart)< us){};
 }
 
-/*remove warnings*/
-static void serial_puts_nothing(const char * s){
-	return;
-}
-static void serial_put_hex_nothing(unsigned int data,unsigned bitlen){
-	return;
-}
-static void serial_put_dec_nothing(unsigned int data){
-	return;
-}
-
 #if 0
     #define hx_serial_puts serial_puts
 	#define hx_serial_put_hex serial_put_hex
 #else
-    #define hx_serial_puts serial_puts_nothing
-	#define hx_serial_put_hex serial_put_hex_nothing
+    #define hx_serial_puts 
+	#define hx_serial_put_hex 
 #endif
 
 #ifdef CONFIG_DDR_MODE_AUTO_DETECT
-	#define pctl_serial_puts serial_puts_nothing
-	#define pctl_serial_put_hex serial_put_hex_nothing
-	#define pctl_serial_put_dec serial_put_dec_nothing
+	#define pctl_serial_puts
+	#define pctl_serial_put_hex
+	#define pctl_serial_put_dec
 #else
 	#define pctl_serial_puts serial_puts
 	#define pctl_serial_put_hex serial_put_hex
@@ -362,7 +346,7 @@ pub_init_ddr0:
 		P_DDR0_PUB_ACIOCR0);
 
 	//configure for phy update request and ack.
-	writel(((readl(P_DDR0_PUB_DSGCR) & 0xffffffef) | (1 << 6)),
+	writel( (readl(P_DDR0_PUB_DSGCR) & 0xffffffef  | (1 << 6)),
 		P_DDR0_PUB_DSGCR );	 //other bits.
 
 	//for simulation to reduce the initial time.
@@ -773,7 +757,7 @@ DDR_INIT_BYPASS_PLL:
 
 	__udelay(1);
 
-#ifdef CONFIG_M8B_SKT_V0_DDR
+#ifdef CONFIG_M8B_SKT_V0
 	writel(0x02020202,P_DDR0_PUB_DX3BDLR0);  //jiaxing just debug for socket board
 	writel(0x02020202,P_DDR0_PUB_DX3BDLR1); //jiaxing just debug for socket board
 	writel(0x02020202,P_DDR0_PUB_DX3BDLR2); //jiaxingjust debug for socket board

@@ -1382,7 +1382,7 @@ static void print_lcd_clk_info(void)
            "cts enct clk      %uMHz\n"
            "cts encl clk      %uMHz\n"
            "lvds fifo clk     %uMHz\n\n",
-           (unsigned int)clk_util_clk_msr(12), (unsigned int)clk_util_clk_msr(10), (unsigned int)clk_util_clk_msr(9), (unsigned int)clk_util_clk_msr(24));
+           clk_util_clk_msr(12), clk_util_clk_msr(10), clk_util_clk_msr(9), clk_util_clk_msr(24));
 }
 
 static void lcd_module_enable(void)

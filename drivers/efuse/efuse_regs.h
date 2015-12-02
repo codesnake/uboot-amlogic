@@ -131,8 +131,8 @@ bit[7-0]    XOR
 
 #define	V1_EFUSE_USID_OFFSET				4
 #define	V1_EFUSE_USID_ENC_LEN				35
-#define	V1_EFUSE_USID_DATA_LEN			33
-#define 	V1_EFUSE_USID_BCH_EN				1
+#define	V1_EFUSE_USID_DATA_LEN			35
+#define 	V1_EFUSE_USID_BCH_EN				0
 #define	V1_EFUSE_USID_BCH_REVERSE		0
 
 #define 	V2_EFUSE_USID_OFFSET				454

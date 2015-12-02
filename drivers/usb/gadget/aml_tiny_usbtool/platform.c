@@ -248,7 +248,9 @@ void usb_memcpy(char * dst,char * src,int len)
 {
 	while(len--)
 	{
-		*(unsigned char*)dst++ = *(unsigned char*)src++;
+		*(unsigned char*)dst = *(unsigned char*)src;
+		(unsigned char*)dst++;
+		(unsigned char*)src++;
 	}
 }
 void usb_memcpy_32bits(int *dst,int *src,int len)

@@ -88,7 +88,7 @@ int axp_gpio_get_io(int gpio, int *io_state)
 
 int axp_gpio_set_value(int gpio, int value)
 {
-    //int io_state,ret;
+    int io_state,ret;
     /*
      * ignore preve io state, set gpio to what caller want
      */

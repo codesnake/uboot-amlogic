@@ -471,7 +471,6 @@ void reset_watchdog(void)
 #endif
 
 #ifdef CONFIG_MESON_TRUSTZONE
-extern uint32_t meson_trustzone_suspend_uboot(void);
 int meson_power_suspend(void)
 {
 	return meson_trustzone_suspend_uboot();

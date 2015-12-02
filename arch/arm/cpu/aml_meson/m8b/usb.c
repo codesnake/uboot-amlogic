@@ -95,8 +95,6 @@ void set_usb_phy_power(amlogic_usb_config_t * usb_cfg,int is_on)
 	peri_b = (usb_peri_reg_t*)CBUS_REG_ADDR(PREI_USB_PHY_REG_B);
 //	peri_c = (usb_peri_reg_t*)CBUS_REG_ADDR(PREI_USB_PHY_REG_C);
 //	peri_d = (usb_peri_reg_t*)CBUS_REG_ADDR(PREI_USB_PHY_REG_D);
-	peri_c = NULL;
-	peri_d = NULL;
 
 	if(port == USB_PHY_PORT_A){
 		peri = peri_a;
@@ -132,7 +130,7 @@ void set_usb_phy_power(amlogic_usb_config_t * usb_cfg,int is_on)
 			if(adp_bc.b.aca_pin_float){
 				printf("USB-B ID detect failed!\n");
 				printf("Please use the chip after version RevA1!\n");
-				return;
+				return -1;
 			}
 		}
 	}else{

@@ -17,7 +17,7 @@
 
 #if defined(CONFIG_AML_SMP)
 #include <smp.dat>
-SPL_STATIC_FUNC int load_smp_code(void)
+SPL_STATIC_FUNC int load_smp_code()
 {
 	//serial_puts("Start load SMP code!\n");
 	unsigned * paddr = (unsigned*)PHYS_MEMORY_START;
@@ -28,7 +28,6 @@ SPL_STATIC_FUNC int load_smp_code(void)
 		paddr++;
 	}
 	//serial_puts("Load SMP code finished!\n");
-	return 0;
 }
 #endif
 
@@ -132,7 +131,6 @@ SPL_STATIC_FUNC int load_uboot(unsigned __TEXT_BASE,unsigned __TEXT_SIZE)
 #if CONFIG_ENABLE_EXT_DEVICE_RETRY
 	while(rc)
 	{
-		extern void debug_rom(char * file, int line);
      debug_rom(__FILE__,__LINE__);
 
 	    rc=fw_init_extl(por_cfg);//INTL device  BOOT FAIL

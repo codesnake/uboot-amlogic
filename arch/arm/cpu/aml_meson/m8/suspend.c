@@ -59,7 +59,7 @@ static void wait_uart_empty(void)
 #define CONFIG_MESON_SUSPEND
 
 
-//static struct meson_pm_config *pdata;
+static struct meson_pm_config *pdata;
 
 
 #if 0
@@ -268,7 +268,7 @@ static char clks_name[CLK_COUNT][32] = {
 __u32 get_clk81_(void)
 {
 	__u32 fixed_div_src;
-	__u32 parent_clk = 2550000000LL;//2.55G
+	__u32 parent_clk = 2550000000;//2.55G
 	
 	fixed_div_src = (readl(P_HHI_MPEG_CLK_CNTL) >> 12) & 0x7;
 
@@ -476,7 +476,6 @@ static void auto_clk_gating_setup(
 #define APPF_UBOOT_FLAG        (1<<15) //call from uboot
 
 #ifdef CONFIG_MESON_TRUSTZONE
-extern uint32_t meson_trustzone_suspend_uboot(void);
 int meson_power_suspend(void)
 {
 	return meson_trustzone_suspend_uboot();

@@ -20,22 +20,14 @@ extern int printf(const char *fmt, ...);
 extern void __efuse_write_byte( unsigned long addr, unsigned long data );
 extern void __efuse_read_dword( unsigned long addr, unsigned long *data);
 extern void efuse_init(void);
-#ifdef CONFIG_EFUSE
-struct efuse_hal_api_arg;
-extern int32_t meson_trustzone_efuse(struct efuse_hal_api_arg* arg);
-#endif
 
 ssize_t efuse_read(char *buf, size_t count, loff_t *ppos )
 {
-	unsigned pos = *ppos;
-#ifndef CONFIG_MESON_TRUSTZONE
-    unsigned residunt = pos%4;
-#endif
-#ifndef CONFIG_MESON_TRUSTZONE
     unsigned long contents[EFUSE_DWORDS];
+	unsigned pos = *ppos;
     unsigned long *pdw;
+    unsigned residunt = pos%4;
     unsigned int dwsize = (count+residunt+3)>>2;
-#endif
     
 	if (pos >= EFUSE_BYTES)
 		return 0;
@@ -86,6 +78,7 @@ ssize_t efuse_read(char *buf, size_t count, loff_t *ppos )
 ssize_t efuse_write(const char *buf, size_t count, loff_t *ppos )
 { 	
 	unsigned pos = *ppos;
+	const char *pc;
 
 	if (pos >= EFUSE_BYTES)
 		return 0;	/* Past EOF */
@@ -95,7 +88,6 @@ ssize_t efuse_write(const char *buf, size_t count, loff_t *ppos )
 		return -1;
 
 #ifndef CONFIG_MESON_TRUSTZONE
-	const char *pc;
 	//Wr( EFUSE_CNTL1, Rd(EFUSE_CNTL1) |  (1 << 12) );
     
     for (pc = buf; count>0;count--, ++pos, ++pc)
@@ -113,7 +105,7 @@ ssize_t efuse_write(const char *buf, size_t count, loff_t *ppos )
 	arg.offset = pos;
 	arg.size=count;
 	arg.buffer_phy=(unsigned int)buf;
-	arg.retcnt_phy=(unsigned int)&retcnt;
+	arg.retcnt_phy=&retcnt;
 	int ret;
 	ret = meson_trustzone_efuse(&arg);
 	if(ret==0){
@@ -185,8 +177,8 @@ static const struct efuse_chip_identify_t efuse_chip_hw_info[]={
 efuse_socchip_type_e efuse_get_socchip_type(void)
 {
 	efuse_socchip_type_e type;
-	//unsigned int *pID1 =(unsigned int *)0xd9040004;
-	//unsigned int *pID2 =(unsigned int *)0xd904002c;
+	unsigned int *pID1 =(unsigned int *)0xd9040004;
+	unsigned int *pID2 =(unsigned int *)0xd904002c;
 	type = EFUSE_SOC_CHIP_UNKNOW;
 	if(cpu_is_before_m6()){
 		type = EFUSE_SOC_CHIP_M3;

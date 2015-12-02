@@ -52,16 +52,14 @@ all:	dsp_firmware $(obj).depend $(LIB)
 $(LIB):	$(OBJS)	
 	$(call cmd_link_o_target, $(OBJS))	
 
-
+ifndef CONFIG_MESON_TRUSTZONE
 
 ifdef CONFIG_AML_SUSPEND
 FIRMWARE_AUTO_UPDATE=y
 export FIRMWARE_AUTO_UPDATE
 $(OBJS): power_firmware.dat
 power_firmware.dat: arc_code
-ifndef CONFIG_MESON_TRUSTZONE
 		make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/appf
-endif
 
 arc_code:
 		make -C $(SRCTREE)/$(CPUDIR)/$(SOC)/firmware/arc_power
@@ -69,6 +67,7 @@ arc_code:
 endif
 
 
+endif
 
 
 .PHONY: dsp_firmware

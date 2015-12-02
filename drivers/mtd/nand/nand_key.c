@@ -16,12 +16,9 @@
 
 //#define TEST_ERROR_ADDRESS_BLOCK
 
-#if 0
 #define debug(fmt,args...) do { printk("[DEBUG]: FILE:%s:%d, FUNC:%s--- "fmt"\n",\
                                                      __FILE__,__LINE__,__func__,## args);} \
                                          while (0)
-#endif
-
 #define NAND_KEY_RD_ERR         2
 #define NAND_KEY_CONFIG_ERR     3
 
@@ -430,7 +427,7 @@ static int aml_nand_save_key(struct mtd_info *mtd, u_char *buf)
 
 		error = aml_nand_write_key(mtd, addr, (u_char *) key_ptr);
 		if (error) {
-			printk("update nand key addr: %llx FAILED! \n",addr);
+			printk("update nand key addr:llx FAILED! \n",addr);
 			if((error == -EIO)||(error == -EFAULT)){
 				memset(&aml_key_erase_info, 0, sizeof(struct erase_info));
 				addr = tail_valid_node->phy_blk_addr;
@@ -595,9 +592,8 @@ static int aml_nand_key_init(struct mtd_info *mtd)
 	struct env_free_node_t  *multi_free_node,*mult_free_tmp_node;
 	int have_env_free_node_flag;
 	#endif
-	//int error = 0, start_blk, total_blk, key_blk, i, pages_per_blk, bad_blk_cnt = 0, max_key_blk, max_env_blk,phys_erase_shift;
-	int error = 0, start_blk, key_blk, i, pages_per_blk, bad_blk_cnt = 0, max_key_blk,phys_erase_shift;
-	uint64_t offset;//, env_offset;
+	int error = 0, start_blk, total_blk, key_blk, i, pages_per_blk, bad_blk_cnt = 0, max_key_blk, max_env_blk,phys_erase_shift;
+	uint64_t offset, env_offset;
 	unsigned char *data_buf;
 	struct mtd_oob_ops aml_oob_ops;
 	unsigned char key_oob_buf[sizeof(struct env_oobinfo_t)];
@@ -1338,8 +1334,8 @@ static int aml_nand_key_check(struct mtd_info *mtd)
 	struct aml_nand_part_info *aml_nand_part;
 	//struct mtd_partition *parts;
 	mesonkey_t *key_ptr;
-	int error = 0, start_blk, total_blk, update_key_flag = 0, i, j, nr, phys_erase_shift;
-	uint64_t offset;
+	int error = 0, start_blk, total_blk, update_key_flag = 0, i, j, nr, max_env_blk, phys_erase_shift;
+	uint64_t offset, env_offset;
 
 	chip = chip;
 	nr = 0;
@@ -1477,8 +1473,6 @@ static int aml_nand_key_check(struct mtd_info *mtd)
 			offset = aml_chip->aml_nandkey_info->start_block;
 			offset *= mtd->erasesize;
 #else
-			uint64_t env_offset;
-			int max_env_blk;
 			//offset = (NAND_MINI_PART_SIZE + 1024 * mtd->writesize / aml_chip->plane_num);
 			offset = (1024 * mtd->writesize / aml_chip->plane_num);
 
@@ -1530,7 +1524,6 @@ exit:
 	return 0;
 }
 
-#if 0
 static int aml_nand_update_key(struct mtd_info *mtd)
 {
 	struct aml_nand_chip *aml_chip = mtd_to_nand_chip(mtd);
@@ -1564,7 +1557,7 @@ exit:
 	kfree(key_ptr);
 	return error;
 }
-#endif
+
 
 static struct mtd_info *nand_key_mtd = NULL;
 

@@ -23,31 +23,25 @@
 #include <linux/err.h>
 int inited=0;
 int flag=-1;
-extern ssize_t uboot_key_init(void);
+extern ssize_t uboot_key_init();
 extern ssize_t uboot_get_keylist(char *keyname);
 extern ssize_t uboot_key_read(char *keyname, char *keydata);
 extern ssize_t uboot_key_write(char *keyname, char *keydata);
-extern int nandkey_provider_register(void);
+extern int nandkey_provider_register();
 extern int key_set_version(char *device);
+#define debug(fmt,args...) do { printk("[DEBUG]: FILE:%s:%d, FUNC:%s--- "fmt"\n",\
+                                                     __FILE__,__LINE__,__func__,## args);} \
+                                         while (0)
 
 #ifndef SECUKEY_DEFAULT_ADDRESS
 #define SECUKEY_DEFAULT_ADDRESS	(PHYS_MEMORY_START + 0x02000000)
 #endif
 
-int uboot_key_initial(char *device);
-ssize_t uboot_key_get(char *device,char *key_name, char *key_data,int key_data_len,int ascii_flag);
-ssize_t uboot_key_put(char *device,char *key_name, char *key_data,int key_data_len,int ascii_flag);
-
-#ifdef CONFIG_STORE_COMPATIBLE 
-bool is_nand_exist (void);
-bool is_emmc_exist (void);
-#endif
-
 /* ------------------------------------------------------------------------- */
-int do_secukey(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+int do_secukey(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 {
 	//
-	int i, error,num=0;
+	int i, ret = 0,error,num=0;
 	char *cmd;
 	char *name;
 	char *data;
@@ -215,7 +209,7 @@ int do_secukey(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 		if(error < 0){
 			printk("%s:%d  in key error\n",__func__,__LINE__);
 		}
-		printk("lenth:%d\n",(int)lenth);
+		printk("lenth:%d\n",lenth);
 		return error;
 	}
 	if(!strcmp(cmd,"out")){
@@ -230,7 +224,7 @@ int do_secukey(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 		if(error < 0){
 			printk("%s:%d  out key error\n",__func__,__LINE__);
 		}
-		printk("lenth:%d\n",(int)lenth);
+		printk("lenth:%d\n",lenth);
 		return error;
 	}
 	if(!strcmp(cmd,"storer")){
@@ -281,7 +275,7 @@ U_BOOT_CMD(secukey, CONFIG_SYS_MAXARGS, 1, do_secukey,
 
 ssize_t uboot_key_put(char *device,char *key_name, char *key_data,int key_data_len,int ascii_flag);
 ssize_t uboot_key_get(char *device,char *key_name, char *key_data,int key_data_len,int ascii_flag);
-int do_ssecukey(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
+int do_ssecukey(cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 {
 	ssize_t error=-1;
 	char *cmd;
@@ -308,7 +302,7 @@ int do_ssecukey(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 			}
 			addr = (ulong)simple_strtoul(argv[5], NULL, 16);
 			lenth = (ulong)simple_strtoul(argv[6], NULL, 16);
-			printk("addr:0x%x,lenth:%d",(int)addr,(int)lenth);
+			printk("addr:0x%x,lenth:%d",addr,lenth);
 			ascii_flag = 1;
 			#if 0 //test
 			char testhexdata[]={0x11,0x22,0x33,0xaa,0x55,0xff,0x77,0x88};

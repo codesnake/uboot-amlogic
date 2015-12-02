@@ -29,7 +29,7 @@ int bit;
 
 
 
-static unsigned timerE_get(void)
+static unsigned timerE_get()
 {
     unsigned addr;
     addr=IO_CBUS_PHY_BASE+(ISA_TIMERE<<2);

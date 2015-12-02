@@ -18,7 +18,7 @@ extern inline int is_ac_online(void);
 extern void power_off(void);
 extern inline int get_charging_percent(void);
 extern inline int set_charging_current(int current);
-extern void mdelay(unsigned long usec);
+
 
 static int do_getkey (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
@@ -159,7 +159,6 @@ extern int axp_charger_set_usbcur_limit(int usbcur_limit);
 #ifdef CONFIG_AML_PMU
 extern int aml_pmu_set_usb_curr_limit(int curr);
 #endif
-#if !defined(CONFIG_PLATFORM_HAS_PMU)
 static int pmu_set_usbcur_limit(int usbcur_limit)
 {
 #ifdef CONFIG_AW_AXP20
@@ -168,11 +167,7 @@ static int pmu_set_usbcur_limit(int usbcur_limit)
 #ifdef CONFIG_AML_PMU
     return aml_pmu_set_usb_curr_limit(usbcur_limit);
 #endif
-#if !defined(CONFIG_AW_AXP20) && !defined(CONFIG_AML_PMU)
-    return 0;
-#endif
 }
-#endif
 static int do_set_usbcur_limit(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
     int usbcur_limit = simple_strtol(argv[1], NULL, 10);
@@ -232,7 +227,7 @@ U_BOOT_CMD(
 static int do_pmu_reg(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 {
     struct aml_pmu_driver *pmu_driver;
-    int rw = 0;//, i;
+    int rw = 0, i;
     int addr;
     unsigned char val;
 

@@ -279,7 +279,7 @@ static struct ddr_set __ddr_setting={
 				(CFG_DDR_RRD << 22 )|       //tRRD       //7500ps
 				(CFG_DDR_RC  << 26)),
 		
-		[1] =  (((CFG_DDR_MRD - 4) << 0 ) |		//tMRD      //4 TCK     For DDR3 and LPDDR2, the value used for tMRD is 4 plus the value programmed in these bits, i.e. tMRDvalue for DDR3 (ranges from 4 to 7)
+		[1] =  ((CFG_DDR_MRD - 4 << 0 ) |		//tMRD      //4 TCK     For DDR3 and LPDDR2, the value used for tMRD is 4 plus the value programmed in these bits, i.e. tMRDvalue for DDR3 (ranges from 4 to 7)
 				((CFG_DDR_MOD - 12) << 2 ) | //tMOD      //0: 12 TCK
 				(CFG_DDR_FAW  << 5 )  |      //tFAW      //40000ps
 				(CFG_DDR_RFC  << 11)  |      //tRFC      //160000~70312500

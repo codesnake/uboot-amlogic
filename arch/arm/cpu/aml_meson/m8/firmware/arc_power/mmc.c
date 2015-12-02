@@ -42,17 +42,12 @@ unsigned int m8_chip_id;
   #undef hx_serial_put_hex
 #endif 
 
-/*remove warnings*/
-static void serial_puts_nothing(const char * s){}
-static void serial_put_hex_nothing(unsigned int data,unsigned bitlen){}
-//static void serial_put_dec_nothing(unsigned int data){}
-
 #if 0
     #define hx_serial_puts    f_serial_puts
 	#define hx_serial_put_hex serial_put_hex
 #else
-    #define hx_serial_puts serial_puts_nothing
-	#define hx_serial_put_hex serial_put_hex_nothing
+    #define hx_serial_puts 
+	#define hx_serial_put_hex 
 #endif
 #if 0
 static void * hx_memcpy(void *dest, const void *src, size_t count)

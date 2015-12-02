@@ -432,12 +432,11 @@ void do_vendor_request( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 		if (ctrl->bRequestType != (USB_DIR_IN | USB_TYPE_VENDOR |
 				USB_RECIP_DEVICE))
 				break;
-		/*unsigned int data = 0;*/
+		unsigned int data = 0;
 		value = (w_value << 16) + w_index;
 
 		//data = _lr(value);
-		/**(unsigned int *)(unsigned)buff = data;*/
-                memset((char*)buff, 0, sizeof(unsigned));
+		*(unsigned int *)buff = data;
 		
 		_pcd->buf = buff;
 		_pcd->length = w_length;
@@ -612,10 +611,9 @@ void do_vendor_out_complete( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
 	  	value = 1; // is_out = 1
       case AM_REQ_RD_LARGE_MEM:
         {	  	
-            const unsigned* intBuf = (unsigned*)buff;
             _pcd->bulk_out = (char)value; // read or write
-            _pcd->bulk_buf = (char*)intBuf[0];
-            _pcd->bulk_data_len = intBuf[1]; // data length
+            _pcd->bulk_buf = (char *)(*(unsigned int*)buff); // board address
+            _pcd->bulk_data_len = (*(unsigned int*) &buff[4]); // data length
 
             //added by Sam.Wu
             _pcd->bulk_xfer_len = 0;
@@ -630,13 +628,12 @@ void do_vendor_out_complete( pcd_struct_t *_pcd, struct usb_ctrlrequest * ctrl)
       case AM_REQ_DOWNLOAD:
         value = 2;//2 to differ from write_large_mem
         {
-            const unsigned* intBuf = (unsigned*)buff;
-            unsigned isPktResended   = intBuf[0];
-            unsigned sequenceNo = intBuf[2];
+            int isPktResended   = *(int*)buff;
+            unsigned sequenceNo = *(unsigned*)(buff + 8);
             _pcd->bulk_out      = value;
-            _pcd->bulk_data_len = intBuf[1];
+            _pcd->bulk_data_len = *(unsigned*)(buff + 4);
             _pcd->bulk_xfer_len = 0;
-            _pcd->origiSum      = intBuf[3];
+            _pcd->origiSum      = *(unsigned*)(buff + 12);
             _pcd->isPktResended = isPktResended;
 
             if(!isPktResended)//request next buffer slot only if transfer packet not re-sended packet

@@ -108,7 +108,7 @@ static int do_adc(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		if(nKeyVal > 1000)
 			continue;
 		
-		printf("SARADC CH-4 Get key : %d [%d%%]\n", nKeyVal,(100*nKeyVal)/1024);
+		printf("SARADC CH-4 Get key : %d [%d\%]\n", nKeyVal,(100*nKeyVal)/1024);
 		nCnt++;
 	}
 	saradc_disable();
@@ -458,7 +458,6 @@ struct aml_nand_device aml_nand_mid_device = {
 //@board schematic: m3_skt_v1.pdf
 //@pinmax: AppNote-M3-CorePinMux.xlsx
 //GPIOA_26 used to set VCCX2_EN: 0 to enable power and 1 to disable power
-#if 0
 static void gpio_set_vbus_power(char is_power_on)
 {
 	if(is_power_on)
@@ -484,7 +483,6 @@ static void gpio_set_vbus_power(char is_power_on)
 		set_gpio_val(GPIOA_bank_bit0_27(26), GPIOA_bit_bit0_27(26), 1);		
 	}
 }
-#endif
 static int usb_charging_detect_call_back(char bc_mode)
 {
 	switch(bc_mode){

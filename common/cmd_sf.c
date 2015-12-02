@@ -112,7 +112,7 @@ static int do_spi_flash_read_write(int argc, char * const argv[])
         {	ret = spi_flash_write(flash, offset, len, buf); nReadFlag = 0;}
 
 	unsigned int nEnd = readl(0xc1109954);
-	printf("Amlogic log : SPI %s %d bytes data used about %d us\n",(nReadFlag ? "read" : "write") ,(int)len,nEnd-nStart);
+	printf("Amlogic log : SPI %s %d bytes data used about %d us\n",(nReadFlag ? "read" : "write") ,len,nEnd-nStart);
 	unmap_physmem(buf, len);
 
 	if (ret) {
@@ -144,7 +144,7 @@ static int do_spi_flash_erase(int argc, char * const argv[])
 	if (*argv[2] == 0 || *endp != 0)
 		goto usage;
 
-        printf("[SF]erase 0x%xB at offset 0x%x\n", (unsigned int)len, (unsigned int)offset);
+        printf("[SF]erase 0x%xB at offset 0x%x\n", len, offset);
 	ret = spi_flash_erase(flash, offset, len);
 	if (ret) {
 		printf("SPI flash %s failed\n", argv[0]);

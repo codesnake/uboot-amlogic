@@ -23,8 +23,6 @@ COBJS-$(CONFIG_USB_DWC_OTG_HCD) += usb.o
 
 COBJS-$(CONFIG_VIDEO_AMLLCD) += tcon.o
 
-COBJS-$(CONFIG_AML_GATE_INIT) += gate_init.o
-
 ifdef CONFIG_AML_SUSPEND
 COBJS += firmwareld.o
 endif

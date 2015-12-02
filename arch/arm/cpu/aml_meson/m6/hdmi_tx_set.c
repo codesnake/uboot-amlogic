@@ -36,8 +36,6 @@ static unsigned int hdmi_rd_reg(unsigned int addr);
 static unsigned int modulo(unsigned int a, unsigned int b);
 static signed int to_signed(unsigned int a);
 
-extern vmode_t vic_to_vmode(HDMI_Video_Codes_t vic);
-
 /*
  * HDMI reg read/write operation
  */

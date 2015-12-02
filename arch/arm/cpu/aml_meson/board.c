@@ -4,8 +4,6 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-extern uint32_t meson_trustzone_sram_read_reg32(uint32_t addr);
-
 #ifdef CONFIG_ACS
 //IMPORTANT: following function must be call before the uboot relocation
 static void update_ddr_mmu_table(void)
@@ -29,7 +27,7 @@ static void update_ddr_mmu_table(void)
 	int nIndex = 0;
 	int nSetting = 0;
 	extern ulong __mmu_table;
-	volatile unsigned int *pVMMUTable = (unsigned int *)__mmu_table;
+	volatile unsigned int *pVMMUTable = __mmu_table;
 	unsigned m6_offset = 0;
 #if defined(CONFIG_M6)
 	m6_offset = 0x800;

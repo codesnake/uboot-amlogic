@@ -12,7 +12,7 @@
 #include <power.c>
 #endif
 #include <ddr.c>
-//#include <mtddevices.c>
+#include <mtddevices.c>
 #include <sdio.c>
 //#include <debug_rom.c>
 
@@ -46,11 +46,7 @@ unsigned main(unsigned __TEXT_BASE,unsigned __TEXT_SIZE)
 #endif
 	//setbits_le32(0xda004000,(1<<0));	//TEST_N enable: This bit should be set to 1 as soon as possible during the Boot process to prevent board changes from placing the chip into a production test mode
 
-#if defined(CONFIG_M3)
-	serial_init(52);
-#else
 	writel((readl(0xDA000004)|0x08000000), 0xDA000004);	//set efuse PD=1
-#endif
 
 //write ENCI_MACV_N0 (CBUS 0x1b30) to 0, disable Macrovision
 #if defined(CONFIG_M6) || defined(CONFIG_M6TV)||defined(CONFIG_M6TVD)
@@ -83,11 +79,8 @@ unsigned main(unsigned __TEXT_BASE,unsigned __TEXT_SIZE)
 #if (MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8)
 	//A9 JTAG enable
 	writel(0x102,0xda004004);
-	
-#if (MESON_CPU_TYPE != MESON_CPU_TYPE_MESON8B)//reg[14] is PWM_C pinmux enable/disable in m8baby,remove MESON_CPU_TYPE_MESON8B for PWM_C disabled.
 	//TDO enable
 	writel(readl(0xc8100014)|0x4000,0xc8100014);
-#endif
 	
 	//detect sdio debug board
 	unsigned pinmux_2 = readl(P_PERIPHS_PIN_MUX_2);
@@ -153,11 +146,7 @@ unsigned main(unsigned __TEXT_BASE,unsigned __TEXT_SIZE)
 #if !defined(CONFIG_VLSI_EMULATOR)
     // initial pll
     pll_init(&__plls);
-
-#if !defined(CONFIG_M3)
 	serial_init(__plls.uart);
-#endif
-
 #else
 	serial_init(readl(P_UART_CONTROL(UART_PORT_CONS))|UART_CNTL_MASK_TX_EN|UART_CNTL_MASK_RX_EN);
 	serial_puts("\n\nAmlogic log: UART OK for emulator!\n");
@@ -165,13 +154,8 @@ unsigned main(unsigned __TEXT_BASE,unsigned __TEXT_SIZE)
 
 
 	//TEMP add 
-	unsigned int nPLL = readl(P_HHI_A9_CLK_CNTL);
-	unsigned int nA9CLK = CONFIG_CRYSTAL_MHZ;
-	if((nPLL & (1<<7)) && (nPLL & (1<<0)))
-	{
-		nPLL = readl(P_HHI_SYS_PLL_CNTL);
-		nA9CLK = ((24 / ((nPLL>>9)& 0x1F) ) * (nPLL & 0x1FF))/ (1<<((nPLL>>16) & 0x3));
-	}
+	unsigned int nPLL = readl(P_HHI_SYS_PLL_CNTL);
+	unsigned int nA9CLK = ((24 / ((nPLL>>9)& 0x1F) ) * (nPLL & 0x1FF))/ (1<<((nPLL>>16) & 0x3));
 	serial_puts("\nCPU clock is ");
 	serial_put_dec(nA9CLK);
 	serial_puts("MHz\n\n");
@@ -185,7 +169,8 @@ unsigned main(unsigned __TEXT_BASE,unsigned __TEXT_SIZE)
     serial_put_dec(get_utimer(nTEBegin));
     serial_puts(" us\n");
 
-#if defined(CONFIG_M8B) && defined(CONFIG_AML_SECU_BOOT_V2) && defined(CONFIG_AML_SPL_L1_CACHE_ON)
+#if defined(CONFIG_M8B) && defined(CONFIG_AML_SECU_BOOT_V2) && \
+    defined(CONFIG_AML_SPL_L1_CACHE_ON)
     asm volatile ("ldr	sp, =(0x12000000)");
     //serial_puts("aml log : set SP to 0x12000000\n");
 #endif
@@ -238,7 +223,8 @@ unsigned main(unsigned __TEXT_BASE,unsigned __TEXT_SIZE)
 	writel(0,0xc8100000);
 #endif
 
-#if defined(CONFIG_M8B) && defined(CONFIG_AML_SECU_BOOT_V2) && defined(CONFIG_AML_SPL_L1_CACHE_ON)
+#if defined(CONFIG_M8B) && defined(CONFIG_AML_SECU_BOOT_V2) && \
+    defined(CONFIG_AML_SPL_L1_CACHE_ON)
 
     unsigned int fpAddr = CONFIG_SYS_TEXT_BASE;
 

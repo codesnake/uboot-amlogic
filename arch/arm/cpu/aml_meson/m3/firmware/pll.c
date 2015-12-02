@@ -25,7 +25,7 @@ static void wait_pll(unsigned clk,unsigned dest)
         serial_puts(" now it is ");
         serial_put_dword(cur);
         __udelay(100);
-    }while(cur<(dest-1) || cur >(dest+1));
+    }while(cur<dest-1 || cur >dest+1);
 }
 
 SPL_STATIC_FUNC void pll_init(struct pll_clk_settings * plls) 
@@ -34,8 +34,8 @@ SPL_STATIC_FUNC void pll_init(struct pll_clk_settings * plls)
     clrbits_le32(P_HHI_MPEG_CLK_CNTL,1<<8);
      //* sys pll
     writel(plls->sys_pll_cntl|0x8000,P_HHI_SYS_PLL_CNTL);//800Mhz(0x664),600Mhz,400Mhz , 200Mhz
-    writel(0x65e11ff  ,P_HHI_SYS_PLL_CNTL2);
-    writel(0x0249a941 , P_HHI_SYS_PLL_CNTL3);
+    writel(0x65e31ff  ,P_HHI_SYS_PLL_CNTL2);
+    writel(0x1649a941 , P_HHI_SYS_PLL_CNTL3);
     writel(plls->sys_pll_cntl&(~0x8000),P_HHI_SYS_PLL_CNTL);
 	
     /** misc pll **/
@@ -44,8 +44,8 @@ SPL_STATIC_FUNC void pll_init(struct pll_clk_settings * plls)
     writel(0x1649a941 , P_HHI_OTHER_PLL_CNTL3);
     writel(plls->other_pll_cntl&(~0x8000),P_HHI_OTHER_PLL_CNTL);
     
-    //wait_pll(2,plls->sys_clk);	//the changed is same as master branch 
-    //wait_pll(4,plls->other_clk);  //the changed is same as master branch 
+    wait_pll(2,plls->sys_clk);	
+    wait_pll(4,plls->other_clk);
     serial_puts("\n\n\n");
     __udelay(3000);
 		serial_wait_tx_empty();
@@ -125,9 +125,11 @@ unsigned long    clk_util_clk_msr(unsigned long   clk_mux)
 
 STATIC_PREFIX void pll_clk_list(void)
 {
+
+
     unsigned long   clk_freq;
-    unsigned char clk_list[]={3,31,7};
-    char *clk_list_name[]={"ddr","a9","clk81"};
+    unsigned char clk_list[]={3,10,11};
+    char *clk_list_name[]={"arm","ddr","other"};
     unsigned long  i;
 	for(i=0;i<3;i++)
 	{

@@ -62,12 +62,7 @@ static unsigned char exit_reason = 0;
 
 #endif  /* CONFIG_AML1218 */
 
-extern void wait_uart_empty();
-extern void udelay__(int i);
-extern void udelay(int i);
-extern void __udelay(int n);
-
-//static unsigned char vbus_status;
+static unsigned char vbus_status;
 
 static int gpio_sel0;
 static int gpio_mask;
@@ -127,7 +122,7 @@ int hard_i2c_wait_complete(void)
 unsigned short hard_i2c_read1616(unsigned char SlaveAddr, unsigned short RegAddr)
 {
     unsigned short data;
-    //unsigned int ctrl;
+    unsigned int ctrl;
 
     // Set the I2C Address
     (*I2C_SLAVE_ADDR) = ((*I2C_SLAVE_ADDR) & ~0xff) | SlaveAddr;
@@ -242,10 +237,10 @@ int find_idx(int start, int target, int step, int size)
 #endif  /* CONFIG_AML1218 */ 
 
 extern void delay_ms(int ms);
-void init_I2C(void)
+void init_I2C()
 {
-	unsigned v,reg;
-	//struct aml_i2c_reg_ctrl* ctrl;
+	unsigned v,speed,reg;
+	struct aml_i2c_reg_ctrl* ctrl;
 
 		//save gpio intr setting
 	gpio_sel0 = readl(0xc8100084);
@@ -377,7 +372,7 @@ int aml1218_set_gpio(int gpio, int val)
     unsigned int data;
 
     if (gpio > 4 || gpio <= 0) {
-        return -1;    
+        return;    
     }
 
     data = (1 << (gpio + 11));
@@ -610,7 +605,7 @@ void aml1218_power_on_at_24M()
 void aml1218_power_off_at_32K_1()
 {
     unsigned int reg;                               // change i2c speed to 1KHz under 32KHz cpu clock
-    //unsigned int sleep_flag = readl(P_AO_RTI_STATUS_REG2);
+    unsigned int sleep_flag = readl(P_AO_RTI_STATUS_REG2);
 
     reg  = readl(P_AO_I2C_M_0_CONTROL_REG);
     reg &= 0xFFC00FFF;
@@ -626,7 +621,7 @@ void aml1218_power_off_at_32K_1()
 //  power_off_vcc33();                                  // close DCDC3, VCC3.3v
 }
 
-void aml1218_power_on_at_32K_1(void)
+void aml1218_power_on_at_32K_1()
 {
     unsigned int    reg;
 
@@ -640,17 +635,18 @@ void aml1218_power_on_at_32K_1(void)
     udelay__(10);
 }
 
-void aml1218_power_off_at_32K_2(void)
+aml1218_power_off_at_32K_2()
 {
        // TODO: add code here
 }
 
-void aml1218_power_on_at_32K_2(void)
+void aml1218_power_on_at_32K_2()
 {
        // TODO: add code here
 }
 
-void aml1218_shut_down(void)
+
+void aml1218_shut_down()
 {
     i2c_pmu_write_b(0x0019, 0x10);                              // cut usb output 
     i2c_pmu_write_w(0x0084, 0x0001);                            // close boost

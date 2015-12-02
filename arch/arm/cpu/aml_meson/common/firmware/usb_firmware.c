@@ -10,7 +10,7 @@
 #include <hardi2c_lite.c>
 #include <power.c>
 #include <ddr.c>
-//#include <mtddevices.c>
+#include <mtddevices.c>
 #include <sdio.c>
 #include <debug_rom.c>
 

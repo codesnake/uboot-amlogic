@@ -90,10 +90,7 @@
 // ---------------------------
 // OSD
 // ---------------------------
-#ifdef REG_OFFSET
-#undef REG_OFFSET
 #define REG_OFFSET		(0x80)
-#endif
 #define P_VIU_OSD1_BLK0_CFG_W0         (0xc110686c)
 #define P_VIU_OSD1_BLK1_CFG_W0         (0xc110687c)
 #define P_VIU_OSD1_BLK2_CFG_W0         (0xc110688c)

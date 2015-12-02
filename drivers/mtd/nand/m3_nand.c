@@ -88,20 +88,14 @@ unsigned char pagelist_1ynm_hynix256[128] = {
 	0xEf, 0xf1, 0xF3, 0xF5, 0xF7, 0xF9, 0xFb, 0xFd,
 };
 #endif
-
-#ifndef CONFIG_M3
-extern unsigned int aml_mx_get_id(void);
-#endif
-
 static unsigned mx_nand_check_chiprevd(void)
 {
     unsigned flag = 0;
     
-#ifndef CONFIG_M3    
     if(aml_mx_get_id() == MX_REV_D_ID){
         flag = 1;
     }
-#endif    
+    
     //printk("checking ChiprevD :%d\n", flag);  
     
     return flag;    
@@ -635,9 +629,9 @@ static int m3_nand_boot_read_page_hwecc(struct mtd_info *mtd, struct nand_chip *
 	unsigned nand_page_size = chip->ecc.steps * chip->ecc.size;
 	unsigned pages_per_blk_shift = (chip->phys_erase_shift - chip->page_shift);
 	int user_byte_num = (chip->ecc.steps * aml_chip->user_byte_mode);
-	int bch_mode = aml_chip->bch_mode, ran_mode=0;
+	int bch_mode = aml_chip->bch_mode, ran_mode;
 	int error = 0, i = 0, stat = 0;
-	int ecc_size, configure_data_w, pages_per_blk_w, configure_data, pages_per_blk, read_page;
+	int ecc_size, configure_data_w, pages_per_blk_w, configure_data, pages_per_blk, read_page_tmp, read_page;
 	int en_slc = 0;
 	
 #ifdef MX_REVD
@@ -848,19 +842,19 @@ exit:
 static int m3_nand_boot_write_page(struct mtd_info *mtd, struct nand_chip *chip, const uint8_t *buf, int page, int cached, int raw)
 {
 	struct aml_nand_chip *aml_chip = mtd_to_nand_chip(mtd);
-	int status, i, write_page, configure_data, pages_per_blk, ran_mode=0;
+	int status, i, write_page, configure_data, pages_per_blk, write_page_tmp, ran_mode;
 	int new_nand_type = 0;
 	int en_slc = 0;
 #ifdef MX_REVD
 	int magic = NAND_PAGELIST_MAGIC;
 	int page_list[6] = {0x01, 0x02, 0x03, 0x06, 0x07, 0x0A};
-	unsigned priv_slc_page;
+	unsigned priv_slc_page,next_msb_page;
 	unsigned char *fill_buf =NULL;
 #endif	
 	
 
 #ifdef CONFIG_SECURE_NAND
-	struct mtd_info *mtd_device1=NULL;
+	struct mtd_info *mtd_device1;
 	struct aml_nand_chip *aml_chip_device1 ; 
 	struct aml_nand_platform *plat = NULL;
 	int k,nand_read_info,secure_block,valid_chip_num =0;

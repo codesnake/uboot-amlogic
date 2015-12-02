@@ -68,7 +68,7 @@ int axp202_charger_online(void)
 unsigned short status_reg;
 int axp_charger_get_charging_status(void)
 {
-	axp_reads(0x00, 2, (uint8_t *)&status_reg);
+	axp_reads(0x00, 2, &status_reg);
 	if (status_reg & (1 << 2)) {
 		return 1;
 	} else {
@@ -76,7 +76,6 @@ int axp_charger_get_charging_status(void)
 	}
 }
 
-#if 0
 static void axp_set_basecap(int base_cap)
 {
 	uint8_t val;
@@ -87,10 +86,9 @@ static void axp_set_basecap(int base_cap)
 	DBG_PSY_MSG("axp_set_basecap = %d\n", val);
 	axp_write(POWER20_DATA_BUFFER4, val);
 }
-#endif
 
 /* 得到开路电压 */
-static int axp_get_ocv(void)
+static int axp_get_ocv()
 {
 	int battery_ocv;
 	uint8_t v[2];
@@ -126,8 +124,8 @@ static int axp_calculate_ocv(int charging, int rdc)
 static int axp_get_coulomb(void)
 {
 	uint8_t  temp[8];
-	uint64_t  rValue1,rValue2,rValue;
-	uint32_t Cur_CoulombCounter_tmp,m;
+	int64_t  rValue1,rValue2,rValue;
+	int Cur_CoulombCounter_tmp,m;
 
 	axp_reads(POWER20_BAT_CHGCOULOMB3,8, temp);
 	rValue1 = ((temp[0] << 24) + (temp[1] << 16) + (temp[2] << 8) + temp[3]);
@@ -150,8 +148,8 @@ static int axp_get_coulomb(void)
 
 int axp202_get_charging_percent(void)
 {
-	//uint8_t val;
-	//struct axp_adc_res axp_adc;
+	uint8_t val;
+	struct axp_adc_res axp_adc;
     extern int config_battery_rdc;
     extern struct battery_curve config_battery_curve[];
     int i;
@@ -301,7 +299,7 @@ int axp_charger_set_usbcur_limit(int usbcur_limit)
 		val |= 0x0;
 		break;
 	default:
-		printf("usbcur_limit=%d, not in 0,100,500,900. please check!\n", usbcur_limit);
+		printf("usbcur_limit=%d, not in 0,100,500,900. please check!\n");
 		return -1;
 		break;
 	}
@@ -617,7 +615,7 @@ int axp_update_calibrate(int charge)
     return 0;
 }
 
-struct energy_array {
+static struct energy_array {
     int     ocv;                            // mV
     int     coulomb;                        // mAh read from axp202
     int     coulomb_p;                      // mAh @ 3700mV
@@ -741,7 +739,7 @@ void  ClearScreen(void)                                 // screen clear for term
 void axp_set_rdc(int rdc)
 {
     uint32_t rdc_tmp = (rdc * 10000 + 5371) / 10742;
-    //char    buf[100];
+    char    buf[100];
 
     axp_set_bits(0xB9, 0x80);                           // stop
     axp_clr_bits(0xBA, 0x80);
@@ -757,15 +755,15 @@ extern struct panel_operations panel_oper;
 
 int axp_battery_calibrate(void)
 {
-    uint64_t energy_c = 0;
-    uint64_t energy_p = 0;
+    int64_t energy_c = 0;
+    int64_t energy_p = 0;
     int     prev_coulomb = 0;
     int     prev_ocv  = 0;
     int     prev_ibat = 0;
     int     key;
     int     ibat_cnt = 0;
     int     i;
-    int64_t energy_top;//, energy_visible;
+    int64_t energy_top, energy_visible;
     int     base, offset, range_charge, percent, range_discharge;
     char    buf[200] = {};
     int     size;
@@ -800,7 +798,7 @@ int axp_battery_calibrate(void)
      * reset rdc with calculated value and redo this test.
      */
     prev_ocv = axp_get_ocv(); 
-    axp_read(0x00, (uint8_t *)buf);
+    axp_read(0x00, buf);
     if ((buf[0] & 0x50) && prev_ocv < 3800) {
         terminal_print(0, 13, "Calibrate RDC now...\n");
         for (i = 0; i < 10; i++) {

@@ -6,7 +6,6 @@
 #ifndef _CPU_H
 #define _CPU_H
 #include <config.h>
-#include <asm/plat-cpu.h>
 #if CONFIG_AML_MESON==0
 #error please define CONFIG_AML_MESON
 #endif
@@ -32,7 +31,7 @@
 #define CONFIG_SYS_POST_WORD_ADDR CONFIG_SYS_TEXT_BASE-0x4
 #endif
 #define CONFIG_SYS_MALLOC_LEN   (4<<20)
-//#define CONFIG_ENV_SIZE         (8 * 1024)
+#define CONFIG_ENV_SIZE         (8 * 1024)
 #define CONFIG_SYS_MAXARGS      16
 
 #define CONFIG_SYS_LOAD_ADDR    0x82000000
@@ -79,8 +78,7 @@
 #define CONFIG_SPI_FLASH_SST        1
 //#define CONFIG_SPI_FLASH_STMICRO    1
 #define CONFIG_SPI_FLASH_WINBOND    1
-#define CONFIG_SPI_FLASH_GIGADEVICE     1
-#define CONFIG_SPI_FLASH_ESMT 1
+
 #endif
 #if CONFIG_SDIO_B1 || CONFIG_SDIO_A || CONFIG_SDIO_B || CONFIG_SDIO_C
 #define CONFIG_CMD_MMC          1
@@ -158,19 +156,5 @@
 //support "editenv"
 #define CONFIG_CMD_EDITENV 1
 /*default command select end*/
-
-#define MESON_CPU_TYPE MESON_CPU_TYPE_MESON3
-
-//max watchdog timer: 41.943s
-#define AML_WATCHDOG_TIME_SLICE        (10)  //us
-#define AML_WATCHDOG_ENABLE_OFFSET     (22)  //bit22 for enable control
-#define AML_WATCHDOG_CPU_RESET_CNTL    (1)   //not defined
-#define AML_WATCHDOG_CPU_RESET_OFFSET  (24)  //not defined
-
-
-#define EFUSE_BITS             3072
-#define EFUSE_BYTES            384  //(EFUSE_BITS/8)
-#define EFUSE_DWORDS            96  //(EFUSE_BITS/32)
-
 
 #endif /* _CPU_H */

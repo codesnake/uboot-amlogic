@@ -7,7 +7,7 @@
 int init_env_chiprev(void)
 {
 	char* rev = NULL;
-	extern unsigned int aml_mx_get_id(void); 
+	extern unsigned int aml_mx_get_id(); 
  
 	switch (aml_mx_get_id()) {
 	case MX_REV_B_ID:
@@ -27,7 +27,6 @@ int init_env_chiprev(void)
 		setenv("chiprev", "B"); //B is the default value
 		printf("default chiprev is B\n");
 	}
-	return 0;
 }
 
 static int do_chiprev(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])

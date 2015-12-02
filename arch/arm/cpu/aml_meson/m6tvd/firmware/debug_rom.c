@@ -286,8 +286,8 @@ STATIC_PREFIX char * debugrom_startup(void)
         memcpy((void*)&cmd_buf[0],(const void *)&init_script[0],sizeof(init_script));
         serial_puts(&cmd_buf[0]);serial_putc('\n');
     }
-    for(;';'!=cmd_buf[cur]&&cmd_buf[cur]!=0;cur++);
-        if(';'==cmd_buf[cur])cmd_buf[cur++]=0;
+    for(;cur!=';'&&cmd_buf[cur]!=0;cur++);
+    if(cur==';')cmd_buf[cur++]=0;
     return &cmd_buf[ret];
 }
 STATIC_PREFIX int run_cmd(char * cmd)

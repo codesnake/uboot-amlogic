@@ -2032,17 +2032,17 @@ typedef union pcgcctl_data
 #define DWC_OTG_EP_TYPE_INTR       3
 
 
-int dwc_core_init(void);
+int dwc_core_init();
 
-static void dwc_otg_core_init(void);
-static int  dwc_otg_pcd_init(void);
-static void dwc_otg_core_reset(void);
-static void dwc_otg_enable_common_interrupts(void);
-static void dwc_otg_enable_device_interrupts(void);
-static void dwc_otg_enable_global_interrupts(void);
-static void dwc_otg_core_dev_init(void);
+static void dwc_otg_core_init();
+static int  dwc_otg_pcd_init();
+static void dwc_otg_core_reset();
+static void dwc_otg_enable_common_interrupts();
+static void dwc_otg_enable_device_interrupts();
+static void dwc_otg_enable_global_interrupts( );
+static void dwc_otg_core_dev_init();
 static void dwc_otg_flush_tx_fifo( const int _num ) ;
-static void dwc_otg_flush_rx_fifo(void) ;
+static void dwc_otg_flush_rx_fifo( ) ;
 int dwc_otg_ep_req_start(pcd_struct_t * _pcd,int ep_num);
 void dwc_otg_ep_start_transfer(dwc_ep_t *_ep);
 static void dwc_otg_bulk_ep_activate(dwc_ep_t *ep);

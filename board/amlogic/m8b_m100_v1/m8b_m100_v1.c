@@ -18,8 +18,6 @@
 #include <amlogic/aml_pmu_common.h>
 #endif
 
-#include <amlogic/gpio.h>
-
 DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_UBOOT_BATTERY_PARAMETERS
@@ -510,7 +508,7 @@ static int _saradc_key_pressed(void)
                 adc_init = 1;
         }
 
-        return  (0 == run_command("saradc get_in_range 0x15d 0x1ad 1", 0));
+        return  (0 == run_command("saradc get_in_range 0x95 0x190 1", 0));
 }
 
 void magic_checkstatus(int saveEnvFlag)
@@ -547,16 +545,7 @@ void magic_checkstatus(int saveEnvFlag)
         if( 0 == run_command("getkey", 0)){//Power key pressed
                 int pwrkeyRelease = 0;
                 start = get_timer(0);
-                delay = 500;//wait powerkey until 400ms
-                static unsigned _lastPwrkeyTime = 0;
-
-                if(!saveEnvFlag){
-                        _lastPwrkeyTime = start;
-                        return ;
-                }
-
-                if(_lastPwrkeyTime)start = _lastPwrkeyTime;
-                _lastPwrkeyTime = 0;
+                delay = 1000;//wait powerkey at most one second
 
                 while(get_timer(start) < delay){
                         if(ctrlc())return;
@@ -602,13 +591,6 @@ static void board_i2c_init(void)
 	printf("\nPMU init time %d\n", after_pmu_init-before_pmu_init);
 #endif
 }
-
-void wifi_power_init(void)
-{
-	printf("-- set usb wifi power off in uboot --\n");
-	amlogic_gpio_direction_output(GPIOX_11,1);
-}
-
 int board_init(void)
 {
 	gd->bd->bi_arch_number=MACH_TYPE_MESON6_SKT;
@@ -617,6 +599,7 @@ int board_init(void)
     nand_init();
     
 #endif    
+  /*run_command("magic_checkstatus", 0);*/
 #ifdef CONFIG_AML_I2C  
 	board_i2c_init();
 #endif /*CONFIG_AML_I2C*/
@@ -628,9 +611,6 @@ int board_init(void)
 	board_usb_init(&g_usb_config_m6_skt_h,BOARD_USB_MODE_CHARGER);
 #endif /*CONFIG_USB_DWC_OTG_HCD*/
     key_init();
-    
-    wifi_power_init();
-    run_command("magic_checkstatus", 0);
 
 	return 0;
 }
@@ -710,7 +690,7 @@ static int do_msr(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 
 	//printf("\n");
 	for(;((nIndex < 64) && nCounter);nCounter--,nIndex++)
-		printf("MSR clock[%d] = %dMHz\n",nIndex,(int)clk_util_clk_msr(nIndex));
+		printf("MSR clock[%d] = %dMHz\n",nIndex,clk_util_clk_msr(nIndex));
 
 	return 0;
 	
@@ -794,7 +774,7 @@ void board_dt_id_process(void)
 	}
 	mem_size = mem_size >> 20;	//MB
 	unsigned char dt_name[64] = {0};
-	strcat(dt_name, "m8b_m102_");  //please change this name when you add a new config
+	strcat(dt_name, "m8b_m100_");  //please change this name when you add a new config
 	debug_print("aml_dt: %s\n", getenv("aml_dt"));
 	switch(mem_size){
 		case 2048: //2GB

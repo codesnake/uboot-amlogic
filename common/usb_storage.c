@@ -1063,8 +1063,8 @@ unsigned long usb_stor_read(int device, unsigned long blknr,
 		else
 			smallblks = (unsigned short) blks;
 retry_it:
-		//if (smallblks == USB_MAX_READ_BLK)
-		//	usb_show_progress();
+		if (smallblks == USB_MAX_READ_BLK)
+			usb_show_progress();
 		srb->datalen = usb_dev_desc[device].blksz * smallblks;
 		srb->pdata = (unsigned char *)buf_addr;
 		if (usb_read_10(srb, (struct us_data *)dev->privptr, start,
@@ -1085,8 +1085,8 @@ retry_it:
 			start, smallblks, buf_addr);
 
 	usb_disable_asynch(0); /* asynch transfer allowed */
-	//if (blkcnt >= USB_MAX_READ_BLK)
-	//	printf("\n");
+	if (blkcnt >= USB_MAX_READ_BLK)
+		printf("\n");
 	return blkcnt;
 }
 

@@ -642,39 +642,8 @@ exit:
     return ret;
 
 }
-static int aml_repair_bbt(struct amlnand_phydev *phydev,uint64_t *bad_blk_addr,int cnt)
-{
-	int i;
-	int error = 0;
-	//int flag = 0;
-	struct phydev_ops *devops = &(phydev->ops);
-	unsigned char * buffer = NULL;
-	buffer = aml_nand_malloc(2 * phydev->writesize);
-	if(!buffer){
-		aml_nand_msg("nand malloc failed");
-		return -1;
-	}
-    memset(buffer, 0xff, 2*phydev->writesize);
-    
-    memset(devops, 0x0, sizeof(struct phydev_ops));
-    devops->len = phydev->erasesize;
-    devops->datbuf = buffer;
-    devops->oobbuf = NULL;
-    devops->mode = NAND_HW_ECC;
-	for(i = 0; i < cnt;i++) {
-        devops->addr = bad_blk_addr[i];
-        aml_nand_msg("devops->addr = %lld,bad_blk_addr[i]=%lld",devops->addr,bad_blk_addr[i]);
-		block_modifybbt(phydev,0);
-		error = nand_test_block(phydev);
-		if(error) {
-            devops->addr = bad_blk_addr[i];
-			block_modifybbt(phydev,1);
-		}
-	}
-	
 
-	return update_bbt(phydev);	
-}
+
 
 int phydev_init_erase(struct amlnand_chip *aml_chip)
 {
@@ -1452,7 +1421,6 @@ int amlnand_phydev_init(struct amlnand_chip *aml_chip)
             aml_nand_msg("bad block count = %d\n",bad_blk_cnt);
         	if((bad_blk_cnt *32 > (phydev->size >> phydev->erasesize_shift))||(bad_blk_cnt>10)){
                 aml_nand_dbg("Too many new bad blocks,try to repair...\n");
-        		ret = aml_repair_bbt(phydev,bad_blk,bad_blk_cnt);		
         	}
     	}
 	}

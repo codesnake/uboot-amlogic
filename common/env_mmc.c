@@ -38,10 +38,6 @@
 DECLARE_GLOBAL_DATA_PTR;
 extern env_t *env_ptr;
 extern uchar default_environment[];
-#ifdef CONFIG_STORE_COMPATIBLE
-extern struct partitions* find_mmc_partition_by_name (char *name);
-extern int find_dev_num_by_partition_name (char *name);
-#endif
 
 #if defined CONFIG_SPI_NAND_COMPATIBLE || defined CONFIG_SPI_NAND_EMMC_COMPATIBLE || defined CONFIG_STORE_COMPATIBLE 
 int emmc_env_init(void)
@@ -81,13 +77,13 @@ void emmc_env_relocate_spec(void)
 
 	blk >>= 9;
     cnt >>= 9;
-	ret =(cnt == mmc->block_dev.block_read(dev_num, blk, cnt, (void *)&env_buf));
+	ret =(cnt == mmc->block_dev.block_read(dev_num, blk, cnt, (const void *)&env_buf));
 	if(!ret){
 		set_default_env("!readenv() failed");
 		return;
 	}
 
-	env_import((const char *)&env_buf, 1);
+	env_import(&env_buf, 1);
 #endif
 }
 #else
@@ -105,43 +101,34 @@ void emmc_env_relocate_spec(void)
 	char *name = "env";
 	struct partitions *part_info = NULL;
 	int blk_shift = 0;
-	//only init once for env relocate
-	static int flag=0;
-	if(flag == 0){
-		flag = 1;
-	}
-	else{
-		printf("emmc env have been init already, just retun here\n");
-		goto error;
-	}
 	env_buf = (env_t *)malloc(CONFIG_ENV_SIZE);
 	if(!env_buf){
 		printf("malloc failed \n");
-		goto error;
+		return ;
 	}
 	memset(env_buf->data, 0, ENV_SIZE);
 #ifdef CONFIG_STORE_COMPATIBLE
-    part_info = (struct partitions *)find_mmc_partition_by_name(name);
+    part_info = find_mmc_partition_by_name(name);
 	if(part_info == NULL){
 		printf("get partition info failed !!\n");
-		goto error;
+		return ;
 	}
 
 	dev_num = find_dev_num_by_partition_name (name);
 	if(dev_num < 0){
 		printf("get mmc dev  failed !!\n");
-		goto error;
+		return ;
 	}
 	store_dbg(" read env: dev_num %d",dev_num);
 
 	mmc = find_mmc_device(dev_num);
 	if (!mmc) {
 		set_default_env("!No MMC device");
-		goto error;
+		return;
 	}
 	if ((cnt % 512) || (blk % 512)) {
 	    set_default_env("!addr or blk count notalign");
-	    goto error;
+	    return ;
 	}
 	
     blk_shift = ffs(mmc->read_bl_len) - 1;
@@ -153,7 +140,7 @@ void emmc_env_relocate_spec(void)
 	if(!ret){
 		set_default_env("!readenv() failed");
 		saveenv();
-		goto error;
+		return;
 	}
 
 	crc = env_buf->crc;	
@@ -162,11 +149,8 @@ void emmc_env_relocate_spec(void)
 		saveenv();
 	}
 	
-	env_import((const char *)env_buf, 1);	 
-	return;
-error:
-	set_default_env("!set default env");
-	
+	env_import(env_buf, 1);	 
+
 #endif
 }
 
@@ -192,12 +176,12 @@ int emmc_saveenv(void)
 	part_info = find_mmc_partition_by_name(name);
 	if(part_info == NULL){
 		printf("get partition info failed !!\n");
-		return -1;
+		return ;
 	}
 	dev_num = find_dev_num_by_partition_name (name);
 	if(dev_num < 0){
 		printf("get mmc dev  failed !!\n");
-		return -1;
+		return ;
 	}
 #else
 	blk = CONFIG_ENV_IN_EMMC_OFFSET;

@@ -320,8 +320,6 @@ int m8b_pin_map_to_direction(unsigned int pin,unsigned int *reg,unsigned int *bi
 extern struct amlogic_set_pullup pullup_ops;
 extern int gpio_irq;
 extern int gpio_flag;
-extern void *malloc (size_t len);
-extern void free(void*);
 #define NONE 0xffffffff
 //#define debug
 #ifdef debug
@@ -478,8 +476,8 @@ static unsigned int gpio_to_pin[][6]={
 	[GPIOAO_9]={P_PIN_MUX_REG(AO,29),P_PIN_MUX_REG(1,15),NONE,NONE,NONE,NONE,},
 	[GPIOAO_10]={P_PIN_MUX_REG(AO,28),P_PIN_MUX_REG(1,14),NONE,NONE,NONE,NONE,},
 	[GPIOAO_11]={P_PIN_MUX_REG(AO,27),NONE,NONE,NONE,NONE,NONE,},
-	[GPIOAO_12]={P_PIN_MUX_REG(AO,17),NONE,NONE,NONE,NONE,NONE,},
-	[GPIOAO_13]={P_PIN_MUX_REG(AO,31),P_PIN_MUX_REG(AO,19),NONE,NONE,NONE,NONE,},
+	[GPIOAO_12]={P_PIN_MUX_REG(AO,17),P_PIN_MUX_REG(AO,14),NONE,NONE,NONE,NONE,},
+	[GPIOAO_13]={P_PIN_MUX_REG(AO,31),P_PIN_MUX_REG(AO,13),P_PIN_MUX_REG(AO,3),NONE,NONE,NONE,},
 	[DIF_TTL_0_P]={P_PIN_MUX_REG(0,24),P_PIN_MUX_REG(6,0),NONE,NONE,NONE,NONE,},
 	[DIF_TTL_0_N]={P_PIN_MUX_REG(0,24),P_PIN_MUX_REG(6,1),NONE,NONE,NONE,NONE,},
 	[DIF_TTL_1_P]={P_PIN_MUX_REG(0,24),P_PIN_MUX_REG(6,2),NONE,NONE,NONE,NONE,},
@@ -665,7 +663,7 @@ int gpio_amlogic_requst(struct gpio_chip *chip,unsigned offset)
 }
 /* amlogic request gpio interface*/
 
-void gpio_amlogic_free(unsigned offset)
+void	 gpio_amlogic_free(struct gpio_chip *chip,unsigned offset)
 {	
 	return;
 }
@@ -815,7 +813,7 @@ int gpio_amlogic_name_to_num(const char *name)
 
 
 
-static int m8b_set_pullup(unsigned pin, int val, unsigned int pullen)
+static int m8b_set_pullup(unsigned int pin,unsigned int val,unsigned int pullen)
 {
 	unsigned int reg=0,bit=0,bit_en=0,ret;
 	ret=m8b_pin_to_pullup(pin,&reg,&bit,&bit_en);

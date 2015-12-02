@@ -108,7 +108,7 @@ void dsp_vsync_int()
 int dsp_main(void)
 {
 	unsigned int machine;
-	//unsigned int cout=0;
+	unsigned int cout=0;
 
 	writel(DSP_CURRENT_RUN,P_AO_RTI_STATUS_REG0);
 

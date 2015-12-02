@@ -28,13 +28,10 @@
 
 #include <amlogic/efuse.h>
 
-extern ssize_t uboot_key_read(char *keyname, char *keydata);
-
 #define UUID_SIZE  32
 
 static char uuid_prefetch[UUID_SIZE] = { 0x00 };
 
-#if 0
 static char twoASCByteToByte(char c1, char c2)
 {   
     char cha;
@@ -55,14 +52,12 @@ static char twoASCByteToByte(char c1, char c2)
     cha = ((cha<<4)|(c2&0x0f));
     return cha;             
 } 
-#endif
 
 // Prefetch the uuid data from nand, efuse, etc
 static int do_uuid_prefetch(cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 {
-	int i,count=1,ret = 0,prefetch_flag = 0;
-	//char tmpbuf[1024],str[1024];
-	char str[1024];
+	int i,j,count=1,ret = 0,prefetch_flag = 0;
+	char tmpbuf[1024],str[1024];
 	//if (argc >= 1)
 	//	return cmd_usage(cmdtp);
 	run_command("secukey nand",0);

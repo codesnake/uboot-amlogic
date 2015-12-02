@@ -33,10 +33,9 @@ int efuse_getinfo(char *title, efuseinfo_item_t *info);
 int efuse_read_usr(char *buf, size_t count, loff_t *ppos);
 int efuse_write_usr(char* buf, size_t count, loff_t* ppos);
 
-/*EFUSE_BYTES,EFUSE_DWORDS move to cpu.h in arch/arm/include/asm/arch-mxx/cpu.h */
 // for m6 and after efuse length
-//#define EFUSE_BYTES				512   //(EFUSE_BITS/8)
-//#define EFUSE_DWORDS		128   //(EFUSE_BITS/32)
+#define EFUSE_BYTES				512   //(EFUSE_BITS/8)
+#define EFUSE_DWORDS		128   //(EFUSE_BITS/32)
 
 #ifdef CONFIG_MESON_TRUSTZONE
 // efuse HAL_API arg

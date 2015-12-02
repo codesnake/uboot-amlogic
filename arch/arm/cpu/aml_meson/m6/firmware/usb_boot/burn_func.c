@@ -140,7 +140,7 @@ unsigned long simple_strtoul(const char *cp,char **endp,unsigned int base)
 	return result;
 }
 
-extern void  memset(void * s,int ,int);
+//extern void * memset(void * s,int c,size_t count);
 u32 checkcum_32(const unsigned char *buf, u32 len)
 {
 	u32 fake_len, chksum = 0;
@@ -583,7 +583,7 @@ int usb_run_command (const char *cmd, char *buffer)
 #endif	//CONFIG_AML_SPL_L1_CACHE_ON
 
 		serial_puts("\naml log : decrypt begin!");
-		aml_m6_sec_boot_check((const unsigned char *)0x8f800000);
+		aml_m6_sec_boot_check(0x8f800000);
 		serial_puts("\naml log : decrypt done!\n");
 		
 #if CONFIG_AML_SPL_L1_CACHE_ON

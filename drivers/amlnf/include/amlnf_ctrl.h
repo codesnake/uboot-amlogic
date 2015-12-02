@@ -64,9 +64,9 @@ static void inline  nand_get_chip(void )
 
 #ifdef CONFIG_NAND_AML_M8
 	// pull up enable
-	   SET_CBUS_REG_MASK(PAD_PULL_UP_EN_REG2, 0x84ff);
+	   SET_CBUS_REG_MASK(PAD_PULL_UP_EN_REG2, 0x85ff);
 	// pull direction, dqs pull down
-	   SET_CBUS_REG_MASK(PAD_PULL_UP_REG2, 0x0400);
+	   SET_CBUS_REG_MASK(PAD_PULL_UP_REG2, 0x0500);
 	   SET_CBUS_REG_MASK(PERIPHS_PIN_MUX_2, ((0x3ff<<18) | (1<<17)));
 #else
 	SET_CBUS_REG_MASK(PREG_PAD_GPIO3_EN_N, 0x3ffff);
@@ -79,8 +79,8 @@ static void inline  nand_get_chip(void )
 static void inline nand_release_chip(void)
 {
 #ifdef CONFIG_NAND_AML_M8
-	CLEAR_CBUS_REG_MASK(PAD_PULL_UP_EN_REG2, 0xf);
-	CLEAR_CBUS_REG_MASK(PAD_PULL_UP_REG2, 0x0400);
+	//CLEAR_CBUS_REG_MASK(PAD_PULL_UP_EN_REG2, 0xf); //do not clear pull-up regs to keep cs0 high level.
+	//CLEAR_CBUS_REG_MASK(PAD_PULL_UP_REG2, 0x0400);
 	CLEAR_CBUS_REG_MASK(PERIPHS_PIN_MUX_2, ((0x3ff<<18) | (1<<17)));
 #else
 	CLEAR_CBUS_REG_MASK(PERIPHS_PIN_MUX_5, ((1<<7) | (1 << 8) | (1 << 9)));

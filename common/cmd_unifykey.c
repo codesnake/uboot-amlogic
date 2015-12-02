@@ -67,69 +67,8 @@ static int do_key_get(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     return 0;
 }
 
-static int do_serialno_get(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
-{
-    int rcode = 0;
-    unsigned reallen = 0;
-    char* keyName = argv[1];
-    char* keyValBuf = NULL;
-    char* buf = NULL;
-    const int keyValMaxLen = 1024;
-
-    rcode = key_drv_init();
-    if(rcode){
-        errorP("fail in key_drv_init\n");
-        return __LINE__;
-    }
-
-    keyValBuf = (char*)malloc(keyValMaxLen);
-    
-    if(!keyValBuf){
-        errorP("malloc failed\n");
-        return __LINE__;
-    }
-    rcode = v2_key_read(keyName, (u8*)keyValBuf, keyValMaxLen/2, keyValBuf + keyValMaxLen/2, &reallen);
-    if(rcode < 0 || !reallen){
-        debugP("failed to read key [%s], rc=%d, reallen=%d\n", keyName, rcode, reallen);
-        free(keyValBuf);
-        return __LINE__;
-    }
-
-    keyValBuf[reallen] = 0;
-
-    buf = (char*)malloc(keyValMaxLen);
-    if(!buf){
-        errorP("malloc failed\n");
-        return __LINE__;
-    }
-    rcode = v2_key_read("mac", (u8*)buf, keyValMaxLen/2, buf + keyValMaxLen/2, &reallen);
-    if(rcode < 0 || !reallen){
-        debugP("failed to read key [%s], rc=%d, reallen=%d\n", keyName, rcode, reallen);
-        free(buf);
-        return __LINE__;
-    }
-    int i,j;
-
-    for(i=0,j=0;buf[i]!='\0';i++)
-    {
-	if(buf[i]!=':')
-	{
-		buf[j++]=buf[i];
-	}
-    }
-    buf[j]='\0';
-    strcat(keyValBuf,&buf[0]);	
-
-    setenv(keyName, keyValBuf);
-
-    free(keyValBuf);
-    free(buf);
-    return 0;
-}
-
 static cmd_tbl_t cmd_key_sub[] = {
 	U_BOOT_CMD_MKENT(get,    4, 0, do_key_get, "", ""),
-	U_BOOT_CMD_MKENT(getserialno,    4, 0, do_serialno_get, "", ""),
 };
 
 static int do_key(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])

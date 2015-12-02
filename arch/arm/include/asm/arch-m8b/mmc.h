@@ -896,8 +896,8 @@
 #define DMC_REG_DEFINE
 #define DMC_REG_BASE       0xc8006000
 
-//#define MMC_Wr(addr,data) *(volatile unsigned long *) (addr ) = data
-//#define MMC_Rd(addr) *(volatile unsigned long *) (addr )
+#define MMC_Wr(addr,data) *(volatile unsigned long *) (addr ) = data
+#define MMC_Rd(addr) *(volatile unsigned long *) (addr )
 //#define writel(v,c) *(volatile unsigned long *) (c ) = v
 //#define readl(c)    *(volatile unsigned long *) (c )
 

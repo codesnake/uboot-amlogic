@@ -503,7 +503,7 @@ int secure_storage_spi_write(char *buf,unsigned int len)
 		printk("spi secure storage not init,please init spi,%s:%d\n",__func__,__LINE__);
 		return -1;
 	}
-	err = spi_securestorage_write(spi_securestorage_flash,(u8 *)buf, len);
+	err = spi_securestorage_write(spi_securestorage_flash,buf, len);
 	return err;
 }
 
@@ -521,7 +521,7 @@ int secure_storage_spi_read(char *buf,unsigned int len)
 	else{
 		size = len;
 	}
-	err = spi_securestorage_read(spi_securestorage_flash,(u8 *)buf, size);
+	err = spi_securestorage_read(spi_securestorage_flash,buf, size);
 	return err;
 }
 

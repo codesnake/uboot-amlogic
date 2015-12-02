@@ -17,7 +17,7 @@
 #define DRIVER_PRODUCT_ID	0xC003
 #define DRIVER_VERSION       0x0100
 
-extern void ipl_memcpy(void*, const void *, __kernel_size_t);
+
 
 #define STRING_MANUFACTURER	1
 #define STRING_PRODUCT		2

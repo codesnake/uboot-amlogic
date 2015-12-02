@@ -424,13 +424,12 @@ void pll_switch(int flag)
 #define         MODE_IRQ_DELAYED_WAKE   1
 #define         MODE_IRQ_ONLY_WAKE      2
 
-#ifndef CONFIG_MESON_SUSPEND
 static void auto_clk_gating_setup(
     unsigned long sleep_dly_tb, unsigned long mode, unsigned long clear_fiq, unsigned long clear_irq,
     unsigned long   start_delay, unsigned long   clock_gate_dly, unsigned long   sleep_time, unsigned long   enable_delay)
 {
 }
-#endif
+
 
 #define ON  1
 #define OFF 0

@@ -47,10 +47,6 @@
 #define POR_1ST_SDIO_C                              3
 #define POR_1ST_SDIO_B                              2
 #define POR_1ST_SDIO_A                              1
-#define POR_1ST_tSD_SDIO_A                          4
-#define POR_1ST_eMMC_SDIO_C                         3
-#define POR_1ST_eMMC_SDIO_A                         2
-#define POR_1ST_tSD_SDIO_C                          1
 #define POR_1ST_NEVER_CHECKED                       0
 
 #define POR_GET_2ND_CFG(a)    ((a>>2)&3)  //por[3:2]
@@ -60,7 +56,7 @@
 #define POR_2ND_NEVER_CHECKED 0
 
 //** ECC mode 7, dma 528 bytes(data+parity),Short mode , no scramble
-//#define DEFAULT_ECC_MODE ((2<<20)|(1<<17)|(7<<14)|(1<<13)|(48<<6)|1)
+#define DEFAULT_ECC_MODE ((2<<20)|(1<<17)|(7<<14)|(1<<13)|(48<<6)|1)
 
 #define C_ROM_BOOT_DEBUG_LOG (volatile unsigned long *)(GL_DATA_ADR + 0xe0)
 //#define DEBUG_EFUSE

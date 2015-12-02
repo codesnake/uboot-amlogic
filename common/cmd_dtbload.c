@@ -15,13 +15,13 @@ int do_dtbload(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     unsigned    offset1;
     unsigned    offset2;
     unsigned    fdt_addr;
-    //int ret;
+    int ret;
     //char dest[11];
 
     if(NULL!= argv[1])
-        hdr = (void *)simple_strtoul(argv[1],NULL,16);
+        hdr = simple_strtoul(argv[1],NULL,16);		
     else
-        hdr = (void *)CONFIG_SYS_LOAD_ADDR;
+        hdr = CONFIG_SYS_LOAD_ADDR;	
 
 #if defined(CONFIG_ANDROID_IMG)	
     boot_img_hdr *hdr_addr = hdr;
@@ -31,7 +31,7 @@ int do_dtbload(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     {
         offset1=(hdr_addr->kernel_size + (hdr_addr->page_size-1)+hdr_addr->page_size)&(~(hdr_addr->page_size -1));
         offset2=(hdr_addr->ramdisk_size + (hdr_addr->page_size-1))&(~(hdr_addr->page_size -1));
-        fdt_addr = (unsigned)hdr_addr + offset1 + offset2;
+        fdt_addr = (void*)((unsigned)hdr_addr + offset1 + offset2);
         if(fdt_check_header((void*)fdt_addr) != 0){
             printf("image data is not a fdt\n");
             return -1;
@@ -45,19 +45,19 @@ int do_dtbload(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
                 return -1;
             } */
 #ifdef CONFIG_DTB_LOAD_ADDR
-			dest_addr = (void *)CONFIG_DTB_LOAD_ADDR;
+			dest_addr = CONFIG_DTB_LOAD_ADDR;
 #else
-			dest_addr = (void *)0x0f000000;
+			dest_addr = 0x0f000000;
 #endif
             //sprintf(dest,"0x%x",dest_addr);
             //setenv("dtbaddr",dest);
-            memcpy(dest_addr,(const void *)fdt_addr,hdr_addr->second_size);
+            memcpy(dest_addr,fdt_addr,hdr_addr->second_size);
             if(fdt_check_header((void*)dest_addr)!= 0){
                 printf("copy error: image data is not a fdt\n");
                 return -1;
             }
             else
-                printf("load dtb file to memory 0x%x\n",(unsigned int)dest_addr);
+                printf("load dtb file to memory 0x%x\n",(void *)dest_addr);
         }
     }
 #endif
@@ -88,12 +88,12 @@ int do_dtbinit(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
         return -1;
     }
 		
-	nodeoffset = fdt_path_offset((const void *)dt_addr, "/mesonfb");
+	nodeoffset = fdt_path_offset(dt_addr, "/mesonfb");
 	if(nodeoffset < 0) {
 		printf(" dts: not find  node %s.\n",fdt_strerror(nodeoffset));
 		return -1;
 	}
-	str = (char *)fdt_getprop((const void *)dt_addr, nodeoffset, "display_size_default", NULL);
+	str = fdt_getprop(dt_addr, nodeoffset, "display_size_default", NULL);
 	if(str == NULL){
 		printf("faild to get resolution\n");
 	}
